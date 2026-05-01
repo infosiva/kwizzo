@@ -20,16 +20,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── Mesh gradient background ──────────────────────────── */
-.mesh-bg {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(124, 58, 237, 0.18) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 110%, rgba(59, 130, 246, 0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 60% at 50% 50%, rgba(16, 8, 40, 0.95) 0%, #080712 100%);
-}
+/* mesh-bg is now inline style in layout.tsx — dynamic per vertical */
 
 /* ── Glass cards ────────────────────────────────────────── */
 .glass {
@@ -71,17 +62,17 @@ body {
 }
 .fade-up { animation: fadeUp 0.5s ease forwards; }
 
-/* ── Pulse glow ─────────────────────────────────────────── */
+/* ── Pulse glow — uses CSS var from layout ──────────────── */
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.15); }
-  50%       { box-shadow: 0 0 40px rgba(139, 92, 246, 0.35); }
+  0%, 100% { box-shadow: 0 0 20px color-mix(in srgb, var(--theme-primary, #7c3aed) 15%, transparent); }
+  50%       { box-shadow: 0 0 40px color-mix(in srgb, var(--theme-primary, #7c3aed) 35%, transparent); }
 }
 .pulse-glow { animation: pulseGlow 3s ease-in-out infinite; }
 
-/* ── Scrollbar ──────────────────────────────────────────── */
+/* ── Scrollbar — uses CSS var from layout ───────────────── */
 ::-webkit-scrollbar       { width: 6px; }
-::-webkit-scrollbar-track { background: #0d0920; }
-::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.4); border-radius: 3px; }
+::-webkit-scrollbar-track { background: var(--theme-base, #0d0920); }
+::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--theme-primary, #7c3aed) 60%, transparent); border-radius: 3px; }
 
 /* ── Custom input styles ────────────────────────────────── */
 .input-dark {
