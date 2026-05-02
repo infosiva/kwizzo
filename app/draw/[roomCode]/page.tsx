@@ -30,6 +30,8 @@ function DrawContent() {
   const [timeLeft,       setTimeLeft]       = useState(DRAW_SECONDS)
   const [showHint,       setShowHint]       = useState(false)
   const [loadError,      setLoadError]      = useState('')
+  const [guessCount,     setGuessCount]     = useState(0)   // total guesses this round
+  const MAX_GUESSES = 5
   const timerRef         = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // Load prompts
@@ -108,10 +110,24 @@ function DrawContent() {
     ...members.map(m => playerPrompts[m.name]?.length ?? 0).filter(n => n > 0),
   ) || 5
 
+  function getWarmCold(attempt: string, word: string): { label: string; color: string } | null {
+    if (!attempt) return null
+    const dist = levenshtein(attempt.toLowerCase(), word.toLowerCase())
+    const overlap = attempt.toLowerCase().split('').filter(c => word.toLowerCase().includes(c)).length
+    const warmScore = (overlap / word.length) * 100 - dist * 10
+    if (dist === 0 || attempt.toLowerCase() === word.toLowerCase()) return null // correct — handled separately
+    if (dist <= 1 || warmScore >= 80) return { label: '🔥 SO close!', color: 'text-orange-400' }
+    if (dist <= 3 || warmScore >= 50) return { label: '♨️ Warm!', color: 'text-amber-400' }
+    if (warmScore >= 20) return { label: '🌡️ Getting warmer', color: 'text-yellow-600' }
+    return { label: '🧊 Cold…', color: 'text-blue-400' }
+  }
+
   function handleGuess() {
     if (!currentPrompt || !guess.trim()) return
     const word    = currentPrompt.word.toLowerCase().trim()
     const attempt = guess.toLowerCase().trim()
+    const newCount = guessCount + 1
+    setGuessCount(newCount)
     // Fuzzy: exact or within 1 edit distance
     const correct = attempt === word ||
       attempt.includes(word) || word.includes(attempt) ||
@@ -119,11 +135,16 @@ function DrawContent() {
     setGuessResult(correct ? 'correct' : 'wrong')
     if (correct) {
       clearInterval(timerRef.current!)
-      // Give point to all guessers who got it right — simplified: just advance
       setScores(prev => prev.map(s =>
         s.name !== drawerName ? { ...s, score: s.score + 1, rounds: [...s.rounds, true] } : s
       ))
       setGameState('round-end')
+    } else if (newCount >= MAX_GUESSES) {
+      // Out of guesses — reveal and move on
+      clearInterval(timerRef.current!)
+      setGameState('round-end')
+    } else {
+      setGuess('') // clear for next attempt
     }
   }
 
@@ -142,6 +163,7 @@ function DrawContent() {
       setDrawerIdx(nextDrawerIdx)
     }
     setGuess('')
+    setGuessCount(0)
     setGuessResult(null)
     setShowWord(false)
     setGameState('drawer-reveal')
@@ -311,7 +333,7 @@ function DrawContent() {
       </div>
 
       {/* Timer bar */}
-      <div className="w-full h-1.5 bg-white/[0.08] rounded-full mb-6 overflow-hidden">
+      <div className="w-full h-2 bg-white/20 rounded-full mb-6 overflow-hidden">
         <div
           className={`h-full rounded-full bg-gradient-to-r ${timerColor} transition-all duration-1000`}
           style={{ width: `${timerPct}%` }}
@@ -349,9 +371,18 @@ function DrawContent() {
 
       {/* Guessers type their answer */}
       <div className={`${theme.card} p-5`}>
-        <p className={`text-xs font-bold ${theme.textAccent} uppercase tracking-widest mb-3`}>
-          {guessers.length > 0 ? `${guessers.map(g => g.name).join(' / ')} — type your guess:` : 'Type your guess:'}
-        </p>
+        <div className="flex items-center justify-between mb-3">
+          <p className={`text-xs font-bold ${theme.textAccent} uppercase tracking-widest`}>
+            {guessers.length > 0 ? `${guessers.map(g => g.name).join(' / ')} — guess:` : 'Type your guess:'}
+          </p>
+          {guessCount > 0 && (
+            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+              MAX_GUESSES - guessCount <= 1 ? 'bg-red-500/20 text-red-400' : 'bg-white/10 text-white/50'
+            }`}>
+              {MAX_GUESSES - guessCount} left
+            </span>
+          )}
+        </div>
         {gameState === 'guessing' || gameState === 'drawing' ? (
           <>
             <div className="flex gap-2">
@@ -372,7 +403,16 @@ function DrawContent() {
                 Guess
               </button>
             </div>
-            {guessResult === 'wrong' && (
+            {/* Warm/cold feedback */}
+            {guessResult === 'wrong' && guess.trim() && (() => {
+              const wc = getWarmCold(guess, currentPrompt?.word ?? '')
+              return wc ? (
+                <div className={`flex items-center gap-2 mt-3 text-sm font-semibold ${wc.color} fade-up`}>
+                  {wc.label}
+                </div>
+              ) : null
+            })()}
+            {guessResult === 'wrong' && !guess.trim() && (
               <div className="flex items-center gap-2 mt-3 text-red-400 text-sm">
                 <XCircle size={16} /> Not quite — keep trying!
               </div>

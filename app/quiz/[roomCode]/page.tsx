@@ -35,13 +35,22 @@ function QuizContent() {
   // Which player is currently answering (round-robin)
   const [activePlayerIdx, setActivePlayerIdx] = useState(0)
   const [members,         setMembers]         = useState<Member[]>([])
+  const [streak,          setStreak]          = useState(0)       // current correct streak
+  const [bestStreak,      setBestStreak]      = useState(0)
+  const [showScorePop,    setShowScorePop]    = useState(false)   // +1 float animation
+  const [answerAnim,      setAnswerAnim]      = useState<'bounce-in' | 'shake' | ''>('')
+  const [answerStartTime, setAnswerStartTime] = useState(0)       // timestamp Q was shown
+  const [fastestSec,      setFastestSec]      = useState<number | null>(null) // fastest answer in seconds
+  const [fastestBy,       setFastestBy]       = useState('')
+  const [qKey,            setQKey]            = useState(0)       // changes on every new Q, triggers stagger animation
 
   const topRef = useRef<HTMLDivElement>(null)
 
-  // Scroll to top whenever a new question loads or a new player starts
+  // Scroll to top + stamp question start time on every new question
   useEffect(() => {
     if (gameState === 'playing') {
       topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      setAnswerStartTime(Date.now())
     }
   }, [currentQ, activePlayerIdx, gameState])
 
@@ -122,13 +131,35 @@ function QuizContent() {
     setSelected(opt)
     setGameState('answered')
 
-    const correct   = opt === q.answer
+    const correct    = opt === q.answer
+    const elapsed    = answerStartTime ? Math.round((Date.now() - answerStartTime) / 1000) : 99
     const activeName = members[activePlayerIdx]?.name ?? scores[0]?.name
+
+    // Streak tracking
+    const newStreak = correct ? streak + 1 : 0
+    setStreak(newStreak)
+    if (newStreak > bestStreak) setBestStreak(newStreak)
+
+    // Fastest answer tracking
+    if (correct && (fastestSec === null || elapsed < fastestSec)) {
+      setFastestSec(elapsed)
+      setFastestBy(displayName(activeName))
+    }
+
+    // Score update
     setScores(prev => prev.map(s =>
       s.name === activeName
         ? { ...s, score: s.score + (correct ? 1 : 0), answers: [...s.answers, correct] }
         : s
     ))
+
+    // Animations
+    setAnswerAnim(correct ? 'bounce-in' : 'shake')
+    if (correct) {
+      setShowScorePop(true)
+      setTimeout(() => setShowScorePop(false), 900)
+    }
+    setTimeout(() => setAnswerAnim(''), 500)
   }
 
   function handleNext() {
@@ -149,6 +180,7 @@ function QuizContent() {
         setActivePlayerIdx(nextPlayerIdx)
         setCurrentQ(0)
         setSelected(null)
+        setStreak(0)
         setGameState('choosing')
       } else {
         setGameState('finished')
@@ -156,6 +188,9 @@ function QuizContent() {
     } else {
       setCurrentQ(nextQ)
       setSelected(null)
+      setStreak(0)
+      setAnswerStartTime(Date.now())
+      setQKey(k => k + 1)
       setGameState('playing')
     }
   }
@@ -164,6 +199,12 @@ function QuizContent() {
     setCurrentQ(0)
     setSelected(null)
     setActivePlayerIdx(0)
+    setStreak(0)
+    setBestStreak(0)
+    setFastestSec(null)
+    setFastestBy('')
+    setQKey(0)
+    setAnswerStartTime(Date.now())
     setScores(prev => prev.map(s => ({ ...s, score: 0, answers: [] })))
     setQuestions([])
     setPlayerQuestions({})
@@ -307,6 +348,24 @@ function QuizContent() {
           </div>
         </div>
 
+        {/* Fun stats strip */}
+        {(bestStreak > 1 || fastestSec !== null) && (
+          <div className="flex gap-3 mb-5 fade-up">
+            {bestStreak > 1 && (
+              <div className={`flex-1 ${theme.card} p-3 rounded-xl text-center`}>
+                <div className="text-2xl font-extrabold text-orange-400">🔥 {bestStreak}</div>
+                <div className="text-white/40 text-xs mt-0.5">best streak</div>
+              </div>
+            )}
+            {fastestSec !== null && (
+              <div className={`flex-1 ${theme.card} p-3 rounded-xl text-center`}>
+                <div className="text-2xl font-extrabold text-cyan-400">⚡ {fastestSec}s</div>
+                <div className="text-white/40 text-xs mt-0.5">fastest answer{fastestBy ? ` by ${fastestBy}` : ''}</div>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="flex flex-col sm:flex-row gap-3 fade-up">
           <button onClick={handlePlayAgain} className={btn.primary + ' flex-1 justify-center py-4'}>
             <RotateCcw size={18} /> Play Again
@@ -324,6 +383,9 @@ function QuizContent() {
   const options   = Object.entries(q.options) as [OptionKey, string][]
   const isCorrect = selected === q.answer
 
+  // Encouragement message based on streak
+  const encouragement = streak >= 5 ? '🔥 On fire!' : streak >= 3 ? '⚡ Streak!' : ''
+
   // ── Playing / Answered ────────────────────────────────────
   return (
     <div ref={topRef} className="min-h-screen px-3 sm:px-4 py-5 sm:py-8 max-w-2xl mx-auto">
@@ -337,12 +399,20 @@ function QuizContent() {
             <div className="text-white/35 text-xs truncate">Age {activeAge} · <span className="capitalize">{topicLabel}</span></div>
           </div>
         </div>
-        {/* Right: Q number */}
-        <div className="shrink-0 text-right">
-          <div className={`text-base font-extrabold ${theme.textAccentBold} tabular-nums leading-tight`}>
-            {currentQ + 1}<span className="text-white/30 font-normal text-sm">/{totalQsForPlayer}</span>
+        {/* Right: Q number + streak */}
+        <div className="shrink-0 text-right flex items-center gap-3">
+          {streak >= 2 && (
+            <div className="text-right">
+              <div className="text-orange-400 font-bold text-sm tabular-nums leading-tight">🔥 {streak}</div>
+              <div className="text-white/25 text-[10px] uppercase tracking-widest">streak</div>
+            </div>
+          )}
+          <div>
+            <div className={`text-base font-extrabold ${theme.textAccentBold} tabular-nums leading-tight`}>
+              {currentQ + 1}<span className="text-white/30 font-normal text-sm">/{totalQsForPlayer}</span>
+            </div>
+            <div className="text-white/25 text-[10px] uppercase tracking-widest">Question</div>
           </div>
-          <div className="text-white/25 text-[10px] uppercase tracking-widest">Question</div>
         </div>
       </div>
 
@@ -352,6 +422,16 @@ function QuizContent() {
           className={`h-full rounded-full bg-gradient-to-r ${theme.gradient} transition-all duration-500`}
           style={{ width: `${progress}%` }}
         />
+      </div>
+
+      {/* Encouragement + score pop */}
+      <div className="relative h-7 mb-1">
+        {encouragement && (
+          <div className="text-center text-sm font-bold text-orange-400 fade-up">{encouragement}</div>
+        )}
+        {showScorePop && (
+          <div className={`absolute right-0 top-0 text-green-400 font-extrabold text-lg score-pop`}>+1</div>
+        )}
       </div>
 
       {/* Difficulty badge */}
@@ -381,14 +461,17 @@ function QuizContent() {
 
       {/* Answer buttons */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-5">
-        {options.map(([key, val]) => {
-          let cardClass = `${theme.card} ${theme.cardHover} p-3.5 sm:p-4 rounded-2xl text-left w-full transition-all duration-200 flex items-start gap-3 cursor-pointer`
+        {options.map(([key, val], idx) => {
+          const isCorrectKey = key === q.answer
+          const isSelectedKey = key === selected
+
+          let cardClass = `${theme.card} ${theme.cardHover} p-3.5 sm:p-4 rounded-2xl text-left w-full transition-all duration-200 flex items-start gap-3 cursor-pointer option-appear`
 
           if (gameState === 'answered') {
-            if (key === q.answer) {
-              cardClass = 'bg-green-500/20 border border-green-500/40 p-3.5 sm:p-4 rounded-2xl text-left w-full flex items-start gap-3'
-            } else if (key === selected) {
-              cardClass = 'bg-red-500/20 border border-red-500/40 p-3.5 sm:p-4 rounded-2xl text-left w-full flex items-start gap-3 opacity-80'
+            if (isCorrectKey) {
+              cardClass = `bg-green-500/20 border border-green-500/40 p-3.5 sm:p-4 rounded-2xl text-left w-full flex items-start gap-3 ${answerAnim && isCorrectKey ? answerAnim : ''}`
+            } else if (isSelectedKey) {
+              cardClass = `bg-red-500/20 border border-red-500/40 p-3.5 sm:p-4 rounded-2xl text-left w-full flex items-start gap-3 opacity-80 ${answerAnim && isSelectedKey ? answerAnim : ''}`
             } else {
               cardClass = 'glass p-3.5 sm:p-4 rounded-2xl text-left w-full flex items-start gap-3 opacity-40'
             }
@@ -396,24 +479,25 @@ function QuizContent() {
 
           return (
             <button
-              key={key}
+              key={`${qKey}-${key}`}
               onClick={() => handleAnswer(key)}
               disabled={gameState === 'answered'}
               className={cardClass}
+              style={gameState === 'playing' ? { animationDelay: `${idx * 60}ms` } : undefined}
             >
-              <span className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${
+              <span className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-colors ${
                 gameState === 'playing'
                   ? `bg-gradient-to-br ${theme.gradient} text-white`
-                  : key === q.answer
+                  : isCorrectKey
                   ? 'bg-green-500 text-white'
-                  : key === selected
+                  : isSelectedKey
                   ? 'bg-red-500 text-white'
                   : 'bg-white/10 text-white/50'
               }`}>
                 {key}
               </span>
               <span className={`text-sm md:text-base leading-snug font-medium pt-1 ${
-                gameState === 'answered' && key !== q.answer && key !== selected
+                gameState === 'answered' && !isCorrectKey && !isSelectedKey
                   ? 'text-white/40'
                   : 'text-white'
               }`}>
@@ -426,14 +510,14 @@ function QuizContent() {
 
       {/* Result + explanation */}
       {gameState === 'answered' && (
-        <div className={`${theme.card} p-5 mb-6 border ${isCorrect ? 'border-green-500/30' : 'border-red-500/30'}`}>
-          <div className={`flex items-center gap-2 font-bold mb-2 ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
+        <div className={`${theme.card} p-5 mb-6 border fade-up ${isCorrect ? 'border-green-500/30' : 'border-red-500/30'}`}>
+          <div className={`flex items-center gap-2 font-bold mb-1 ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
             {isCorrect
-              ? <><CheckCircle size={18} /> Correct! Well done, {displayName(activeName)}!</>
-              : <><XCircle size={18} /> Not quite — the answer is {q.answer}</>
+              ? <><CheckCircle size={18} />{streak >= 3 ? ` ${streak} in a row, ${displayName(activeName)}! 🔥` : ` Correct! Well done, ${displayName(activeName)}!`}</>
+              : <><XCircle size={18} /> Not quite — the answer was <span className="ml-1 px-1.5 py-0.5 bg-white/10 rounded text-white">{q.options[q.answer]}</span></>
             }
           </div>
-          <p className="text-white/60 text-sm leading-relaxed">{q.explanation}</p>
+          <p className="text-white/60 text-sm leading-relaxed mt-2">{q.explanation}</p>
         </div>
       )}
 
