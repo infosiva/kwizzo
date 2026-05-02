@@ -110,23 +110,40 @@ async function generateForPlayer(
   const difficulty = ageToDifficulty(player.age)
   const ageLabel   = player.age <= 12 ? 'child' : player.age <= 17 ? 'teenager' : 'adult'
 
-  const userMessage = `Generate exactly 10 quiz questions on the topic "${topic}" for a ${ageLabel} aged ${player.age}.
+  const difficultyGuide =
+    difficulty === 'easy'
+      ? `EASY (age ${player.age}, child):
+         - Super short, playful questions — like talking to a friend, not a teacher
+         - Use emojis in the question text to make it fun 🐶🎮🍕
+         - Topics: animals, colours, cartoons, food, simple nature, silly facts
+         - Avoid: history dates, geography capitals, science terms — keep it light!
+         - Wrong answers should be funny/silly (not misleading)
+         - Explanation: "Did you know? 🤩" style — one fun wow-fact`
+      : difficulty === 'medium'
+      ? `MEDIUM (age ${player.age}, teenager):
+         - Interesting, not boring — avoid dry textbook style
+         - Pop culture, sports, tech, movies, science facts are great
+         - Moderate vocabulary — no jargon, but not baby talk
+         - Wrong answers should be plausible (not silly)
+         - Explanation: brief and cool, 1-2 sentences`
+      : `HARD (age ${player.age}, adult):
+         - Detailed knowledge, nuanced questions, adult vocabulary
+         - Can reference history, science, geography, economics, culture
+         - Wrong answers should be genuinely tricky
+         - Explanation: concise, informative, 1-2 sentences`
 
-Difficulty level: ${difficulty}
-- easy: simple facts, familiar concepts, short questions, fun language
-- medium: requires some knowledge, moderate vocabulary
-- hard: detailed knowledge, nuanced questions, adult vocabulary
+  const userMessage = `Generate exactly 10 quiz questions on the topic "${topic}" for ${player.name}.
 
-Player name: ${player.name}
+${difficultyGuide}
 
-Return ONLY valid JSON — no markdown, no explanation:
+Return ONLY valid JSON — no markdown, no explanation outside JSON:
 {
   "questions": [
     {
       "question": "string",
       "options": { "A": "string", "B": "string", "C": "string", "D": "string" },
       "answer": "A" | "B" | "C" | "D",
-      "explanation": "fun fact 1-2 sentences at age-appropriate language",
+      "explanation": "age-appropriate fun fact, 1-2 sentences",
       "difficulty": "${difficulty}"
     }
   ]
