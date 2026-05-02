@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useSearchParams, useRouter } from 'next/navigation'
 import { ArrowRight, Trophy, RotateCcw, Home, CheckCircle, XCircle } from 'lucide-react'
 import { theme, btn } from '@/lib/theme'
@@ -35,6 +35,15 @@ function QuizContent() {
   // Which player is currently answering (round-robin)
   const [activePlayerIdx, setActivePlayerIdx] = useState(0)
   const [members,         setMembers]         = useState<Member[]>([])
+
+  const topRef = useRef<HTMLDivElement>(null)
+
+  // Scroll to top whenever a new question loads or a new player starts
+  useEffect(() => {
+    if (gameState === 'playing') {
+      topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [currentQ, activePlayerIdx, gameState])
 
   const loadQuestions = useCallback(async (ms: Member[], topicId: string) => {
     setGameState('loading')
@@ -174,6 +183,8 @@ function QuizContent() {
   const q         = getCurrentQuestion()
   const activeName = members[activePlayerIdx]?.name ?? scores[0]?.name ?? ''
   const activeAge  = members[activePlayerIdx]?.age ?? '?'
+  // Guard: if name is purely numeric (e.g. user typed age in name field), show 'Player'
+  const displayName = (name: string) => /^\d+$/.test(name.trim()) ? 'Player' : (name || 'Player')
   const totalQsForPlayer = (() => {
     const bank = playerQuestions[activeName]?.length ? playerQuestions[activeName] : questions
     return bank.length
@@ -222,7 +233,7 @@ function QuizContent() {
         )}
         <div className="text-6xl mb-6">🎮</div>
         <h2 className="text-3xl font-extrabold text-white mb-2">
-          Your turn, <span className={theme.gradientText}>{activeName}</span>!
+          Your turn, <span className={theme.gradientText}>{displayName(activeName)}</span>!
         </h2>
         <p className="text-white/50 mb-2">Age {activeAge} · {totalQsForPlayer} questions ready for you</p>
         <p className="text-white/30 text-sm mb-10 capitalize">Topic: {topic.replace(/-/g, ' ')}</p>
@@ -315,14 +326,14 @@ function QuizContent() {
 
   // ── Playing / Answered ────────────────────────────────────
   return (
-    <div className="min-h-screen px-3 sm:px-4 py-5 sm:py-8 max-w-2xl mx-auto">
+    <div ref={topRef} className="min-h-screen px-3 sm:px-4 py-5 sm:py-8 max-w-2xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-4 gap-3">
         {/* Left: logo + player info */}
         <div className="flex items-center gap-2.5 min-w-0">
           <span className="text-2xl shrink-0">🧠</span>
           <div className="min-w-0">
-            <div className="text-white font-bold text-sm leading-tight truncate">{activeName || 'Player'}</div>
+            <div className="text-white font-bold text-sm leading-tight truncate">{displayName(activeName)}</div>
             <div className="text-white/35 text-xs truncate">Age {activeAge} · <span className="capitalize">{topicLabel}</span></div>
           </div>
         </div>
@@ -336,7 +347,7 @@ function QuizContent() {
       </div>
 
       {/* Progress bar */}
-      <div className="w-full h-2 bg-white/[0.10] rounded-full mb-5 overflow-hidden">
+      <div className="w-full h-2 bg-white/20 rounded-full mb-5 overflow-hidden">
         <div
           className={`h-full rounded-full bg-gradient-to-r ${theme.gradient} transition-all duration-500`}
           style={{ width: `${progress}%` }}
@@ -354,7 +365,8 @@ function QuizContent() {
             {q.difficulty}
           </span>
         )}
-        <span className={`${theme.badge} px-2.5 py-1 rounded-full text-xs`}>for {activeName}</span>
+        <span className={`${theme.badge} px-2.5 py-1 rounded-full text-xs`}>for {displayName(activeName)}</span>
+        <span className="text-white/25 text-xs">{totalQsForPlayer} questions</span>
       </div>
 
       {/* Question */}
@@ -417,7 +429,7 @@ function QuizContent() {
         <div className={`${theme.card} p-5 mb-6 border ${isCorrect ? 'border-green-500/30' : 'border-red-500/30'}`}>
           <div className={`flex items-center gap-2 font-bold mb-2 ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
             {isCorrect
-              ? <><CheckCircle size={18} /> Correct! Well done, {activeName}!</>
+              ? <><CheckCircle size={18} /> Correct! Well done, {displayName(activeName)}!</>
               : <><XCircle size={18} /> Not quite — the answer is {q.answer}</>
             }
           </div>

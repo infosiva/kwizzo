@@ -19,6 +19,13 @@ function ageToDifficulty(age: number): 'easy' | 'medium' | 'hard' {
   return 'hard'
 }
 
+// How many questions per difficulty level
+function difficultyToCount(difficulty: 'easy' | 'medium' | 'hard'): number {
+  if (difficulty === 'easy')   return 8   // shorter — kids lose focus
+  if (difficulty === 'medium') return 10  // standard
+  return 12                               // adults get the full challenge
+}
+
 // Shared fallback questions (one set, used if AI fails)
 const FALLBACK_QUESTIONS: Question[] = [
   {
@@ -138,7 +145,9 @@ GOAL: Genuinely challenging — not just obscure, but satisfyingly hard.
 - Wrong answers must be plausible — no obvious throwaways
 - Explanation: concise and informative, adds context they didn't know`
 
-  const userMessage = `Generate exactly 10 quiz questions on the topic "${topic}" for ${player.name}.
+  const count = difficultyToCount(difficulty)
+
+  const userMessage = `Generate exactly ${count} quiz questions on the topic "${topic}" for ${player.name}.
 
 ${difficultyGuide}
 
@@ -173,7 +182,7 @@ Return ONLY valid JSON — no markdown, no explanation outside JSON:
 
   if (valid.length < 3) throw new Error('Too few valid questions')
 
-  return valid.slice(0, 10).map(q => ({ ...q, forPlayer: player.name }))
+  return valid.slice(0, count).map(q => ({ ...q, forPlayer: player.name }))
 }
 
 export async function POST(req: NextRequest) {
