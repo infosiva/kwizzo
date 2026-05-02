@@ -317,18 +317,21 @@ function QuizContent() {
   return (
     <div className="min-h-screen px-3 sm:px-4 py-5 sm:py-8 max-w-2xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-5 gap-3">
+      <div className="flex items-center justify-between mb-4 gap-3">
+        {/* Left: logo + player info */}
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${theme.gradient} flex items-center justify-center text-white font-bold text-sm shrink-0`}>
-            {activeName?.[0]?.toUpperCase() ?? '?'}
-          </div>
+          <span className="text-2xl shrink-0">🧠</span>
           <div className="min-w-0">
-            <div className="text-white font-semibold text-sm leading-tight truncate">{activeName || 'Player'}</div>
-            <div className="text-white/35 text-xs">Age {activeAge} · <span className="capitalize">{topicLabel}</span></div>
+            <div className="text-white font-bold text-sm leading-tight truncate">{activeName || 'Player'}</div>
+            <div className="text-white/35 text-xs truncate">Age {activeAge} · <span className="capitalize">{topicLabel}</span></div>
           </div>
         </div>
-        <div className={`text-sm font-bold ${theme.textAccentBold} shrink-0 tabular-nums`}>
-          {currentQ + 1}<span className="text-white/30">/{totalQsForPlayer}</span>
+        {/* Right: Q number */}
+        <div className="shrink-0 text-right">
+          <div className={`text-base font-extrabold ${theme.textAccentBold} tabular-nums leading-tight`}>
+            {currentQ + 1}<span className="text-white/30 font-normal text-sm">/{totalQsForPlayer}</span>
+          </div>
+          <div className="text-white/25 text-[10px] uppercase tracking-widest">Question</div>
         </div>
       </div>
 
