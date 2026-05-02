@@ -213,50 +213,54 @@ function PlayContent() {
 
           {/* Players */}
           <div>
-            <label className="block text-white/50 text-xs font-semibold mb-1 uppercase tracking-wider">Players</label>
-            <p className="text-white/30 text-xs mb-3">
-              {gameType === 'draw'
-                ? 'Add everyone playing — AI picks age-appropriate words for each'
-                : 'Add players — AI adapts quiz difficulty to each person\'s age'}
-            </p>
-            {/* Column headers */}
-            <div className="flex gap-2 mb-1">
-              <div className="flex-1 text-[10px] text-white/30 uppercase tracking-wider pl-1">Name</div>
-              <div className="w-16 text-[10px] text-white/30 uppercase tracking-wider text-center">Age</div>
-              {members.length > 1 && <div className="w-6" />}
-            </div>
-            <div className="space-y-2.5">
+            <label className="block text-white/50 text-xs font-semibold mb-3 uppercase tracking-wider">
+              Who's playing?
+            </label>
+            <div className="space-y-2">
               {members.map((m, i) => (
-                <div key={i} className="flex gap-2 items-center">
+                <div key={i} className="rounded-2xl bg-white/[0.04] border border-white/[0.07] p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-base">👤</span>
+                    <span className="text-white/40 text-xs font-semibold uppercase tracking-wider">
+                      {i === 0 ? 'Player 1' : `Player ${i + 1}`}
+                    </span>
+                    {members.length > 1 && (
+                      <button
+                        onClick={() => removeMember(i)}
+                        className="ml-auto text-white/20 hover:text-red-400 transition-colors p-0.5"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
+                  </div>
                   <input
-                    className="input-dark flex-1 py-2.5 text-sm"
-                    placeholder={i === 0 ? 'e.g. Sam' : `Player ${i + 1}`}
+                    className="input-dark w-full py-3 text-base mb-2"
+                    placeholder={i === 0 ? 'e.g. Sam' : 'Name'}
                     value={m.name}
                     onChange={e => updateMember(i, 'name', e.target.value)}
                   />
-                  <input
-                    className="input-dark w-16 py-2.5 text-sm text-center"
-                    type="number"
-                    placeholder="8"
-                    min="3"
-                    max="110"
-                    value={m.age}
-                    onChange={e => updateMember(i, 'age', e.target.value)}
-                  />
-                  {members.length > 1 && (
-                    <button onClick={() => removeMember(i)} className="text-white/25 hover:text-red-400 transition-colors p-1">
-                      <Trash2 size={15} />
-                    </button>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <span className="text-white/30 text-xs shrink-0">Age</span>
+                    <input
+                      className="input-dark w-20 py-2.5 text-base text-center font-semibold"
+                      type="number"
+                      placeholder="8"
+                      min="3"
+                      max="110"
+                      value={m.age}
+                      onChange={e => updateMember(i, 'age', e.target.value)}
+                    />
+                    <span className="text-white/20 text-xs">years old</span>
+                  </div>
                 </div>
               ))}
             </div>
-            <p className="text-white/20 text-[11px] mt-2">Name + age — AI personalises for each player</p>
+
             <button
               onClick={addMember}
-              className={`mt-3 flex items-center gap-1.5 text-xs ${theme.textAccent} hover:opacity-70 transition-opacity`}
+              className="mt-3 w-full py-3 rounded-2xl border border-dashed border-white/[0.12] text-white/40 hover:text-white/70 hover:border-white/20 transition-all text-sm flex items-center justify-center gap-2"
             >
-              <Plus size={14} /> Add player
+              <Plus size={15} /> Add another player
             </button>
           </div>
 
