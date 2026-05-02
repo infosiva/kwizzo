@@ -158,7 +158,7 @@ const config: VerticalConfig = {
   id:         'kwizzo',
   name:       'Kwizzo',
   tagline:    'The family quiz game where every age wins — powered by AI',
-  domain:     'kwizzo.ai',
+  domain:     'kwizzo.app',
   themeColor: 'violet',
 
   toolType:  'game',
@@ -224,7 +224,7 @@ export const AI_TOOL_PRESETS: Record<string, AiToolConfig> = {
     id:         'kwizzo',
     name:       'Kwizzo',
     tagline:    'The family quiz game where every age wins — powered by AI',
-    domain:     'kwizzo.ai',
+    domain:     'kwizzo.app',
     themeColor: 'violet',
     toolType:   'game',
     ageGroups:  ['family'],
@@ -258,13 +258,13 @@ Adapt difficulty by player age: kids (5-12) easy, teens (13-17) medium, adults (
     keywords:        ['family quiz', 'ai quiz game', 'kwizzo', 'kids quiz', 'multiplayer quiz'],
   },
 
-  // Option B — Nudge: AI Personal Tutor
-  nudge: {
+  // Option B — Tutiq: AI Personal Tutor
+  tutiq: {
     mode:       'ai-tool',
-    id:         'nudge',
-    name:       'Nudge',
-    tagline:    'The AI that nudges you forward — learn anything, at your pace, your level',
-    domain:     'nudgeai.com',
+    id:         'tutiq',
+    name:       'Tutiq',
+    tagline:    'Your AI tutor that adapts to you — learn anything, at your pace, your level',
+    domain:     'tutiq.app',
     themeColor: 'emerald',
     toolType:   'tutor',
     ageGroups:  ['kids', 'teens', 'adults'],
@@ -302,13 +302,13 @@ Return JSON: { questions: [{ type, question, options?, answer, explanation }] }`
     keywords:        ['ai tutor', 'personalised learning', 'nudge ai', 'ai teacher', 'learn online', 'kids tutor'],
   },
 
-  // Option C — Questly: Live AI Classroom Quiz
-  questly: {
+  // Option C — QuizBites: Live AI Classroom Quiz
+  quizbites: {
     mode:       'ai-tool',
-    id:         'questly',
-    name:       'Questly',
-    tagline:    'Start a quest — AI generates your live quiz, your class competes in real time',
-    domain:     'questly.ai',
+    id:         'quizbites',
+    name:       'QuizBites',
+    tagline:    'Bite-sized AI quizzes — host a live session, your group competes in real time',
+    domain:     'quizbites.app',
     themeColor: 'blue',
     toolType:   'quiz',
     ageGroups:  ['kids', 'teens', 'adults', 'all'],
