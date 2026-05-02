@@ -54,6 +54,9 @@ function PlayContent() {
     if (gameType === 'quiz' && !subject) { setError('Pick a topic first.'); return }
     const validMembers = members.filter(m => m.name.trim() && m.age)
     if (validMembers.length < 1) { setError('Add at least one player with a name and age.'); return }
+    // Catch accidental number-as-name (e.g. typing age in name field)
+    const numericName = validMembers.find(m => /^\d+$/.test(m.name.trim()))
+    if (numericName) { setError(`"${numericName.name}" doesn't look like a name — enter a name in the first box, age in the second.`); return }
     if (gameType === 'draw' && validMembers.length < 2) {
       setError('Draw & Guess needs at least 2 players.')
       return
@@ -216,22 +219,25 @@ function PlayContent() {
                 ? 'Add everyone playing — AI picks age-appropriate words for each'
                 : 'Add players — AI adapts quiz difficulty to each person\'s age'}
             </p>
+            {/* Column headers */}
+            <div className="flex gap-2 mb-1">
+              <div className="flex-1 text-[10px] text-white/30 uppercase tracking-wider pl-1">Name</div>
+              <div className="w-16 text-[10px] text-white/30 uppercase tracking-wider text-center">Age</div>
+              {members.length > 1 && <div className="w-6" />}
+            </div>
             <div className="space-y-2.5">
               {members.map((m, i) => (
                 <div key={i} className="flex gap-2 items-center">
-                  <div className="flex-1 relative">
-                    <input
-                      className="input-dark w-full py-2.5 text-sm pr-10"
-                      placeholder={i === 0 ? 'Your name (e.g. Sam)' : `Player ${i + 1} name`}
-                      value={m.name}
-                      onChange={e => updateMember(i, 'name', e.target.value)}
-                    />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 text-xs pointer-events-none">👤</span>
-                  </div>
+                  <input
+                    className="input-dark flex-1 py-2.5 text-sm"
+                    placeholder={i === 0 ? 'e.g. Sam' : `Player ${i + 1}`}
+                    value={m.name}
+                    onChange={e => updateMember(i, 'name', e.target.value)}
+                  />
                   <input
                     className="input-dark w-16 py-2.5 text-sm text-center"
                     type="number"
-                    placeholder="Age"
+                    placeholder="8"
                     min="3"
                     max="110"
                     value={m.age}

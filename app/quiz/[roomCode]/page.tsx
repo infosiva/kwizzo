@@ -336,7 +336,7 @@ function QuizContent() {
       </div>
 
       {/* Progress bar */}
-      <div className="w-full h-1.5 bg-white/[0.08] rounded-full mb-8 overflow-hidden">
+      <div className="w-full h-2 bg-white/[0.10] rounded-full mb-5 overflow-hidden">
         <div
           className={`h-full rounded-full bg-gradient-to-r ${theme.gradient} transition-all duration-500`}
           style={{ width: `${progress}%` }}
