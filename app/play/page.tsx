@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Plus, Trash2, ArrowRight, Users, Zap, Pencil } from 'lucide-react'
 import config from '@/vertical.config'
@@ -28,6 +28,7 @@ function PlayContent() {
   const [members,  setMembers]  = useState<Member[]>([{ name: '', age: '' }])
   const [subject,  setSubject]  = useState(defaultSubject)
   const [creating, setCreating] = useState(false)
+  const playersRef = useRef<HTMLDivElement>(null)
   const [error,    setError]    = useState('')
   const [roomCode, setRoomCode] = useState('')
   const [joinError,setJoinError]= useState('')
@@ -179,7 +180,10 @@ function PlayContent() {
                 {SUBJECTS.map(s => (
                   <button
                     key={s.id}
-                    onClick={() => setSubject(s.id)}
+                    onClick={() => {
+                      setSubject(s.id)
+                      setTimeout(() => playersRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80)
+                    }}
                     className={`p-3 rounded-xl text-left flex items-center gap-2 text-sm transition-all ${
                       subject === s.id
                         ? `bg-gradient-to-r ${theme.gradient} text-white font-semibold shadow`
@@ -212,7 +216,7 @@ function PlayContent() {
           )}
 
           {/* Players */}
-          <div>
+          <div ref={playersRef}>
             <label className="block text-white/50 text-xs font-semibold mb-3 uppercase tracking-wider">
               Who's playing?
             </label>

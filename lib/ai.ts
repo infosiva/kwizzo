@@ -66,7 +66,7 @@ export async function aiChat(messages: Msg[], systemPrompt?: string): Promise<st
           model:       GROQ_PRIMARY,
           messages:    groqMsgs,
           max_tokens:  3000,
-          temperature: 0.7,
+          temperature: 0.95,
         }),
         TIMEOUT, 'Groq primary'
       )
@@ -80,9 +80,10 @@ export async function aiChat(messages: Msg[], systemPrompt?: string): Promise<st
     try {
       const res = await withTimeout(
         groq().chat.completions.create({
-          model:      GROQ_FALLBACK,
-          messages:   groqMsgs,
-          max_tokens: 3000,
+          model:       GROQ_FALLBACK,
+          messages:    groqMsgs,
+          max_tokens:  3000,
+          temperature: 0.95,
         }),
         TIMEOUT, 'Groq fallback'
       )

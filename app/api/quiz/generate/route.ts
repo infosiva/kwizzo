@@ -146,8 +146,10 @@ GOAL: Genuinely challenging — not just obscure, but satisfyingly hard.
 - Explanation: concise and informative, adds context they didn't know`
 
   const count = difficultyToCount(difficulty)
+  // Random token injected into every call so LLM never serves the same set twice
+  const seed = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`
 
-  const userMessage = `Generate exactly ${count} quiz questions on the topic "${topic}" for ${player.name}.
+  const userMessage = `[run:${seed}] Generate exactly ${count} FRESH quiz questions on the topic "${topic}" for ${player.name}. Every run must produce a completely different set — vary the subtopics, angles, and question styles each time.
 
 ${difficultyGuide}
 

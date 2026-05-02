@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useParams, useSearchParams, useRouter } from 'next/navigation'
 import { ArrowRight, Trophy, RotateCcw, Home, CheckCircle, XCircle } from 'lucide-react'
 import { theme, btn } from '@/lib/theme'
@@ -380,7 +380,16 @@ function QuizContent() {
 
   if (!q) return null
 
-  const options   = Object.entries(q.options) as [OptionKey, string][]
+  // Shuffle options once per question (keyed by qKey so stable across re-renders)
+  const options = useMemo(() => {
+    const arr = Object.entries(q.options) as [OptionKey, string][]
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]]
+    }
+    return arr
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [qKey, currentQ, activePlayerIdx])
   const isCorrect = selected === q.answer
 
   // Encouragement message based on streak
