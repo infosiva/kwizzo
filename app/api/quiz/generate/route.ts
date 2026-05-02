@@ -112,25 +112,31 @@ async function generateForPlayer(
 
   const difficultyGuide =
     difficulty === 'easy'
-      ? `EASY (age ${player.age}, child):
-         - Super short, playful questions — like talking to a friend, not a teacher
-         - Use emojis in the question text to make it fun 🐶🎮🍕
-         - Topics: animals, colours, cartoons, food, simple nature, silly facts
-         - Avoid: history dates, geography capitals, science terms — keep it light!
-         - Wrong answers should be funny/silly (not misleading)
-         - Explanation: "Did you know? 🤩" style — one fun wow-fact`
+      ? `EASY — for ${player.name}, age ${player.age} (child):
+GOAL: Make them laugh and say "wow!" — not feel like school.
+- Short fun questions, conversational tone, emoji in the question ✅
+- Great themes for this age: animals 🐾, Minecraft/Roblox/gaming 🎮, food 🍕, superheroes, Pokémon, nature surprises
+- Questions like: "Which animal sleeps standing up? 🐴" or "What colour is a flamingo? 🦩"
+- Wrong answers: make 1-2 of them obviously silly/funny (e.g. "a flying pizza")
+- Avoid: dates, capitals, science vocab, anything that sounds like homework
+- Explanation: start with "Did you know? 🤩" — one surprising fun fact in simple words`
       : difficulty === 'medium'
-      ? `MEDIUM (age ${player.age}, teenager):
-         - Interesting, not boring — avoid dry textbook style
-         - Pop culture, sports, tech, movies, science facts are great
-         - Moderate vocabulary — no jargon, but not baby talk
-         - Wrong answers should be plausible (not silly)
-         - Explanation: brief and cool, 1-2 sentences`
-      : `HARD (age ${player.age}, adult):
-         - Detailed knowledge, nuanced questions, adult vocabulary
-         - Can reference history, science, geography, economics, culture
-         - Wrong answers should be genuinely tricky
-         - Explanation: concise, informative, 1-2 sentences`
+      ? `MEDIUM — for ${player.name}, age ${player.age} (teenager):
+GOAL: Cool, current, slightly challenging — nothing cringe or outdated.
+- Reference 2024/2025 culture: AI tools, viral moments, streaming shows, esports, TikTok trends (tasteful), space news
+- Sports: Premier League, NBA, Olympics 2024, F1
+- Tech: ChatGPT, iPhones, gaming (Fortnite, Minecraft, FIFA), YouTube
+- Science: cool recent discoveries, space, climate, biology facts that surprise
+- Questions should feel like something a smart friend would ask, not a teacher
+- Wrong answers: plausible but clearly wrong on reflection
+- Explanation: one cool "here's why" sentence — casual tone`
+      : `HARD — for ${player.name}, age ${player.age} (adult):
+GOAL: Genuinely challenging — not just obscure, but satisfyingly hard.
+- Mix depth with breadth: history, world geography, science, economics, literature, current affairs 2024/2025
+- Go beyond surface knowledge — ask about causes, mechanisms, comparisons
+- Include some questions about modern AI, geopolitics, climate, tech industry
+- Wrong answers must be plausible — no obvious throwaways
+- Explanation: concise and informative, adds context they didn't know`
 
   const userMessage = `Generate exactly 10 quiz questions on the topic "${topic}" for ${player.name}.
 

@@ -77,7 +77,7 @@ function PlayContent() {
   }
 
   return (
-    <div className="min-h-screen px-4 py-10 max-w-xl mx-auto">
+    <div className="min-h-screen px-3 sm:px-4 py-8 sm:py-10 max-w-xl mx-auto">
 
       {/* Header */}
       <div className="text-center mb-8 fade-up">

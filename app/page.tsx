@@ -18,7 +18,7 @@ export default function HomePage() {
     <div className="overflow-hidden">
 
       {/* ── HERO ─────────────────────────────────────────── */}
-      <section className="relative px-6 pt-16 pb-20 max-w-4xl mx-auto text-center">
+      <section className="relative px-4 sm:px-6 pt-10 sm:pt-16 pb-12 sm:pb-20 max-w-4xl mx-auto text-center">
         {/* Soft glow blob */}
         <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full opacity-15 blur-3xl -z-10 bg-gradient-to-br ${theme.gradient}`} />
 
@@ -27,12 +27,12 @@ export default function HomePage() {
             <Sparkles size={11} /> AI-powered · Free to play
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight tracking-tight mb-5">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold leading-tight tracking-tight mb-4">
             <span className="text-white">Quiz anyone,</span><br />
             <span className={theme.gradientText}>any age.</span>
           </h1>
 
-          <p className="text-white/50 text-lg mb-8 max-w-xl mx-auto leading-relaxed">
+          <p className="text-white/50 text-base sm:text-lg mb-6 sm:mb-8 max-w-xl mx-auto leading-relaxed">
             Pick a topic, add your players. AI creates age-perfect questions for each person — play solo, with family, or with friends online.
           </p>
 
@@ -56,7 +56,7 @@ export default function HomePage() {
       </section>
 
       {/* ── TOPIC GRID ────────────────────────────────────── */}
-      <section id="subjects" className="py-14 px-6 max-w-5xl mx-auto">
+      <section id="subjects" className="py-10 sm:py-14 px-4 sm:px-6 max-w-5xl mx-auto">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-white mb-2">Choose a topic</h2>
           <p className="text-white/40 text-sm">AI generates fresh questions every game</p>
@@ -77,7 +77,7 @@ export default function HomePage() {
       </section>
 
       {/* ── HOW IT WORKS ──────────────────────────────────── */}
-      <section id="how-it-works" className="py-14 px-6 glass border-y border-white/[0.05]">
+      <section id="how-it-works" className="py-10 sm:py-14 px-4 sm:px-6 glass border-y border-white/[0.05]">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-2xl font-bold text-white mb-2">How it works</h2>
@@ -104,7 +104,7 @@ export default function HomePage() {
       </section>
 
       {/* ── FEATURES ──────────────────────────────────────── */}
-      <section className="py-14 px-6 max-w-5xl mx-auto">
+      <section className="py-10 sm:py-14 px-4 sm:px-6 max-w-5xl mx-auto">
         <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
           {FEATURES.map(f => (
             <div key={f.title} className={`${theme.card} p-5 flex flex-col gap-3 rounded-2xl`}>
@@ -121,8 +121,8 @@ export default function HomePage() {
       </section>
 
       {/* ── CTA ───────────────────────────────────────────── */}
-      <section className="py-16 px-6">
-        <div className={`max-w-2xl mx-auto text-center glass rounded-3xl p-10 border ${theme.border} relative overflow-hidden`}>
+      <section className="py-10 sm:py-16 px-4 sm:px-6">
+        <div className={`max-w-2xl mx-auto text-center glass rounded-3xl p-6 sm:p-10 border ${theme.border} relative overflow-hidden`}>
           <div className={`absolute inset-0 bg-gradient-to-br ${theme.gradient} opacity-5 rounded-3xl`} />
           <div className="text-4xl mb-4 relative">🧠</div>
           <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-3 relative">Ready to play?</h2>

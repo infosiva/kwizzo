@@ -183,18 +183,20 @@ function QuizContent() {
     : 0
   const sortedScores = [...scores].sort((a, b) => b.score - a.score)
 
+  const topicLabel = topic.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+
   // ── Loading ───────────────────────────────────────────────
   if (gameState === 'loading') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center">
-        <div className="text-6xl mb-6 float">🤖</div>
-        <h2 className="text-2xl font-bold text-white mb-3">KwizBot is generating questions…</h2>
-        <p className="text-white/50 mb-2">Creating age-perfect questions for each player</p>
-        <p className="text-white/30 text-sm mb-8">This takes a few seconds — personalised for every age group</p>
+        <div className="text-5xl mb-5 float">🤖</div>
+        <h2 className="text-xl font-bold text-white mb-2">Cooking up your quiz…</h2>
+        <p className="text-white/40 text-sm mb-1 capitalize">Topic: <span className="text-white/60">{topicLabel}</span></p>
+        <p className="text-white/30 text-xs mb-8">Personalising for each player's age — takes a few seconds</p>
         {loadError ? (
-          <div className="space-y-4">
+          <div className="space-y-3">
             <p className="text-red-400 text-sm px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20">{loadError}</p>
-            <button onClick={() => router.push('/play')} className={btn.secondary}>Back to Game Hub</button>
+            <button onClick={() => router.push('/play')} className={btn.secondary}>← Back</button>
           </div>
         ) : (
           <div className="flex gap-2 justify-center">
@@ -313,17 +315,17 @@ function QuizContent() {
 
   // ── Playing / Answered ────────────────────────────────────
   return (
-    <div className="min-h-screen px-4 py-8 max-w-2xl mx-auto">
+    <div className="min-h-screen px-3 sm:px-4 py-5 sm:py-8 max-w-2xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <div className={`text-xs font-bold ${theme.textAccent} uppercase tracking-widest`}>{familyName}</div>
-          <div className="text-white/40 text-sm">
-            Now playing: <span className="text-white/70 font-semibold">{activeName}</span>
+      <div className="flex items-center justify-between mb-5 gap-2">
+        <div className="min-w-0">
+          <div className={`text-[10px] font-bold ${theme.textAccent} uppercase tracking-widest truncate`}>{familyName}</div>
+          <div className="text-white/40 text-sm truncate">
+            <span className="text-white/70 font-semibold">{activeName}</span>
             <span className="text-white/30"> · Age {activeAge}</span>
           </div>
         </div>
-        <div className={`text-sm font-bold ${theme.textAccentBold}`}>
+        <div className={`text-sm font-bold ${theme.textAccentBold} shrink-0`}>
           {currentQ + 1} / {totalQsForPlayer}
         </div>
       </div>
@@ -336,44 +338,42 @@ function QuizContent() {
         />
       </div>
 
-      {/* Room code + difficulty badge */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className={`${theme.badge} inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs`}>
-          Room: {roomCode}
-        </div>
+      {/* Difficulty badge */}
+      <div className="flex items-center gap-2 mb-4">
         {q.difficulty && (
           <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
             q.difficulty === 'easy'   ? 'bg-green-500/20 text-green-400' :
             q.difficulty === 'medium' ? 'bg-amber-500/20 text-amber-400' :
                                         'bg-red-500/20 text-red-400'
           }`}>
-            {q.difficulty} · for {activeName}
+            {q.difficulty}
           </span>
         )}
+        <span className={`${theme.badge} px-2.5 py-1 rounded-full text-xs`}>for {activeName}</span>
       </div>
 
       {/* Question */}
-      <div className={`${theme.card} p-6 md:p-8 mb-6`}>
-        <div className={`text-xs font-bold ${theme.textAccent} uppercase tracking-widest mb-4`}>
+      <div className={`${theme.card} p-5 md:p-8 mb-5`}>
+        <div className={`text-xs font-bold ${theme.textAccent} uppercase tracking-widest mb-3`}>
           Question {currentQ + 1}
         </div>
-        <p className="text-2xl md:text-3xl font-bold text-white leading-tight">
+        <p className="text-xl md:text-3xl font-bold text-white leading-tight">
           {q.question}
         </p>
       </div>
 
       {/* Answer buttons */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-5">
         {options.map(([key, val]) => {
-          let cardClass = `${theme.card} ${theme.cardHover} p-4 md:p-5 rounded-2xl text-left w-full transition-all duration-200 flex items-start gap-3 cursor-pointer`
+          let cardClass = `${theme.card} ${theme.cardHover} p-3.5 sm:p-4 rounded-2xl text-left w-full transition-all duration-200 flex items-start gap-3 cursor-pointer`
 
           if (gameState === 'answered') {
             if (key === q.answer) {
-              cardClass = 'bg-green-500/20 border border-green-500/40 p-4 md:p-5 rounded-2xl text-left w-full flex items-start gap-3'
+              cardClass = 'bg-green-500/20 border border-green-500/40 p-3.5 sm:p-4 rounded-2xl text-left w-full flex items-start gap-3'
             } else if (key === selected) {
-              cardClass = 'bg-red-500/20 border border-red-500/40 p-4 md:p-5 rounded-2xl text-left w-full flex items-start gap-3 opacity-80'
+              cardClass = 'bg-red-500/20 border border-red-500/40 p-3.5 sm:p-4 rounded-2xl text-left w-full flex items-start gap-3 opacity-80'
             } else {
-              cardClass = 'glass p-4 md:p-5 rounded-2xl text-left w-full flex items-start gap-3 opacity-40'
+              cardClass = 'glass p-3.5 sm:p-4 rounded-2xl text-left w-full flex items-start gap-3 opacity-40'
             }
           }
 
@@ -439,7 +439,7 @@ function QuizContent() {
           <div className="text-xs text-white/30 mb-3 uppercase tracking-widest">Scores</div>
           <div className="flex flex-wrap gap-2">
             {[...scores].sort((a, b) => b.score - a.score).map(s => (
-              <div key={s.name} className={`${theme.card} px-3 py-2 rounded-xl flex items-center gap-2 ${s.name === activeName ? `ring-1 ring-${theme.solid}` : ''}`}>
+              <div key={s.name} className={`${theme.card} px-3 py-2 rounded-xl flex items-center gap-2 ${s.name === activeName ? 'ring-1 ring-violet-400' : ''}`}>
                 <span className="text-white/70 text-xs font-medium">{s.name}</span>
                 <span className={`${theme.textAccent} font-bold text-sm`}>{s.score}</span>
                 {s.name === activeName && <span className="text-[10px] text-white/30">playing</span>}
