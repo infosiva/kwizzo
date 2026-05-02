@@ -28,10 +28,12 @@ function PlayContent() {
   const [members,  setMembers]  = useState<Member[]>([{ name: '', age: '' }])
   const [subject,  setSubject]  = useState(defaultSubject)
   const [creating, setCreating] = useState(false)
-  const playersRef = useRef<HTMLDivElement>(null)
   const [error,    setError]    = useState('')
   const [roomCode, setRoomCode] = useState('')
   const [joinError,setJoinError]= useState('')
+
+  const playersRef  = useRef<HTMLDivElement>(null)
+  const joinInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     try {
@@ -43,6 +45,13 @@ function PlayContent() {
     } catch { /* ignore */ }
   }, [])
 
+  // Auto-focus join input when Join tab selected
+  useEffect(() => {
+    if (mode === 'join') {
+      setTimeout(() => joinInputRef.current?.focus(), 100)
+    }
+  }, [mode])
+
   function addMember()    { setMembers(prev => [...prev, { name: '', age: '' }]) }
   function removeMember(i: number) { setMembers(prev => prev.filter((_, idx) => idx !== i)) }
   function updateMember(i: number, field: keyof Member, value: string) {
@@ -50,14 +59,19 @@ function PlayContent() {
   }
   function generateCode() { return String(Math.floor(1000 + Math.random() * 9000)) }
 
+  function selectSubject(id: string) {
+    setSubject(id)
+    setError('')
+    setTimeout(() => playersRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100)
+  }
+
   async function handleStart() {
     setError('')
     if (gameType === 'quiz' && !subject) { setError('Pick a topic first.'); return }
     const validMembers = members.filter(m => m.name.trim() && m.age)
     if (validMembers.length < 1) { setError('Add at least one player with a name and age.'); return }
-    // Catch accidental number-as-name (e.g. typing age in name field)
     const numericName = validMembers.find(m => /^\d+$/.test(m.name.trim()))
-    if (numericName) { setError(`"${numericName.name}" doesn't look like a name — enter a name in the first box, age in the second.`); return }
+    if (numericName) { setError(`"${numericName.name}" doesn't look like a name — enter a name, then age.`); return }
     if (gameType === 'draw' && validMembers.length < 2) {
       setError('Draw & Guess needs at least 2 players.')
       return
@@ -94,7 +108,7 @@ function PlayContent() {
   const isSetup = mode === 'solo' || mode === 'group'
 
   return (
-    <div className="min-h-screen px-3 sm:px-4 py-8 sm:py-10 max-w-xl mx-auto">
+    <div className="min-h-screen px-3 sm:px-4 py-8 sm:py-10 max-w-xl mx-auto pb-32">
 
       {/* Header */}
       <div className="text-center mb-7 fade-up">
@@ -154,12 +168,14 @@ function PlayContent() {
           <h2 className="text-base font-bold text-white mb-1">Join a game</h2>
           <p className="text-white/40 text-xs mb-5">Enter the 4-digit code from the host</p>
           <input
+            ref={joinInputRef}
             className="input-dark text-center text-3xl font-bold tracking-widest mb-4"
             placeholder="0000"
             maxLength={4}
             value={roomCode}
             onChange={e => setRoomCode(e.target.value.replace(/\D/g, '').slice(0, 4))}
             onKeyDown={e => e.key === 'Enter' && handleJoin()}
+            inputMode="numeric"
           />
           {joinError && <p className="text-red-400 text-xs mb-3">{joinError}</p>}
           <button onClick={handleJoin} className={btn.primary + ' w-full justify-center py-3'}>
@@ -175,18 +191,17 @@ function PlayContent() {
           {/* Topic — quiz only */}
           {gameType === 'quiz' && (
             <div>
-              <label className="block text-white/50 text-xs font-semibold mb-3 uppercase tracking-wider">Topic</label>
+              <label className="block text-white/50 text-xs font-semibold mb-3 uppercase tracking-wider">
+                Topic {subject && <span className="text-green-400 normal-case tracking-normal font-normal ml-1">✓ selected</span>}
+              </label>
               <div className="grid grid-cols-2 gap-2">
                 {SUBJECTS.map(s => (
                   <button
                     key={s.id}
-                    onClick={() => {
-                      setSubject(s.id)
-                      setTimeout(() => playersRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80)
-                    }}
+                    onClick={() => selectSubject(s.id)}
                     className={`p-3 rounded-xl text-left flex items-center gap-2 text-sm transition-all ${
                       subject === s.id
-                        ? `bg-gradient-to-r ${theme.gradient} text-white font-semibold shadow`
+                        ? `bg-gradient-to-r ${theme.gradient} text-white font-semibold shadow scale-[1.02]`
                         : `${theme.card} ${theme.cardHover} text-white/60`
                     }`}
                   >
@@ -251,6 +266,7 @@ function PlayContent() {
                       placeholder="8"
                       min="3"
                       max="110"
+                      inputMode="numeric"
                       value={m.age}
                       onChange={e => updateMember(i, 'age', e.target.value)}
                     />
@@ -262,7 +278,7 @@ function PlayContent() {
 
             <button
               onClick={addMember}
-              className="mt-3 w-full py-3 rounded-2xl border border-dashed border-white/[0.12] text-white/40 hover:text-white/70 hover:border-white/20 transition-all text-sm flex items-center justify-center gap-2"
+              className={`mt-3 w-full py-3 rounded-2xl bg-white/[0.03] border border-white/[0.10] text-white/50 hover:text-white/80 hover:bg-white/[0.06] transition-all text-sm font-medium flex items-center justify-center gap-2`}
             >
               <Plus size={15} /> Add another player
             </button>
@@ -273,21 +289,31 @@ function PlayContent() {
               💡 A room code will be generated — share it so remote players can join
             </div>
           )}
+        </div>
+      )}
 
-          {error && <p className="text-red-400 text-xs">{error}</p>}
-
-          <button
-            onClick={handleStart}
-            disabled={creating}
-            className={btn.primary + ' w-full justify-center py-3.5 text-base'}
-          >
-            {creating
-              ? 'Setting up…'
-              : gameType === 'draw'
-              ? <><Pencil size={16} /> Start Drawing!</>
-              : <>{mode === 'solo' ? 'Start Quiz' : 'Start Game'} <ArrowRight size={16} /></>
-            }
-          </button>
+      {/* Sticky Start button — always reachable without scrolling */}
+      {isSetup && (
+        <div className="fixed bottom-0 left-0 right-0 px-3 pb-5 pt-3 bg-gradient-to-t from-[#080712] via-[#080712]/95 to-transparent z-20">
+          <div className="max-w-xl mx-auto">
+            {error && (
+              <p className="text-red-400 text-xs text-center mb-2 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2">
+                {error}
+              </p>
+            )}
+            <button
+              onClick={handleStart}
+              disabled={creating}
+              className={btn.primary + ' w-full justify-center py-4 text-base'}
+            >
+              {creating
+                ? 'Setting up…'
+                : gameType === 'draw'
+                ? <><Pencil size={16} /> Start Drawing!</>
+                : <>{mode === 'solo' ? 'Start Quiz' : 'Start Game'} <ArrowRight size={16} /></>
+              }
+            </button>
+          </div>
         </div>
       )}
     </div>

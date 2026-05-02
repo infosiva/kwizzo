@@ -41,7 +41,7 @@ export default function HomePage() {
             <Link href="/play?mode=solo" className={btn.primary + ' text-base px-8 py-3.5'}>
               Play Solo <ArrowRight size={16} />
             </Link>
-            <Link href="/play?mode=create" className={btn.secondary + ' text-base px-8 py-3.5'}>
+            <Link href="/play?mode=group" className={btn.secondary + ' text-base px-8 py-3.5'}>
               <Users size={16} /> Play with Others
             </Link>
           </div>
@@ -131,7 +131,7 @@ export default function HomePage() {
             <Link href="/play?mode=solo" className={btn.primary + ' text-base px-8 py-3.5'}>
               Start Solo <ArrowRight size={16} />
             </Link>
-            <Link href="/play?mode=create" className={btn.secondary + ' text-base px-8 py-3.5'}>
+            <Link href="/play?mode=group" className={btn.secondary + ' text-base px-8 py-3.5'}>
               <Users size={16} /> Play with Others
             </Link>
           </div>
