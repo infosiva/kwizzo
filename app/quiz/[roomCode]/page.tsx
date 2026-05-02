@@ -7,7 +7,7 @@ import { Suspense } from 'react'
 import type { Question } from '@/app/api/quiz/generate/route'
 
 type Member = { name: string; age: string }
-type GameState = 'loading' | 'playing' | 'answered' | 'finished'
+type GameState = 'loading' | 'choosing' | 'playing' | 'answered' | 'finished'
 type PlayerScore = { name: string; age: string; score: number; answers: boolean[] }
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D'] as const
@@ -18,19 +18,25 @@ function QuizContent() {
   const searchParams = useSearchParams()
   const router       = useRouter()
 
-  const roomCode = params.roomCode as string
+  const roomCode       = params.roomCode as string
   const subjectFromUrl = searchParams.get('subject') ?? ''
 
-  const [gameState,    setGameState]    = useState<GameState>('loading')
-  const [questions,    setQuestions]    = useState<Question[]>([])
-  const [currentQ,     setCurrentQ]     = useState(0)
-  const [selected,     setSelected]     = useState<OptionKey | null>(null)
-  const [scores,       setScores]       = useState<PlayerScore[]>([])
-  const [familyName,   setFamilyName]   = useState('Your Family')
-  const [topic,        setTopic]        = useState(subjectFromUrl)
-  const [loadError,    setLoadError]    = useState('')
+  const [gameState,       setGameState]       = useState<GameState>('loading')
+  // Per-player question banks: { playerName: Question[] }
+  const [playerQuestions, setPlayerQuestions] = useState<Record<string, Question[]>>({})
+  // Shared fallback questions (single-player or fallback)
+  const [questions,       setQuestions]       = useState<Question[]>([])
+  const [currentQ,        setCurrentQ]        = useState(0)
+  const [selected,        setSelected]        = useState<OptionKey | null>(null)
+  const [scores,          setScores]          = useState<PlayerScore[]>([])
+  const [familyName,      setFamilyName]      = useState('Your Family')
+  const [topic,           setTopic]           = useState(subjectFromUrl)
+  const [loadError,       setLoadError]       = useState('')
+  // Which player is currently answering (round-robin)
+  const [activePlayerIdx, setActivePlayerIdx] = useState(0)
+  const [members,         setMembers]         = useState<Member[]>([])
 
-  const loadQuestions = useCallback(async (members: Member[], topicId: string) => {
+  const loadQuestions = useCallback(async (ms: Member[], topicId: string) => {
     setGameState('loading')
     setLoadError('')
     try {
@@ -39,13 +45,17 @@ function QuizContent() {
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({
           topic:   topicId,
-          members: members.map(m => ({ name: m.name, age: Number(m.age) })),
+          members: ms.map(m => ({ name: m.name, age: Number(m.age) })),
         }),
       })
       const data = await res.json()
       if (data?.questions?.length) {
         setQuestions(data.questions)
-        setGameState('playing')
+        // Store per-player banks if available
+        if (data.playerQuestions && Object.keys(data.playerQuestions).length > 0) {
+          setPlayerQuestions(data.playerQuestions)
+        }
+        setGameState(ms.length > 1 ? 'choosing' : 'playing')
       } else {
         setLoadError('Could not load questions. Please try again.')
       }
@@ -55,56 +65,87 @@ function QuizContent() {
   }, [])
 
   useEffect(() => {
-    // Load room data from localStorage
     try {
       const roomData = localStorage.getItem(`kwizzo_room_${roomCode}`)
       if (roomData) {
-        const data = JSON.parse(roomData)
-        const members: Member[] = data.members ?? []
-        const topicId: string   = data.subject ?? subjectFromUrl
+        const data       = JSON.parse(roomData)
+        const ms: Member[] = data.members ?? []
+        const topicId    = data.subject ?? subjectFromUrl
 
         setFamilyName(data.familyName ?? 'Your Family')
         setTopic(topicId)
-        setScores(members.map(m => ({ name: m.name, age: m.age, score: 0, answers: [] })))
-        loadQuestions(members, topicId)
+        setMembers(ms)
+        setScores(ms.map(m => ({ name: m.name, age: m.age, score: 0, answers: [] })))
+        loadQuestions(ms, topicId)
       } else {
-        // Someone joined via code — no room data in their localStorage
-        // Use fallback and try to load generic questions
-        const family = localStorage.getItem('kwizzo_family')
-        const members: Member[] = family ? (JSON.parse(family).members ?? []) : [{ name: 'Player', age: '18' }]
-        const topicId = subjectFromUrl || 'general'
+        const family     = localStorage.getItem('kwizzo_family')
+        const ms: Member[] = family ? (JSON.parse(family).members ?? []) : [{ name: 'Player', age: '18' }]
+        const topicId    = subjectFromUrl || 'general'
 
         setTopic(topicId)
-        setScores(members.map(m => ({ name: m.name, age: m.age, score: 0, answers: [] })))
-        loadQuestions(members, topicId)
+        setMembers(ms)
+        setScores(ms.map(m => ({ name: m.name, age: m.age, score: 0, answers: [] })))
+        loadQuestions(ms, topicId)
       }
     } catch {
-      // Pure fallback
-      const members = [{ name: 'Player', age: '18' }]
+      const ms = [{ name: 'Player', age: '18' }]
       setTopic(subjectFromUrl || 'general')
-      setScores(members.map(m => ({ name: m.name, age: m.age, score: 0, answers: [] })))
-      loadQuestions(members, subjectFromUrl || 'general')
+      setMembers(ms)
+      setScores(ms.map(m => ({ name: m.name, age: m.age, score: 0, answers: [] })))
+      loadQuestions(ms, subjectFromUrl || 'general')
     }
   }, [roomCode, subjectFromUrl, loadQuestions])
 
+  // Get the question for the current active player
+  function getCurrentQuestion(): Question | null {
+    if (members.length === 0) return questions[currentQ] ?? null
+    const activeName  = members[activePlayerIdx]?.name
+    const playerBank  = playerQuestions[activeName]
+    // Use per-player question bank if available, else shared
+    const bank = playerBank?.length ? playerBank : questions
+    return bank[currentQ] ?? null
+  }
+
   function handleAnswer(opt: OptionKey) {
     if (gameState !== 'playing') return
+    const q = getCurrentQuestion()
+    if (!q) return
     setSelected(opt)
     setGameState('answered')
 
-    const correct = opt === questions[currentQ].answer
-    setScores(prev => prev.map(s => ({
-      ...s,
-      score:   s.score + (correct ? 1 : 0),
-      answers: [...s.answers, correct],
-    })))
+    const correct   = opt === q.answer
+    const activeName = members[activePlayerIdx]?.name ?? scores[0]?.name
+    setScores(prev => prev.map(s =>
+      s.name === activeName
+        ? { ...s, score: s.score + (correct ? 1 : 0), answers: [...s.answers, correct] }
+        : s
+    ))
   }
 
   function handleNext() {
-    if (currentQ + 1 >= questions.length) {
-      setGameState('finished')
+    const totalQs = (() => {
+      if (members.length === 0) return questions.length
+      const activeName = members[activePlayerIdx]?.name
+      const bank = playerQuestions[activeName]?.length ? playerQuestions[activeName] : questions
+      return bank.length
+    })()
+
+    const nextQ = currentQ + 1
+
+    if (nextQ >= totalQs) {
+      // This player is done — move to next player or finish
+      const nextPlayerIdx = activePlayerIdx + 1
+      if (nextPlayerIdx < members.length) {
+        // Next player's turn
+        setActivePlayerIdx(nextPlayerIdx)
+        setCurrentQ(0)
+        setSelected(null)
+        setGameState('choosing')
+      } else {
+        setGameState('finished')
+      }
     } else {
-      setCurrentQ(prev => prev + 1)
+      setCurrentQ(nextQ)
       setSelected(null)
       setGameState('playing')
     }
@@ -113,39 +154,47 @@ function QuizContent() {
   function handlePlayAgain() {
     setCurrentQ(0)
     setSelected(null)
+    setActivePlayerIdx(0)
     setScores(prev => prev.map(s => ({ ...s, score: 0, answers: [] })))
     setQuestions([])
-    // Reload from localStorage
+    setPlayerQuestions({})
     try {
       const roomData = localStorage.getItem(`kwizzo_room_${roomCode}`)
       if (roomData) {
         const data = JSON.parse(roomData)
         loadQuestions(data.members ?? [], data.subject ?? topic)
       } else {
-        loadQuestions([{ name: 'Player', age: '18' }], topic)
+        loadQuestions(members.length ? members : [{ name: 'Player', age: '18' }], topic)
       }
     } catch {
       loadQuestions([{ name: 'Player', age: '18' }], topic)
     }
   }
 
-  const q = questions[currentQ]
-  const progress = questions.length > 0 ? ((currentQ + (gameState === 'answered' ? 1 : 0)) / questions.length) * 100 : 0
+  const q         = getCurrentQuestion()
+  const activeName = members[activePlayerIdx]?.name ?? scores[0]?.name ?? ''
+  const activeAge  = members[activePlayerIdx]?.age ?? '?'
+  const totalQsForPlayer = (() => {
+    const bank = playerQuestions[activeName]?.length ? playerQuestions[activeName] : questions
+    return bank.length
+  })()
+  const progress  = totalQsForPlayer > 0
+    ? ((currentQ + (gameState === 'answered' ? 1 : 0)) / totalQsForPlayer) * 100
+    : 0
   const sortedScores = [...scores].sort((a, b) => b.score - a.score)
 
-  // ── Loading state ─────────────────────────────────────────
+  // ── Loading ───────────────────────────────────────────────
   if (gameState === 'loading') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center">
         <div className="text-6xl mb-6 float">🤖</div>
         <h2 className="text-2xl font-bold text-white mb-3">KwizBot is generating questions…</h2>
-        <p className="text-white/50 mb-8">Creating age-perfect questions for your family</p>
+        <p className="text-white/50 mb-2">Creating age-perfect questions for each player</p>
+        <p className="text-white/30 text-sm mb-8">This takes a few seconds — personalised for every age group</p>
         {loadError ? (
           <div className="space-y-4">
             <p className="text-red-400 text-sm px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20">{loadError}</p>
-            <button onClick={() => router.push('/play')} className={btn.secondary}>
-              Back to Game Hub
-            </button>
+            <button onClick={() => router.push('/play')} className={btn.secondary}>Back to Game Hub</button>
           </div>
         ) : (
           <div className="flex gap-2 justify-center">
@@ -158,7 +207,48 @@ function QuizContent() {
     )
   }
 
-  // ── Finished — Leaderboard ────────────────────────────────
+  // ── Player handoff screen ─────────────────────────────────
+  if (gameState === 'choosing') {
+    const prevPlayerIdx = activePlayerIdx - 1
+    const prevPlayer    = prevPlayerIdx >= 0 ? members[prevPlayerIdx] : null
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center">
+        {prevPlayer && (
+          <div className="mb-8 text-white/50 text-sm">
+            ✅ {prevPlayer.name} finished their round
+          </div>
+        )}
+        <div className="text-6xl mb-6">🎮</div>
+        <h2 className="text-3xl font-extrabold text-white mb-2">
+          Your turn, <span className={theme.gradientText}>{activeName}</span>!
+        </h2>
+        <p className="text-white/50 mb-2">Age {activeAge} · {totalQsForPlayer} questions ready for you</p>
+        <p className="text-white/30 text-sm mb-10 capitalize">Topic: {topic.replace(/-/g, ' ')}</p>
+        <button
+          onClick={() => setGameState('playing')}
+          className={btn.primary + ' text-lg px-12 py-4'}
+        >
+          I'm ready <ArrowRight size={20} />
+        </button>
+        {/* Show other players' scores so far */}
+        {scores.some(s => s.answers.length > 0) && (
+          <div className="mt-10 w-full max-w-sm">
+            <div className="text-xs text-white/30 mb-3 uppercase tracking-widest">Scores so far</div>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {sortedScores.filter(s => s.answers.length > 0).map(s => (
+                <div key={s.name} className={`${theme.card} px-3 py-2 rounded-xl flex items-center gap-2`}>
+                  <span className="text-white/70 text-xs font-medium">{s.name}</span>
+                  <span className={`${theme.textAccent} font-bold text-sm`}>{s.score}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // ── Finished ──────────────────────────────────────────────
   if (gameState === 'finished') {
     const medals = ['🥇', '🥈', '🥉']
     return (
@@ -167,6 +257,7 @@ function QuizContent() {
           <div className="text-6xl mb-4">🏆</div>
           <h1 className="text-3xl font-extrabold text-white mb-2">{familyName}</h1>
           <p className={`${theme.textAccent} font-semibold`}>Quiz Complete!</p>
+          <p className="text-white/30 text-sm mt-1">Everyone played their own age-adapted round</p>
         </div>
 
         <div className={`${theme.card} p-6 mb-6 fade-up`}>
@@ -174,28 +265,32 @@ function QuizContent() {
             <Trophy size={20} className={theme.textAccent} /> Final Leaderboard
           </h2>
           <div className="space-y-3">
-            {sortedScores.map((s, i) => (
-              <div
-                key={s.name}
-                className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
-                  i === 0 ? `bg-gradient-to-r ${theme.gradient} bg-opacity-20` : 'glass'
-                }`}
-              >
-                <span className="text-2xl w-8 flex-shrink-0">{medals[i] ?? `${i + 1}`}</span>
-                <div className="flex-1">
-                  <div className="font-semibold text-white">{s.name}</div>
-                  <div className="text-white/40 text-xs">Age {s.age}</div>
-                </div>
-                <div className="text-right">
-                  <div className={`text-xl font-extrabold ${i === 0 ? 'text-white' : theme.textAccent}`}>
-                    {s.score}/{questions.length}
+            {sortedScores.map((s, i) => {
+              const playerBank = playerQuestions[s.name]?.length ? playerQuestions[s.name] : questions
+              const total      = playerBank.length || 10
+              return (
+                <div
+                  key={s.name}
+                  className={`flex items-center gap-3 p-3 rounded-xl ${
+                    i === 0 ? `bg-gradient-to-r ${theme.gradient} bg-opacity-20` : 'glass'
+                  }`}
+                >
+                  <span className="text-2xl w-8 flex-shrink-0">{medals[i] ?? `${i + 1}`}</span>
+                  <div className="flex-1">
+                    <div className="font-semibold text-white">{s.name}</div>
+                    <div className="text-white/40 text-xs">Age {s.age} · {i === 0 ? 'Leaderboard leader 🎉' : `${Math.round((s.score / total) * 100)}% correct`}</div>
                   </div>
-                  <div className="text-white/40 text-xs">
-                    {Math.round((s.score / questions.length) * 100)}%
+                  <div className="text-right">
+                    <div className={`text-xl font-extrabold ${i === 0 ? 'text-white' : theme.textAccent}`}>
+                      {s.score}/{total}
+                    </div>
+                    <div className="text-white/40 text-xs">
+                      {Math.round((s.score / total) * 100)}%
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 
@@ -213,7 +308,7 @@ function QuizContent() {
 
   if (!q) return null
 
-  const options = Object.entries(q.options) as [OptionKey, string][]
+  const options   = Object.entries(q.options) as [OptionKey, string][]
   const isCorrect = selected === q.answer
 
   // ── Playing / Answered ────────────────────────────────────
@@ -223,10 +318,13 @@ function QuizContent() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className={`text-xs font-bold ${theme.textAccent} uppercase tracking-widest`}>{familyName}</div>
-          <div className="text-white/40 text-sm capitalize">{topic.replace(/-/g, ' ')} · Round 1</div>
+          <div className="text-white/40 text-sm">
+            Now playing: <span className="text-white/70 font-semibold">{activeName}</span>
+            <span className="text-white/30"> · Age {activeAge}</span>
+          </div>
         </div>
         <div className={`text-sm font-bold ${theme.textAccentBold}`}>
-          {currentQ + 1} / {questions.length}
+          {currentQ + 1} / {totalQsForPlayer}
         </div>
       </div>
 
@@ -238,24 +336,26 @@ function QuizContent() {
         />
       </div>
 
-      {/* Room code */}
-      <div className={`${theme.badge} inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs mb-6`}>
-        Room: {roomCode}
+      {/* Room code + difficulty badge */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className={`${theme.badge} inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs`}>
+          Room: {roomCode}
+        </div>
+        {q.difficulty && (
+          <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
+            q.difficulty === 'easy'   ? 'bg-green-500/20 text-green-400' :
+            q.difficulty === 'medium' ? 'bg-amber-500/20 text-amber-400' :
+                                        'bg-red-500/20 text-red-400'
+          }`}>
+            {q.difficulty} · for {activeName}
+          </span>
+        )}
       </div>
 
       {/* Question */}
       <div className={`${theme.card} p-6 md:p-8 mb-6`}>
         <div className={`text-xs font-bold ${theme.textAccent} uppercase tracking-widest mb-4`}>
           Question {currentQ + 1}
-          {q.difficulty && (
-            <span className={`ml-3 px-2 py-0.5 rounded-full text-xs ${
-              q.difficulty === 'easy'   ? 'bg-green-500/20 text-green-400' :
-              q.difficulty === 'medium' ? 'bg-amber-500/20 text-amber-400' :
-                                          'bg-red-500/20 text-red-400'
-            }`}>
-              {q.difficulty}
-            </span>
-          )}
         </div>
         <p className="text-2xl md:text-3xl font-bold text-white leading-tight">
           {q.question}
@@ -312,7 +412,7 @@ function QuizContent() {
         <div className={`${theme.card} p-5 mb-6 border ${isCorrect ? 'border-green-500/30' : 'border-red-500/30'}`}>
           <div className={`flex items-center gap-2 font-bold mb-2 ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
             {isCorrect
-              ? <><CheckCircle size={18} /> Correct! Well done!</>
+              ? <><CheckCircle size={18} /> Correct! Well done, {activeName}!</>
               : <><XCircle size={18} /> Not quite — the answer is {q.answer}</>
             }
           </div>
@@ -323,8 +423,10 @@ function QuizContent() {
       {/* Next button */}
       {gameState === 'answered' && (
         <button onClick={handleNext} className={btn.primary + ' w-full justify-center py-4 text-base'}>
-          {currentQ + 1 >= questions.length ? (
-            <><Trophy size={18} /> See Leaderboard</>
+          {currentQ + 1 >= totalQsForPlayer ? (
+            activePlayerIdx + 1 < members.length
+              ? <><ArrowRight size={18} /> Pass to {members[activePlayerIdx + 1]?.name}</>
+              : <><Trophy size={18} /> See Leaderboard</>
           ) : (
             <>Next Question <ArrowRight size={18} /></>
           )}
@@ -337,9 +439,10 @@ function QuizContent() {
           <div className="text-xs text-white/30 mb-3 uppercase tracking-widest">Scores</div>
           <div className="flex flex-wrap gap-2">
             {[...scores].sort((a, b) => b.score - a.score).map(s => (
-              <div key={s.name} className={`${theme.card} px-3 py-2 rounded-xl flex items-center gap-2`}>
+              <div key={s.name} className={`${theme.card} px-3 py-2 rounded-xl flex items-center gap-2 ${s.name === activeName ? `ring-1 ring-${theme.solid}` : ''}`}>
                 <span className="text-white/70 text-xs font-medium">{s.name}</span>
                 <span className={`${theme.textAccent} font-bold text-sm`}>{s.score}</span>
+                {s.name === activeName && <span className="text-[10px] text-white/30">playing</span>}
               </div>
             ))}
           </div>
