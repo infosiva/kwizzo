@@ -317,16 +317,18 @@ function QuizContent() {
   return (
     <div className="min-h-screen px-3 sm:px-4 py-5 sm:py-8 max-w-2xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-5 gap-2">
-        <div className="min-w-0">
-          <div className={`text-[10px] font-bold ${theme.textAccent} uppercase tracking-widest truncate`}>{familyName}</div>
-          <div className="text-white/40 text-sm truncate">
-            <span className="text-white/70 font-semibold">{activeName}</span>
-            <span className="text-white/30"> · Age {activeAge}</span>
+      <div className="flex items-center justify-between mb-5 gap-3">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${theme.gradient} flex items-center justify-center text-white font-bold text-sm shrink-0`}>
+            {activeName?.[0]?.toUpperCase() ?? '?'}
+          </div>
+          <div className="min-w-0">
+            <div className="text-white font-semibold text-sm leading-tight truncate">{activeName || 'Player'}</div>
+            <div className="text-white/35 text-xs">Age {activeAge} · <span className="capitalize">{topicLabel}</span></div>
           </div>
         </div>
-        <div className={`text-sm font-bold ${theme.textAccentBold} shrink-0`}>
-          {currentQ + 1} / {totalQsForPlayer}
+        <div className={`text-sm font-bold ${theme.textAccentBold} shrink-0 tabular-nums`}>
+          {currentQ + 1}<span className="text-white/30">/{totalQsForPlayer}</span>
         </div>
       </div>
 

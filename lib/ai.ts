@@ -43,19 +43,33 @@ function anthropic() { return new Anthropic({ apiKey: process.env.ANTHROPIC_API_
 
 type Msg = { role: 'user' | 'assistant'; content: string }
 
+// Race a promise against a timeout — rejects with 'timeout' if too slow
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)
+    ),
+  ])
+}
+
 export async function aiChat(messages: Msg[], systemPrompt?: string): Promise<string> {
-  const system = systemPrompt ?? config.aiSystemPrompt
-  const groqMsgs = [{ role: 'system' as const, content: system }, ...messages]
+  const system    = systemPrompt ?? config.aiSystemPrompt
+  const groqMsgs  = [{ role: 'system' as const, content: system }, ...messages]
+  const TIMEOUT   = 12000  // 12s per provider — switch fast on hang
 
   // ── 1. Groq llama-3.3-70b (free, fast, high quality) ────────────────────
   if (process.env.GROQ_API_KEY) {
     try {
-      const res = await groq().chat.completions.create({
-        model:       GROQ_PRIMARY,
-        messages:    groqMsgs,
-        max_tokens:  700,
-        temperature: 0.7,
-      })
+      const res = await withTimeout(
+        groq().chat.completions.create({
+          model:       GROQ_PRIMARY,
+          messages:    groqMsgs,
+          max_tokens:  3000,
+          temperature: 0.7,
+        }),
+        TIMEOUT, 'Groq primary'
+      )
       const text = res.choices[0]?.message?.content
       if (text) return text
     } catch (e: any) {
@@ -64,11 +78,14 @@ export async function aiChat(messages: Msg[], systemPrompt?: string): Promise<st
 
     // ── 2. Groq gemma2-9b (free, lighter fallback) ──────────────────────
     try {
-      const res = await groq().chat.completions.create({
-        model:      GROQ_FALLBACK,
-        messages:   groqMsgs,
-        max_tokens: 700,
-      })
+      const res = await withTimeout(
+        groq().chat.completions.create({
+          model:      GROQ_FALLBACK,
+          messages:   groqMsgs,
+          max_tokens: 3000,
+        }),
+        TIMEOUT, 'Groq fallback'
+      )
       const text = res.choices[0]?.message?.content
       if (text) return text
     } catch (e: any) {
@@ -79,13 +96,16 @@ export async function aiChat(messages: Msg[], systemPrompt?: string): Promise<st
   // ── 3. Gemini 2.0 Flash (free tier, very fast) ──────────────────────────
   if (process.env.GEMINI_API_KEY) {
     try {
-      const model = gemini().getGenerativeModel({ model: GEMINI_PRIMARY, systemInstruction: system })
+      const model   = gemini().getGenerativeModel({ model: GEMINI_PRIMARY, systemInstruction: system })
       const history = messages.slice(0, -1).map(m => ({
         role:  m.role === 'user' ? 'user' : 'model',
         parts: [{ text: m.content }],
       }))
       const chat = model.startChat({ history })
-      const res  = await chat.sendMessage(messages.at(-1)!.content)
+      const res  = await withTimeout(
+        chat.sendMessage(messages.at(-1)!.content),
+        TIMEOUT, 'Gemini 2.0'
+      )
       const text = res.response.text()
       if (text) return text
     } catch (e: any) {
@@ -101,7 +121,10 @@ export async function aiChat(messages: Msg[], systemPrompt?: string): Promise<st
           parts: [{ text: m.content }],
         }))
       })
-      const res  = await chat.sendMessage(messages.at(-1)!.content)
+      const res  = await withTimeout(
+        chat.sendMessage(messages.at(-1)!.content),
+        TIMEOUT, 'Gemini 2.5'
+      )
       const text = res.response.text()
       if (text) return text
     } catch (e: any) {
@@ -112,11 +135,14 @@ export async function aiChat(messages: Msg[], systemPrompt?: string): Promise<st
   // ── 5. Cerebras llama3.1-70b (free, very fast inference) ────────────────
   if (process.env.CEREBRAS_API_KEY) {
     try {
-      const res = await cerebras().chat.completions.create({
-        model:      CEREBRAS_MODEL,
-        messages:   groqMsgs,
-        max_tokens: 700,
-      })
+      const res = await withTimeout(
+        cerebras().chat.completions.create({
+          model:      CEREBRAS_MODEL,
+          messages:   groqMsgs,
+          max_tokens: 3000,
+        }),
+        TIMEOUT, 'Cerebras'
+      )
       const text = res.choices[0]?.message?.content
       if (text) return text
     } catch (e: any) {
@@ -125,12 +151,15 @@ export async function aiChat(messages: Msg[], systemPrompt?: string): Promise<st
   }
 
   // ── 6. Claude Haiku (paid, absolute last resort) ─────────────────────────
-  const res = await anthropic().messages.create({
-    model:      CLAUDE_FALLBACK,
-    max_tokens: 700,
-    system,
-    messages,
-  })
+  const res = await withTimeout(
+    anthropic().messages.create({
+      model:      CLAUDE_FALLBACK,
+      max_tokens: 3000,
+      system,
+      messages,
+    }),
+    20000, 'Claude Haiku'
+  )
   return (res.content[0] as { text: string }).text
 }
 

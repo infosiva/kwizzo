@@ -167,21 +167,26 @@ function PlayContent() {
             <div className="space-y-2.5">
               {members.map((m, i) => (
                 <div key={i} className="flex gap-2 items-center">
-                  <input
-                    className="input-dark flex-1 py-2.5 text-sm"
-                    placeholder={i === 0 ? 'Your name' : `Player ${i + 1}`}
-                    value={m.name}
-                    onChange={e => updateMember(i, 'name', e.target.value)}
-                  />
-                  <input
-                    className="input-dark w-16 py-2.5 text-sm text-center"
-                    type="number"
-                    placeholder="Age"
-                    min="3"
-                    max="110"
-                    value={m.age}
-                    onChange={e => updateMember(i, 'age', e.target.value)}
-                  />
+                  <div className="flex-1 relative">
+                    <input
+                      className="input-dark w-full py-2.5 text-sm pr-10"
+                      placeholder={i === 0 ? 'Your name (e.g. Sam)' : `Player ${i + 1} name`}
+                      value={m.name}
+                      onChange={e => updateMember(i, 'name', e.target.value)}
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 text-xs pointer-events-none">👤</span>
+                  </div>
+                  <div className="relative">
+                    <input
+                      className="input-dark w-16 py-2.5 text-sm text-center pr-1"
+                      type="number"
+                      placeholder="Age"
+                      min="3"
+                      max="110"
+                      value={m.age}
+                      onChange={e => updateMember(i, 'age', e.target.value)}
+                    />
+                  </div>
                   {members.length > 1 && (
                     <button onClick={() => removeMember(i)} className="text-white/25 hover:text-red-400 transition-colors p-1">
                       <Trash2 size={15} />
@@ -190,6 +195,7 @@ function PlayContent() {
                 </div>
               ))}
             </div>
+            <p className="text-white/20 text-[11px] mt-2">Name + age — AI adapts the quiz difficulty for each player</p>
             <button
               onClick={addMember}
               className={`mt-3 flex items-center gap-1.5 text-xs ${theme.textAccent} hover:opacity-70 transition-opacity`}
