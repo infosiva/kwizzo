@@ -510,28 +510,30 @@ function QuizContent() {
 
       {/* Result + explanation */}
       {gameState === 'answered' && (
-        <div className={`${theme.card} p-5 mb-6 border fade-up ${isCorrect ? 'border-green-500/30' : 'border-red-500/30'}`}>
-          <div className={`flex items-center gap-2 font-bold mb-1 ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
+        <div className={`${theme.card} p-4 mb-24 border fade-up ${isCorrect ? 'border-green-500/30' : 'border-red-500/30'}`}>
+          <div className={`flex items-center gap-2 font-bold mb-1 text-sm ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
             {isCorrect
-              ? <><CheckCircle size={18} />{streak >= 3 ? ` ${streak} in a row, ${displayName(activeName)}! 🔥` : ` Correct! Well done, ${displayName(activeName)}!`}</>
-              : <><XCircle size={18} /> Not quite — the answer was <span className="ml-1 px-1.5 py-0.5 bg-white/10 rounded text-white">{q.options[q.answer]}</span></>
+              ? <><CheckCircle size={16} />{streak >= 3 ? ` ${streak} in a row, ${displayName(activeName)}! 🔥` : ` Correct! Well done, ${displayName(activeName)}!`}</>
+              : <><XCircle size={16} /> Not quite — the answer was <span className="ml-1 px-1.5 py-0.5 bg-white/10 rounded text-white">{q.options[q.answer]}</span></>
             }
           </div>
-          <p className="text-white/60 text-sm leading-relaxed mt-2">{q.explanation}</p>
+          <p className="text-white/50 text-xs leading-relaxed mt-1.5">{q.explanation}</p>
         </div>
       )}
 
-      {/* Next button */}
+      {/* Next button — sticky at bottom so it's always visible without scrolling */}
       {gameState === 'answered' && (
-        <button onClick={handleNext} className={btn.primary + ' w-full justify-center py-4 text-base'}>
-          {currentQ + 1 >= totalQsForPlayer ? (
-            activePlayerIdx + 1 < members.length
-              ? <><ArrowRight size={18} /> Pass to {members[activePlayerIdx + 1]?.name}</>
-              : <><Trophy size={18} /> See Leaderboard</>
-          ) : (
-            <>Next Question <ArrowRight size={18} /></>
-          )}
-        </button>
+        <div className="fixed bottom-0 left-0 right-0 px-3 pb-5 pt-3 bg-gradient-to-t from-[#080712] via-[#080712]/90 to-transparent z-20">
+          <button onClick={handleNext} className={btn.primary + ' w-full justify-center py-4 text-base max-w-2xl mx-auto'}>
+            {currentQ + 1 >= totalQsForPlayer ? (
+              activePlayerIdx + 1 < members.length
+                ? <><ArrowRight size={18} /> Pass to {members[activePlayerIdx + 1]?.name}</>
+                : <><Trophy size={18} /> See Leaderboard</>
+            ) : (
+              <>Next Question <ArrowRight size={18} /></>
+            )}
+          </button>
+        </div>
       )}
 
       {/* Score strip */}
