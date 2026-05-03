@@ -78,9 +78,18 @@ function QuizContent() {
         }),
       })
       const data = await res.json()
+
+      if (data?.aiError) {
+        setLoadError(
+          res.status === 503 && data.error?.includes('not configured')
+            ? 'AI keys not set up on server. Contact support.'
+            : 'AI is busy right now — tap retry in a moment.'
+        )
+        return
+      }
+
       if (data?.questions?.length) {
         setQuestions(data.questions)
-        // Store per-player banks if available
         if (data.playerQuestions && Object.keys(data.playerQuestions).length > 0) {
           setPlayerQuestions(data.playerQuestions)
         }

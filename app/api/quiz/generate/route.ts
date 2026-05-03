@@ -199,6 +199,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'topic is required' }, { status: 400 })
     }
 
+    // Check at least one AI key is configured — fail fast with clear message
+    const hasAI = !!(process.env.GROQ_API_KEY || process.env.GEMINI_API_KEY || process.env.ANTHROPIC_API_KEY)
+    if (!hasAI) {
+      console.error('[kwizzo] No AI API keys configured. Set GROQ_API_KEY, GEMINI_API_KEY, or ANTHROPIC_API_KEY in Vercel env vars.')
+      return NextResponse.json({ error: 'AI not configured', aiError: true }, { status: 503 })
+    }
+
     // Strip 'custom:' prefix added by Pro custom topic input
     const cleanTopic   = topic.startsWith('custom:') ? topic.slice(7).trim() : topic
     const systemPrompt = isAiTool(config) ? config.aiSystemPrompt : ''
@@ -209,30 +216,42 @@ export async function POST(req: NextRequest) {
       players.map(p => generateForPlayer(p, cleanTopic, systemPrompt))
     )
 
-    // Build per-player question map; fall back to shared fallback on failure
+    // Build per-player question map
     const playerQuestions: Record<string, Question[]> = {}
+    let anySucceeded = false
+
     results.forEach((r, i) => {
       const name = players[i].name
       if (r.status === 'fulfilled') {
         playerQuestions[name] = r.value
+        anySucceeded = true
       } else {
         console.error(`[kwizzo] AI failed for ${name}:`, r.reason)
-        // Tag fallback questions with player name
-        playerQuestions[name] = FALLBACK_QUESTIONS.map(q => ({ ...q, forPlayer: name }))
+        playerQuestions[name] = []
       }
     })
 
-    // Also return a flat shared list (the first player's questions) for backwards compat
+    // If all players failed, return a retriable error (not silent fallback)
+    if (!anySucceeded) {
+      console.error('[kwizzo] All AI providers failed — returning error so client can retry')
+      return NextResponse.json({ error: 'AI generation failed, please retry', aiError: true }, { status: 503 })
+    }
+
+    // Fill any failed players with first successful player's questions
+    const firstGood = Object.values(playerQuestions).find(qs => qs.length > 0)!
+    Object.keys(playerQuestions).forEach(name => {
+      if (playerQuestions[name].length === 0) {
+        playerQuestions[name] = firstGood.map(q => ({ ...q, forPlayer: name }))
+      }
+    })
+
     const firstPlayerName = players[0].name
-    const questions       = playerQuestions[firstPlayerName] ?? FALLBACK_QUESTIONS
+    const questions       = playerQuestions[firstPlayerName]
 
     return NextResponse.json({ questions, playerQuestions })
 
   } catch (err) {
     console.error('[kwizzo] /api/quiz/generate error:', err)
-    return NextResponse.json(
-      { questions: FALLBACK_QUESTIONS, playerQuestions: {} },
-      { status: 200 },
-    )
+    return NextResponse.json({ error: 'Server error, please retry', aiError: true }, { status: 500 })
   }
 }
