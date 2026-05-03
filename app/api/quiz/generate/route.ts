@@ -3,6 +3,9 @@ import { aiChat } from '@/lib/ai'
 import config from '@/vertical.config'
 import { isAiTool } from '@/vertical.config'
 
+// Allow up to 60s on Vercel Hobby — AI chains can take 20-40s across providers
+export const maxDuration = 60
+
 export interface Question {
   question:    string
   options:     { A: string; B: string; C: string; D: string }
@@ -21,9 +24,9 @@ function ageToDifficulty(age: number): 'easy' | 'medium' | 'hard' {
 
 // How many questions per difficulty level
 function difficultyToCount(difficulty: 'easy' | 'medium' | 'hard'): number {
-  if (difficulty === 'easy')   return 8   // shorter — kids lose focus
-  if (difficulty === 'medium') return 10  // standard
-  return 12                               // adults get the full challenge
+  if (difficulty === 'easy')   return 6   // shorter — kids lose focus
+  if (difficulty === 'medium') return 8   // standard
+  return 10                               // adults get the full challenge
 }
 
 // Shared fallback questions (one set, used if AI fails)

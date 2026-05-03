@@ -7,7 +7,8 @@
  *   3. Gemini    — gemini-2.0-flash          (free, latest stable Google)
  *   4. Gemini    — gemini-2.5-flash-preview  (free preview, most capable Google)
  *   5. Cerebras  — llama3.1-70b              (free, very fast inference)
- *   6. Anthropic — claude-haiku-4-5          (paid, absolute last resort)
+ *   6. Together  — llama3.3-70b-free         (free tier, OpenAI-compatible)
+ *   7. Anthropic — claude-haiku-4-5          (paid, absolute last resort)
  *
  * Models are picked at runtime — upgrading = change one string here.
  * Errors from each provider are logged so you know which are failing.
@@ -28,6 +29,7 @@ const GROQ_FALLBACK   = 'gemma2-9b-it'                   // lighter Groq fallbac
 const GEMINI_PRIMARY  = 'gemini-2.0-flash'               // latest stable free Gemini
 const GEMINI_HEAVY    = 'gemini-2.5-flash-preview-05-20' // most capable free preview
 const CEREBRAS_MODEL  = 'llama3.1-70b'                   // free, very fast
+const TOGETHER_MODEL  = 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free' // free tier
 const CLAUDE_FALLBACK = 'claude-haiku-4-5-20251001'      // cheapest Claude (paid)
 
 // ── Lazy clients — instantiated at request time, not build time ──────────────
@@ -37,6 +39,12 @@ function cerebras()  {
   return new OpenAI({
     apiKey: process.env.CEREBRAS_API_KEY!,
     baseURL: 'https://api.cerebras.ai/v1',
+  })
+}
+function together()  {
+  return new OpenAI({
+    apiKey: process.env.TOGETHER_API_KEY!,
+    baseURL: 'https://api.together.xyz/v1',
   })
 }
 function anthropic() { return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! }) }
@@ -56,7 +64,7 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise
 export async function aiChat(messages: Msg[], systemPrompt?: string): Promise<string> {
   const system    = systemPrompt ?? config.aiSystemPrompt
   const groqMsgs  = [{ role: 'system' as const, content: system }, ...messages]
-  const TIMEOUT   = 12000  // 12s per provider — switch fast on hang
+  const TIMEOUT   = 8000   // 8s per provider — Vercel Hobby limit is 10s total
 
   // ── 1. Groq llama-3.3-70b (free, fast, high quality) ────────────────────
   if (process.env.GROQ_API_KEY) {
@@ -151,7 +159,25 @@ export async function aiChat(messages: Msg[], systemPrompt?: string): Promise<st
     }
   }
 
-  // ── 6. Claude Haiku (paid, absolute last resort) ─────────────────────────
+  // ── 6. Together AI llama3.3-70b-free (free tier) ────────────────────────
+  if (process.env.TOGETHER_API_KEY) {
+    try {
+      const res = await withTimeout(
+        together().chat.completions.create({
+          model:      TOGETHER_MODEL,
+          messages:   groqMsgs,
+          max_tokens: 3000,
+        }),
+        TIMEOUT, 'Together'
+      )
+      const text = res.choices[0]?.message?.content
+      if (text) return text
+    } catch (e: any) {
+      console.warn('[AI] Together failed:', e?.message ?? e)
+    }
+  }
+
+  // ── 7. Claude Haiku (paid, absolute last resort) ─────────────────────────
   const res = await withTimeout(
     anthropic().messages.create({
       model:      CLAUDE_FALLBACK,
