@@ -199,12 +199,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'topic is required' }, { status: 400 })
     }
 
+    // Strip 'custom:' prefix added by Pro custom topic input
+    const cleanTopic   = topic.startsWith('custom:') ? topic.slice(7).trim() : topic
     const systemPrompt = isAiTool(config) ? config.aiSystemPrompt : ''
     const players      = members?.length ? members : [{ name: 'Player', age: 18 }]
 
     // Generate per-player questions in parallel
     const results = await Promise.allSettled(
-      players.map(p => generateForPlayer(p, topic, systemPrompt))
+      players.map(p => generateForPlayer(p, cleanTopic, systemPrompt))
     )
 
     // Build per-player question map; fall back to shared fallback on failure

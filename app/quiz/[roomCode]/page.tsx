@@ -4,10 +4,12 @@ import { useParams, useRouter } from 'next/navigation'
 import { ArrowRight, Trophy, RotateCcw, Home, CheckCircle, XCircle } from 'lucide-react'
 import { theme, btn } from '@/lib/theme'
 import AdUnit from '@/components/AdUnit'
+import ProWall from '@/components/ProWall'
+import { isProUser, FREE_QUESTION_LIMIT } from '@/lib/pro'
 import type { Question } from '@/app/api/quiz/generate/route'
 
 type Member = { name: string; age: string }
-type GameState = 'loading' | 'choosing' | 'playing' | 'answered' | 'finished'
+type GameState = 'loading' | 'choosing' | 'playing' | 'answered' | 'finished' | 'pro-wall'
 type PlayerScore = { name: string; age: string; score: number; answers: boolean[] }
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D'] as const
@@ -48,8 +50,12 @@ function QuizContent() {
   const [fastestSec,      setFastestSec]      = useState<number | null>(null) // fastest answer in seconds
   const [fastestBy,       setFastestBy]       = useState('')
   const [qKey,            setQKey]            = useState(0)       // changes on every new Q, triggers stagger animation
+  const [isPro,           setIsPro]           = useState(false)   // Pro subscription status
 
   const topRef = useRef<HTMLDivElement>(null)
+
+  // Check Pro status once on mount
+  useEffect(() => { setIsPro(isProUser()) }, [])
 
   // Scroll to top + stamp question start time on every new question
   useEffect(() => {
@@ -185,6 +191,12 @@ function QuizContent() {
     })()
 
     const nextQ = currentQ + 1
+
+    // Pro gate — free users limited to FREE_QUESTION_LIMIT questions
+    if (!isPro && nextQ >= FREE_QUESTION_LIMIT) {
+      setGameState('pro-wall')
+      return
+    }
 
     if (nextQ >= totalQs) {
       // This player is done — move to next player or finish
@@ -392,6 +404,26 @@ function QuizContent() {
         {/* Quiet ad — shown only after quiz finishes, not during play */}
         <AdUnit format="horizontal" className="mt-4 min-h-[80px]" />
       </div>
+    )
+  }
+
+  // ── Pro wall ──────────────────────────────────────────────
+  if (gameState === 'pro-wall') {
+    const activeScore = scores.find(s => s.name === members[activePlayerIdx]?.name)
+    return (
+      <ProWall
+        questionsAnswered={FREE_QUESTION_LIMIT}
+        playerName={displayName(members[activePlayerIdx]?.name ?? 'Player')}
+        score={activeScore?.score ?? 0}
+        onContinueFree={() => {
+          setCurrentQ(0)
+          setSelected(null)
+          setStreak(0)
+          setQKey(k => k + 1)
+          setGameState('playing')
+        }}
+        onNewGame={() => router.push('/play')}
+      />
     )
   }
 

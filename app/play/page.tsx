@@ -1,12 +1,19 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Plus, Trash2, ArrowRight, Users, Zap, Pencil } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Plus, Trash2, ArrowRight, Users, Zap, Pencil, Crown } from 'lucide-react'
 import config from '@/vertical.config'
 import { isAiTool } from '@/vertical.config'
 import { theme, btn } from '@/lib/theme'
 import { Suspense } from 'react'
 import AdUnit from '@/components/AdUnit'
+import { isProUser, startCheckout } from '@/lib/pro'
+
+// Read query params without useSearchParams (avoids React error #310)
+function getParam(key: string): string {
+  if (typeof window === 'undefined') return ''
+  return new URLSearchParams(window.location.search).get(key) ?? ''
+}
 
 type Member   = { name: string; age: string }
 type GameType = 'quiz' | 'draw'
@@ -15,12 +22,11 @@ type Mode     = 'solo' | 'group' | 'join'
 const SUBJECTS = isAiTool(config) ? config.subjects : []
 
 function PlayContent() {
-  const router       = useRouter()
-  const searchParams = useSearchParams()
+  const router = useRouter()
 
-  const modeParam      = searchParams.get('mode') ?? 'solo'
-  const defaultSubject = searchParams.get('subject') ?? ''
-  const defaultGame    = (searchParams.get('game') as GameType) ?? 'quiz'
+  const modeParam      = getParam('mode') || 'solo'
+  const defaultSubject = getParam('subject')
+  const defaultGame    = (getParam('game') as GameType) || 'quiz'
 
   const [gameType, setGameType] = useState<GameType>(defaultGame)
   const [mode,     setMode]     = useState<Mode>(
@@ -29,10 +35,16 @@ function PlayContent() {
   )
   const [members,  setMembers]  = useState<Member[]>([{ name: '', age: '' }])
   const [subject,  setSubject]  = useState(defaultSubject)
-  const [creating, setCreating] = useState(false)
-  const [error,    setError]    = useState('')
-  const [roomCode, setRoomCode] = useState('')
-  const [joinError,setJoinError]= useState('')
+  const [creating,     setCreating]     = useState(false)
+  const [error,        setError]        = useState('')
+  const [roomCode,     setRoomCode]     = useState('')
+  const [joinError,    setJoinError]    = useState('')
+  const [isPro,        setIsPro]        = useState(false)
+  const [customTopic,  setCustomTopic]  = useState('')
+  const [proLoading,   setProLoading]   = useState(false)
+
+  // Check Pro status on mount
+  useEffect(() => { setIsPro(isProUser()) }, [])
 
   const joinInputRef = useRef<HTMLInputElement>(null)
 
@@ -219,6 +231,29 @@ function PlayContent() {
                     </button>
                   ))}
                 </div>
+
+                {/* Pro: custom topic input */}
+                {isPro ? (
+                  <div className="mt-3 pt-3 border-t border-white/[0.07]">
+                    <p className="text-white/40 text-xs mb-2 flex items-center gap-1.5">
+                      <Crown size={11} className="text-amber-400" /> Pro — type any topic
+                    </p>
+                    <input
+                      className="w-full bg-white/[0.06] border border-white/[0.12] rounded-xl px-3 py-2.5 text-white text-sm placeholder:text-white/25 outline-none focus:border-white/30 transition-colors"
+                      placeholder="e.g. Ancient Egypt, Premier League, Taylor Swift…"
+                      value={customTopic}
+                      onChange={e => { setCustomTopic(e.target.value); if (e.target.value.trim()) { setSubject('custom:' + e.target.value.trim()); setError('') } else setSubject('') }}
+                    />
+                  </div>
+                ) : (
+                  <button
+                    onClick={async () => { setProLoading(true); try { await startCheckout() } catch { setProLoading(false) } }}
+                    disabled={proLoading}
+                    className="mt-3 w-full py-2 rounded-xl border border-amber-500/25 text-amber-400/70 hover:text-amber-400 hover:border-amber-500/50 transition-all text-xs font-semibold flex items-center justify-center gap-1.5"
+                  >
+                    <Crown size={11} /> {proLoading ? 'Opening…' : 'Pro: type any topic — £3.99/mo'}
+                  </button>
+                )}
               </div>
             )}
 
@@ -331,13 +366,5 @@ function PlayContent() {
 }
 
 export default function PlayPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-white/30 text-sm">Loading…</div>
-      </div>
-    }>
-      <PlayContent />
-    </Suspense>
-  )
+  return <PlayContent />
 }
