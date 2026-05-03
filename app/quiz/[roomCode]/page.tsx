@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { ArrowRight, Trophy, RotateCcw, Home, CheckCircle, XCircle } from 'lucide-react'
 import { theme, btn } from '@/lib/theme'
+import AdUnit from '@/components/AdUnit'
 import type { Question } from '@/app/api/quiz/generate/route'
 
 type Member = { name: string; age: string }
@@ -387,6 +388,9 @@ function QuizContent() {
             <Home size={18} /> New Game
           </button>
         </div>
+
+        {/* Quiet ad — shown only after quiz finishes, not during play */}
+        <AdUnit format="horizontal" className="mt-4 min-h-[80px]" />
       </div>
     )
   }

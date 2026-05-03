@@ -6,6 +6,7 @@ import config from '@/vertical.config'
 import { isAiTool } from '@/vertical.config'
 import { theme, btn } from '@/lib/theme'
 import { Suspense } from 'react'
+import AdUnit from '@/components/AdUnit'
 
 type Member   = { name: string; age: string }
 type GameType = 'quiz' | 'draw'
@@ -316,6 +317,9 @@ function PlayContent() {
                 : <>{mode === 'solo' ? 'Start Quiz' : 'Start Game'} <ArrowRight size={18} /></>
               }
             </button>
+
+            {/* Quiet ad — shown on setup screen only, never during gameplay */}
+            <AdUnit format="horizontal" className="min-h-[80px]" />
 
             {/* bottom spacer so footer doesn't overlap */}
             <div className="h-4" />
