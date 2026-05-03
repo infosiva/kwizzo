@@ -247,7 +247,7 @@ function QuizContent() {
     }
   }
 
-  const q         = getCurrentQuestion()
+  const q          = getCurrentQuestion()
   const activeName = members[activePlayerIdx]?.name ?? scores[0]?.name ?? ''
   const activeAge  = members[activePlayerIdx]?.age ?? '?'
   // Guard: if name is purely numeric (e.g. user typed age in name field), show 'Player'
@@ -260,8 +260,19 @@ function QuizContent() {
     ? ((currentQ + (gameState === 'answered' ? 1 : 0)) / totalQsForPlayer) * 100
     : 0
   const sortedScores = [...scores].sort((a, b) => b.score - a.score)
+  const topicLabel   = topic.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 
-  const topicLabel = topic.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  // Shuffle options once per question — MUST be before ALL conditional returns (Rules of Hooks)
+  const options = useMemo(() => {
+    if (!q) return []
+    const arr = Object.entries(q.options) as [OptionKey, string][]
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]]
+    }
+    return arr
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [qKey, currentQ, activePlayerIdx])
 
   // ── Loading ───────────────────────────────────────────────
   if (gameState === 'loading') {
@@ -426,19 +437,6 @@ function QuizContent() {
       />
     )
   }
-
-  // Shuffle options once per question (keyed by qKey so stable across re-renders)
-  // Must be called BEFORE any conditional return (Rules of Hooks)
-  const options = useMemo(() => {
-    if (!q) return []
-    const arr = Object.entries(q.options) as [OptionKey, string][]
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]]
-    }
-    return arr
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [qKey, currentQ, activePlayerIdx])
 
   if (!q) return null
 
