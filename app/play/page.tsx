@@ -254,7 +254,7 @@ function PlayContent() {
                   </div>
                   <input
                     className="input-dark w-full py-3 text-base mb-2"
-                    placeholder={i === 0 ? 'e.g. Sam' : 'Name'}
+                    placeholder={i === 0 ? 'Enter player name' : 'Enter player name'}
                     value={m.name}
                     onChange={e => updateMember(i, 'name', e.target.value)}
                   />
@@ -263,7 +263,7 @@ function PlayContent() {
                     <input
                       className="input-dark w-20 py-2.5 text-base text-center font-semibold"
                       type="number"
-                      placeholder="8"
+                      placeholder="Age"
                       min="3"
                       max="110"
                       inputMode="numeric"
