@@ -378,10 +378,10 @@ function QuizContent() {
     )
   }
 
-  if (!q) return null
-
   // Shuffle options once per question (keyed by qKey so stable across re-renders)
+  // Must be called BEFORE any conditional return (Rules of Hooks)
   const options = useMemo(() => {
+    if (!q) return []
     const arr = Object.entries(q.options) as [OptionKey, string][]
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -390,6 +390,9 @@ function QuizContent() {
     return arr
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [qKey, currentQ, activePlayerIdx])
+
+  if (!q) return null
+
   const isCorrect = selected === q.answer
 
   // Encouragement message based on streak
