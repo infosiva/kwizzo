@@ -83,22 +83,31 @@ function QuizContent() {
   }, [])
 
   useEffect(() => {
+    // Sanitise members: strip blank names, fill missing ages, guarantee ≥1 player
+    function sanitise(raw: Member[]): Member[] {
+      const clean = raw
+        .filter(m => m.name?.trim() && !/^\d+$/.test(m.name.trim()))
+        .map(m => ({ name: m.name.trim(), age: m.age || '10' }))
+      return clean.length > 0 ? clean : [{ name: 'Player', age: '10' }]
+    }
+
     try {
       const roomData = localStorage.getItem(`kwizzo_room_${roomCode}`)
       if (roomData) {
-        const data       = JSON.parse(roomData)
-        const ms: Member[] = data.members ?? []
-        const topicId    = data.subject ?? subjectFromUrl
+        const data    = JSON.parse(roomData)
+        const ms      = sanitise(data.members ?? [])
+        const topicId = data.subject ?? subjectFromUrl ?? 'general'
 
-        setFamilyName(data.familyName ?? 'Your Family')
+        setFamilyName(data.familyName ?? ms.map(m => m.name).join(' & '))
         setTopic(topicId)
         setMembers(ms)
         setScores(ms.map(m => ({ name: m.name, age: m.age, score: 0, answers: [] })))
         loadQuestions(ms, topicId)
       } else {
-        const family     = localStorage.getItem('kwizzo_family')
-        const ms: Member[] = family ? (JSON.parse(family).members ?? []) : [{ name: 'Player', age: '18' }]
-        const topicId    = subjectFromUrl || 'general'
+        const family  = localStorage.getItem('kwizzo_family')
+        const raw     = family ? (JSON.parse(family).members ?? []) : []
+        const ms      = sanitise(raw)
+        const topicId = subjectFromUrl || 'general'
 
         setTopic(topicId)
         setMembers(ms)
@@ -106,7 +115,7 @@ function QuizContent() {
         loadQuestions(ms, topicId)
       }
     } catch {
-      const ms = [{ name: 'Player', age: '18' }]
+      const ms = [{ name: 'Player', age: '10' }]
       setTopic(subjectFromUrl || 'general')
       setMembers(ms)
       setScores(ms.map(m => ({ name: m.name, age: m.age, score: 0, answers: [] })))
