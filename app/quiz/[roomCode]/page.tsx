@@ -1,9 +1,8 @@
 'use client'
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
-import { useParams, useSearchParams, useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { ArrowRight, Trophy, RotateCcw, Home, CheckCircle, XCircle } from 'lucide-react'
 import { theme, btn } from '@/lib/theme'
-import { Suspense } from 'react'
 import type { Question } from '@/app/api/quiz/generate/route'
 
 type Member = { name: string; age: string }
@@ -13,13 +12,18 @@ type PlayerScore = { name: string; age: string; score: number; answers: boolean[
 const OPTION_LABELS = ['A', 'B', 'C', 'D'] as const
 type OptionKey = typeof OPTION_LABELS[number]
 
+// Read ?subject= without useSearchParams (avoids useSyncExternalStore / React #310)
+function getSubjectParam(): string {
+  if (typeof window === 'undefined') return ''
+  return new URLSearchParams(window.location.search).get('subject') ?? ''
+}
+
 function QuizContent() {
-  const params       = useParams()
-  const searchParams = useSearchParams()
-  const router       = useRouter()
+  const params  = useParams()
+  const router  = useRouter()
 
   const roomCode       = params.roomCode as string
-  const subjectFromUrl = searchParams.get('subject') ?? ''
+  const subjectFromUrl = getSubjectParam()
 
   const [gameState,       setGameState]       = useState<GameState>('loading')
   // Per-player question banks: { playerName: Question[] }
@@ -577,13 +581,5 @@ function QuizContent() {
 }
 
 export default function QuizPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-white/50">Loading quiz…</div>
-      </div>
-    }>
-      <QuizContent />
-    </Suspense>
-  )
+  return <QuizContent />
 }
