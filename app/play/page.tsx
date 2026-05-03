@@ -23,8 +23,19 @@ function PlayContent() {
 
   const [gameType, setGameType] = useState<GameType>(defaultGame)
   const [mode,     setMode]     = useState<Mode>(
+    defaultGame === 'draw' ? 'group' :
     modeParam === 'group' ? 'group' : modeParam === 'join' ? 'join' : 'solo'
   )
+
+  function selectGameType(g: GameType) {
+    setGameType(g)
+    // Draw & Guess requires 2+ players — force group mode, add a second player slot
+    if (g === 'draw') {
+      setMode('group')
+      setMembers(prev => prev.length < 2 ? [...prev, { name: '', age: '' }] : prev)
+    }
+    // Switching back to quiz in group mode → keep group; solo is fine too
+  }
   const [members,  setMembers]  = useState<Member[]>([{ name: '', age: '' }])
   const [subject,  setSubject]  = useState(defaultSubject)
   const [creating, setCreating] = useState(false)
@@ -122,13 +133,13 @@ function PlayContent() {
       {/* Game type selector */}
       <div className="flex gap-2 mb-4">
         {([
-          { id: 'quiz', label: 'Quiz',          icon: '🧠', desc: 'Answer AI questions' },
-          { id: 'draw', label: 'Draw & Guess',  icon: '🎨', desc: 'Draw it, guess it' },
+          { id: 'quiz', label: 'Quiz',         icon: '🧠', desc: 'Answer AI questions',    badge: null },
+          { id: 'draw', label: 'Draw & Guess', icon: '🎨', desc: 'Draw it, guess it',       badge: '2+ players' },
         ] as const).map(g => (
           <button
             key={g.id}
-            onClick={() => setGameType(g.id)}
-            className={`flex-1 p-3 rounded-2xl text-left transition-all border ${
+            onClick={() => selectGameType(g.id)}
+            className={`flex-1 p-3 rounded-2xl text-left transition-all border relative ${
               gameType === g.id
                 ? `bg-gradient-to-br ${theme.gradient} border-transparent text-white`
                 : `${theme.card} ${theme.cardHover} border-white/[0.06]`
@@ -137,22 +148,30 @@ function PlayContent() {
             <div className="text-xl mb-1">{g.icon}</div>
             <div className="font-bold text-sm">{g.label}</div>
             <div className={`text-xs ${gameType === g.id ? 'text-white/70' : 'text-white/35'}`}>{g.desc}</div>
+            {g.badge && (
+              <span className={`absolute top-2 right-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
+                gameType === g.id ? 'bg-white/20 text-white/80' : 'bg-white/[0.06] text-white/30'
+              }`}>{g.badge}</span>
+            )}
           </button>
         ))}
       </div>
 
-      {/* Mode tabs */}
+      {/* Mode tabs — solo disabled for Draw & Guess */}
       <div className="flex gap-1.5 p-1 rounded-2xl glass mb-5">
         {([
-          { id: 'solo',  label: gameType === 'quiz' ? 'Play Solo' : 'Play Together', icon: <Zap size={14} /> },
-          { id: 'group', label: 'With Others', icon: <Users size={14} /> },
-          { id: 'join',  label: 'Join Room',   icon: '🔑' },
+          { id: 'solo',  label: 'Solo',         icon: <Zap size={14} />,   disabled: gameType === 'draw' },
+          { id: 'group', label: 'Play Together', icon: <Users size={14} />, disabled: false },
+          { id: 'join',  label: 'Join Room',     icon: '🔑',                disabled: false },
         ] as const).map(tab => (
           <button
             key={tab.id}
-            onClick={() => setMode(tab.id)}
+            onClick={() => !tab.disabled && setMode(tab.id)}
+            disabled={tab.disabled}
             className={`flex-1 py-2.5 rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-all ${
-              mode === tab.id
+              tab.disabled
+                ? 'text-white/15 cursor-not-allowed'
+                : mode === tab.id
                 ? `bg-gradient-to-r ${theme.gradient} text-white shadow`
                 : 'text-white/45 hover:text-white/70'
             }`}
@@ -226,7 +245,7 @@ function PlayContent() {
                 <li>✦ Others type their guess — AI checks if it's close</li>
                 <li>✦ Hint unlocks after 30s if no one gets it</li>
               </ul>
-              {mode === 'solo' && <p className="text-amber-400/70 text-xs mt-2">⚠ Needs at least 2 players to play</p>}
+              <p className="text-white/30 text-xs mt-2">👥 Requires 2+ players · each takes turns drawing</p>
             </div>
           )}
 
@@ -237,31 +256,19 @@ function PlayContent() {
             </label>
             <div className="space-y-2">
               {members.map((m, i) => (
-                <div key={i} className="rounded-2xl bg-white/[0.04] border border-white/[0.07] p-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-base">👤</span>
-                    <span className="text-white/40 text-xs font-semibold uppercase tracking-wider">
-                      {i === 0 ? 'Player 1' : `Player ${i + 1}`}
-                    </span>
-                    {members.length > 1 && (
-                      <button
-                        onClick={() => removeMember(i)}
-                        className="ml-auto text-white/20 hover:text-red-400 transition-colors p-0.5"
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    )}
-                  </div>
-                  <input
-                    className="input-dark w-full py-3 text-base mb-2"
-                    placeholder={i === 0 ? 'Enter player name' : 'Enter player name'}
-                    value={m.name}
-                    onChange={e => updateMember(i, 'name', e.target.value)}
-                  />
-                  <div className="flex items-center gap-2">
-                    <span className="text-white/30 text-xs shrink-0">Age</span>
+                <div key={i} className="rounded-2xl bg-white/[0.04] border border-white/[0.07] p-3 flex items-center gap-3">
+                  <span className="text-lg shrink-0">👤</span>
+                  <div className="flex-1 min-w-0">
                     <input
-                      className="input-dark w-20 py-2.5 text-base text-center font-semibold"
+                      className="input-dark w-full py-2.5 text-sm"
+                      placeholder={`Player ${i + 1} name`}
+                      value={m.name}
+                      onChange={e => updateMember(i, 'name', e.target.value)}
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <input
+                      className="input-dark w-16 py-2.5 text-sm text-center font-semibold"
                       type="number"
                       placeholder="Age"
                       min="3"
@@ -270,8 +277,16 @@ function PlayContent() {
                       value={m.age}
                       onChange={e => updateMember(i, 'age', e.target.value)}
                     />
-                    <span className="text-white/20 text-xs">years old</span>
+                    <span className="text-white/20 text-xs">yrs</span>
                   </div>
+                  {members.length > 1 && (
+                    <button
+                      onClick={() => removeMember(i)}
+                      className="text-white/20 hover:text-red-400 transition-colors p-0.5 shrink-0"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
