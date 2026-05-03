@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Plus, Trash2, ArrowRight, Users, Zap, Pencil, Sparkles } from 'lucide-react'
+import { Plus, Trash2, ArrowRight, Users, Zap, Pencil } from 'lucide-react'
 import config from '@/vertical.config'
 import { isAiTool } from '@/vertical.config'
 import { theme, btn } from '@/lib/theme'
@@ -33,17 +33,16 @@ function PlayContent() {
   const [roomCode, setRoomCode] = useState('')
   const [joinError,setJoinError]= useState('')
 
-  const playersRef   = useRef<HTMLDivElement>(null)
   const joinInputRef = useRef<HTMLInputElement>(null)
 
+  // Load saved players — strip any where name is purely numeric (old bug)
   useEffect(() => {
     try {
       const saved = localStorage.getItem('kwizzo_family')
       if (saved) {
         const data = JSON.parse(saved)
         if (data.members?.length) {
-          // Filter out any stale entries where name looks like a number
-          const clean = data.members.map((m: Member) => ({
+          const clean: Member[] = data.members.map((m: Member) => ({
             name: /^\d+$/.test((m.name ?? '').trim()) ? '' : (m.name ?? ''),
             age:  m.age ?? '',
           }))
@@ -65,33 +64,32 @@ function PlayContent() {
     }
   }
 
-  function addMember()    { setMembers(prev => [...prev, { name: '', age: '' }]) }
+  function addMember() { setMembers(prev => [...prev, { name: '', age: '' }]) }
   function removeMember(i: number) { setMembers(prev => prev.filter((_, idx) => idx !== i)) }
-  function updateMember(i: number, field: keyof Member, value: string) {
-    setMembers(prev => prev.map((m, idx) => idx === i ? { ...m, [field]: value } : m))
+  function updateMember(i: number, field: keyof Member, val: string) {
+    setMembers(prev => prev.map((m, idx) => idx === i ? { ...m, [field]: val } : m))
   }
-  function generateCode() { return String(Math.floor(1000 + Math.random() * 9000)) }
-  function selectSubject(id: string) {
-    setSubject(id); setError('')
-    setTimeout(() => playersRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100)
-  }
+
+  function selectSubject(id: string) { setSubject(id); setError('') }
 
   async function handleStart() {
     setError('')
     if (gameType === 'quiz' && !subject) { setError('Pick a topic first.'); return }
-    const validMembers = members.filter(m => m.name.trim() && m.age)
-    if (validMembers.length < 1) { setError('Add at least one player with a name and age.'); return }
-    const numericName = validMembers.find(m => /^\d+$/.test(m.name.trim()))
-    if (numericName) { setError(`"${numericName.name}" looks like a number — enter a name, not a number.`); return }
-    if (gameType === 'draw' && validMembers.length < 2) { setError('Draw & Guess needs at least 2 players.'); return }
-
+    const valid = members.filter(m => m.name.trim() && m.age)
+    if (!valid.length) { setError('Add at least one player with a name and age.'); return }
+    if (valid.find(m => /^\d+$/.test(m.name.trim()))) {
+      setError('Player name cannot be a number — enter a real name.'); return
+    }
+    if (gameType === 'draw' && valid.length < 2) {
+      setError('Draw & Guess needs at least 2 players.'); return
+    }
     setCreating(true)
     try {
-      const code = generateCode()
-      localStorage.setItem('kwizzo_family', JSON.stringify({ members: validMembers }))
+      const code = String(Math.floor(1000 + Math.random() * 9000))
+      localStorage.setItem('kwizzo_family', JSON.stringify({ members: valid }))
       localStorage.setItem(`kwizzo_room_${code}`, JSON.stringify({
-        familyName: validMembers.map(m => m.name).join(' & '),
-        members: validMembers, subject, code,
+        familyName: valid.map(m => m.name).join(' & '),
+        members: valid, subject, code,
       }))
       router.push(gameType === 'draw' ? `/draw/${code}` : `/quiz/${code}?subject=${subject}`)
     } catch {
@@ -110,85 +108,76 @@ function PlayContent() {
   const isSetup = mode === 'solo' || mode === 'group'
 
   return (
-    <div className="min-h-screen bg-[#080712]">
-      {/* Top gradient blob */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className={`absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-gradient-to-br ${theme.gradient} opacity-[0.06] blur-3xl`} />
-      </div>
+    <div className="min-h-screen py-8 px-4">
+      <div className="max-w-lg mx-auto space-y-5">
 
-      <div className="relative z-10 max-w-lg mx-auto px-4 pt-10 pb-32">
-
-        {/* ── Header ─────────────────────────────────────────────────────── */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/[0.06] border border-white/[0.08] text-3xl mb-3 shadow-xl">🧠</div>
-          <h1 className="text-3xl font-black text-white tracking-tight mb-1">
+        {/* ── Header ── */}
+        <div className="text-center pb-2">
+          <div className="text-4xl mb-2">🧠</div>
+          <h1 className="text-2xl font-black text-white mb-0.5">
             <span className={theme.gradientText}>Kwizzo</span>
           </h1>
           <p className="text-white/35 text-sm">AI games · any topic · any age</p>
         </div>
 
-        {/* ── Game type cards ─────────────────────────────────────────────── */}
-        <div className="flex gap-3 mb-5">
+        {/* ── Game type ── */}
+        <div className="grid grid-cols-2 gap-3">
           {([
-            { id: 'quiz', label: 'Quiz',         icon: '🧠', desc: 'Answer AI questions', badge: null },
-            { id: 'draw', label: 'Draw & Guess', icon: '🎨', desc: 'Draw it, guess it',   badge: '2+ players' },
-          ] as const).map(g => (
+            { id: 'quiz' as const, icon: '🧠', label: 'Quiz',         sub: 'Answer AI questions',  badge: null },
+            { id: 'draw' as const, icon: '🎨', label: 'Draw & Guess', sub: 'Draw it, guess it',    badge: '2+ players' },
+          ]).map(g => (
             <button
               key={g.id}
               onClick={() => selectGameType(g.id)}
-              className={`flex-1 p-4 rounded-2xl text-left transition-all relative overflow-hidden ${
+              className={`relative p-4 rounded-2xl text-left transition-all ${
                 gameType === g.id
-                  ? `bg-gradient-to-br ${theme.gradient} shadow-lg shadow-violet-900/30`
-                  : 'bg-white/[0.04] border border-white/[0.07] hover:bg-white/[0.07]'
+                  ? `bg-gradient-to-br ${theme.gradient} text-white shadow-lg`
+                  : 'bg-white/[0.05] border border-white/[0.08] hover:bg-white/[0.09] text-white/80'
               }`}
             >
-              {gameType === g.id && <div className="absolute inset-0 bg-white/5 rounded-2xl" />}
-              <div className="relative">
-                <div className="text-2xl mb-2">{g.icon}</div>
-                <div className="font-bold text-sm text-white">{g.label}</div>
-                <div className={`text-xs mt-0.5 ${gameType === g.id ? 'text-white/65' : 'text-white/30'}`}>{g.desc}</div>
-                {g.badge && (
-                  <span className={`absolute top-0 right-0 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                    gameType === g.id ? 'bg-white/20 text-white/80' : 'bg-white/[0.07] text-white/30'
-                  }`}>{g.badge}</span>
-                )}
-              </div>
+              <div className="text-2xl mb-2">{g.icon}</div>
+              <div className="font-bold text-sm">{g.label}</div>
+              <div className={`text-xs mt-0.5 ${gameType === g.id ? 'text-white/65' : 'text-white/30'}`}>{g.sub}</div>
+              {g.badge && (
+                <span className={`absolute top-2.5 right-2.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
+                  gameType === g.id ? 'bg-white/20 text-white/80' : 'bg-white/[0.08] text-white/30'
+                }`}>{g.badge}</span>
+              )}
             </button>
           ))}
         </div>
 
-        {/* ── Mode tabs ───────────────────────────────────────────────────── */}
-        <div className="flex gap-1 p-1 rounded-2xl bg-white/[0.04] border border-white/[0.06] mb-6">
+        {/* ── Mode tabs ── */}
+        <div className="grid grid-cols-3 gap-1 p-1 rounded-2xl bg-white/[0.04] border border-white/[0.07]">
           {([
-            { id: 'solo',  label: 'Solo',          icon: <Zap size={13} />,   disabled: gameType === 'draw' },
-            { id: 'group', label: 'Play Together',  icon: <Users size={13} />, disabled: false },
-            { id: 'join',  label: 'Join Room',      icon: '🔑',                disabled: false },
-          ] as const).map(tab => (
+            { id: 'solo'  as const, label: 'Solo',          icon: <Zap size={13} />,   off: gameType === 'draw' },
+            { id: 'group' as const, label: 'Play Together',  icon: <Users size={13} />, off: false },
+            { id: 'join'  as const, label: 'Join Room',      icon: <span>🔑</span>,     off: false },
+          ]).map(t => (
             <button
-              key={tab.id}
-              onClick={() => !tab.disabled && setMode(tab.id)}
-              disabled={tab.disabled}
-              className={`flex-1 py-2 rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 transition-all ${
-                tab.disabled
-                  ? 'text-white/15 cursor-not-allowed'
-                  : mode === tab.id
-                  ? `bg-gradient-to-r ${theme.gradient} text-white shadow-sm`
-                  : 'text-white/40 hover:text-white/70'
+              key={t.id}
+              onClick={() => !t.off && setMode(t.id)}
+              disabled={t.off}
+              className={`py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1 transition-all ${
+                t.off  ? 'text-white/15 cursor-not-allowed' :
+                mode === t.id ? `bg-gradient-to-r ${theme.gradient} text-white shadow` :
+                'text-white/40 hover:text-white/70'
               }`}
             >
-              <span className="opacity-80">{tab.icon}</span> {tab.label}
+              {t.icon} <span className="hidden sm:inline">{t.label}</span>
+              <span className="sm:hidden">{t.id === 'solo' ? 'Solo' : t.id === 'group' ? 'Group' : 'Join'}</span>
             </button>
           ))}
         </div>
 
-        {/* ── Join room ───────────────────────────────────────────────────── */}
+        {/* ── Join room ── */}
         {mode === 'join' && (
-          <div className="bg-white/[0.04] border border-white/[0.08] rounded-3xl p-6">
-            <p className="text-white font-bold text-base mb-1">Join a game</p>
-            <p className="text-white/35 text-xs mb-5">Enter the 4-digit code from the host</p>
+          <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5">
+            <p className="text-white font-bold mb-1">Join a game</p>
+            <p className="text-white/35 text-xs mb-4">Enter the 4-digit code from the host</p>
             <input
               ref={joinInputRef}
-              className="input-dark text-center text-4xl font-black tracking-[0.3em] mb-4 py-4"
+              className="w-full bg-white/[0.06] border border-white/[0.10] rounded-xl text-center text-3xl font-black tracking-[0.3em] text-white py-3 mb-3 outline-none focus:border-white/30 transition-colors"
               placeholder="0000"
               maxLength={4}
               value={roomCode}
@@ -197,35 +186,34 @@ function PlayContent() {
               inputMode="numeric"
             />
             {joinError && <p className="text-red-400 text-xs mb-3">{joinError}</p>}
-            <button onClick={handleJoin} className={btn.primary + ' w-full justify-center py-3.5'}>
+            <button onClick={handleJoin} className={btn.primary + ' w-full justify-center py-3'}>
               Join Room <ArrowRight size={16} />
             </button>
           </div>
         )}
 
-        {/* ── Setup panel ─────────────────────────────────────────────────── */}
+        {/* ── Setup ── */}
         {isSetup && (
-          <div className="space-y-5">
-
-            {/* Topic picker — quiz only */}
+          <>
+            {/* Topic grid — quiz only */}
             {gameType === 'quiz' && (
-              <div className="bg-white/[0.03] border border-white/[0.07] rounded-3xl p-5">
-                <div className="flex items-center justify-between mb-4">
+              <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-4">
+                <div className="flex items-center justify-between mb-3">
                   <p className="text-white/50 text-xs font-semibold uppercase tracking-wider">Topic</p>
-                  {subject && <span className="text-green-400 text-xs font-medium flex items-center gap-1"><span>✓</span> Selected</span>}
+                  {subject && <span className="text-green-400 text-xs">✓ Selected</span>}
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   {SUBJECTS.map(s => (
                     <button
                       key={s.id}
                       onClick={() => selectSubject(s.id)}
-                      className={`p-3 rounded-xl text-left flex items-center gap-2.5 text-sm font-medium transition-all ${
+                      className={`flex items-center gap-2 p-3 rounded-xl text-sm font-medium transition-all ${
                         subject === s.id
-                          ? `bg-gradient-to-r ${theme.gradient} text-white shadow-md`
-                          : 'bg-white/[0.04] hover:bg-white/[0.08] text-white/55 border border-white/[0.05]'
+                          ? `bg-gradient-to-r ${theme.gradient} text-white shadow`
+                          : 'bg-white/[0.04] hover:bg-white/[0.08] text-white/55 border border-white/[0.06]'
                       }`}
                     >
-                      <span className="text-base">{s.icon}</span>
+                      <span>{s.icon}</span>
                       <span className="truncate">{s.label}</span>
                     </button>
                   ))}
@@ -233,59 +221,50 @@ function PlayContent() {
               </div>
             )}
 
-            {/* Draw & Guess info */}
+            {/* Draw info */}
             {gameType === 'draw' && (
-              <div className="bg-white/[0.03] border border-white/[0.07] rounded-3xl p-5">
-                <div className="flex items-center gap-2.5 mb-3">
-                  <span className="text-2xl">🎨</span>
+              <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">🎨</span>
                   <div>
-                    <p className="font-bold text-white text-sm">Draw & Guess</p>
+                    <p className="text-white font-bold text-sm">Draw & Guess</p>
                     <p className="text-white/30 text-xs">2+ players · take turns drawing</p>
                   </div>
                 </div>
-                <ul className="space-y-1.5">
+                <ul className="space-y-1 text-xs text-white/40 mt-3">
                   {[
                     'AI picks a word tailored to each player\'s age',
-                    'Drawer sees the word privately, draws on paper',
+                    'Drawer sees the word privately — draws on paper',
                     'Others type their guess — AI checks if it\'s close',
-                    'Hint unlocks after 30s if no one gets it',
-                  ].map((t, i) => (
-                    <li key={i} className="flex items-start gap-2 text-xs text-white/45">
-                      <span className={`mt-0.5 text-[10px] ${theme.gradientText} font-bold`}>✦</span>
-                      {t}
-                    </li>
-                  ))}
+                    'Hint unlocks after 30s if no one guesses',
+                  ].map((t, i) => <li key={i} className="flex gap-2"><span className="opacity-50">·</span>{t}</li>)}
                 </ul>
               </div>
             )}
 
             {/* Players */}
-            <div ref={playersRef} className="bg-white/[0.03] border border-white/[0.07] rounded-3xl p-5">
-              <p className="text-white/50 text-xs font-semibold uppercase tracking-wider mb-4">Who&apos;s playing?</p>
-
-              <div className="space-y-2.5">
+            <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-4">
+              <p className="text-white/50 text-xs font-semibold uppercase tracking-wider mb-3">Who&apos;s playing?</p>
+              <div className="space-y-2">
                 {members.map((m, i) => (
-                  <div key={i} className="flex items-center gap-2.5 bg-white/[0.04] border border-white/[0.07] rounded-2xl px-3 py-2.5">
-                    {/* Avatar circle */}
-                    <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${theme.gradient} flex items-center justify-center text-white font-black text-xs shrink-0 opacity-80`}>
-                      {m.name ? m.name[0].toUpperCase() : (i + 1)}
+                  <div key={i} className="flex items-center gap-2 bg-white/[0.05] border border-white/[0.08] rounded-xl px-3 py-2.5">
+                    {/* Avatar */}
+                    <div className={`w-7 h-7 rounded-full bg-gradient-to-br ${theme.gradient} flex items-center justify-center text-white text-xs font-black shrink-0`}>
+                      {m.name.trim() ? m.name.trim()[0].toUpperCase() : String(i + 1)}
                     </div>
-
-                    {/* Name input */}
+                    {/* Name */}
                     <input
-                      className="flex-1 min-w-0 bg-transparent text-white text-sm font-medium placeholder:text-white/20 outline-none"
+                      className="flex-1 bg-transparent text-white text-sm placeholder:text-white/20 outline-none min-w-0"
                       placeholder={`Player ${i + 1} name`}
                       value={m.name}
-                      onChange={e => updateMember(i, 'name', e.target.value)}
                       autoComplete="off"
+                      onChange={e => updateMember(i, 'name', e.target.value)}
                     />
-
-                    {/* Divider */}
-                    <div className="w-px h-5 bg-white/[0.08] shrink-0" />
-
-                    {/* Age input */}
+                    {/* Separator */}
+                    <div className="w-px h-4 bg-white/[0.10] shrink-0" />
+                    {/* Age */}
                     <input
-                      className="w-12 bg-transparent text-white/70 text-sm font-semibold text-center placeholder:text-white/20 outline-none"
+                      className="w-10 bg-transparent text-white/60 text-sm text-center font-semibold placeholder:text-white/20 outline-none shrink-0"
                       type="number"
                       placeholder="Age"
                       min="3" max="110"
@@ -294,62 +273,55 @@ function PlayContent() {
                       onChange={e => updateMember(i, 'age', e.target.value)}
                     />
                     <span className="text-white/20 text-xs shrink-0">yrs</span>
-
-                    {/* Remove */}
                     {members.length > 1 && (
-                      <button onClick={() => removeMember(i)} className="text-white/15 hover:text-red-400 transition-colors shrink-0 ml-0.5">
-                        <Trash2 size={14} />
+                      <button onClick={() => removeMember(i)} className="text-white/15 hover:text-red-400 transition-colors shrink-0">
+                        <Trash2 size={13} />
                       </button>
                     )}
                   </div>
                 ))}
               </div>
-
               <button
                 onClick={addMember}
-                className="mt-3 w-full py-2.5 rounded-2xl border border-dashed border-white/[0.12] text-white/35 hover:text-white/60 hover:border-white/25 transition-all text-sm flex items-center justify-center gap-2"
+                className="mt-2.5 w-full py-2.5 rounded-xl border border-dashed border-white/[0.12] text-white/35 hover:text-white/60 hover:border-white/25 transition-all text-sm flex items-center justify-center gap-2"
               >
-                <Plus size={14} /> Add player
+                <Plus size={13} /> Add player
               </button>
             </div>
 
-            {/* Group mode hint */}
+            {/* Group hint */}
             {mode === 'group' && gameType !== 'draw' && (
-              <div className="flex items-start gap-2.5 bg-white/[0.02] border border-white/[0.06] rounded-2xl px-4 py-3">
-                <Sparkles size={13} className="text-white/30 mt-0.5 shrink-0" />
-                <p className="text-xs text-white/35">A room code will be generated — share it so others can join from their device</p>
-              </div>
+              <p className="text-white/25 text-xs text-center px-4">
+                💡 A room code will be generated — share it so others can join from their device
+              </p>
             )}
 
-          </div>
-        )}
-      </div>
-
-      {/* ── Sticky Start button ─────────────────────────────────────────── */}
-      {isSetup && (
-        <div className="fixed bottom-0 left-0 right-0 z-20">
-          <div className="max-w-lg mx-auto px-4 pb-6 pt-4 bg-gradient-to-t from-[#080712] via-[#080712]/95 to-transparent">
+            {/* Error */}
             {error && (
-              <p className="text-red-400 text-xs text-center mb-2.5 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2">
+              <p className="text-red-400 text-xs text-center bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2.5">
                 {error}
               </p>
             )}
+
+            {/* ── Start button — inline, always visible ── */}
             <button
               onClick={handleStart}
               disabled={creating}
-              className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-base transition-all bg-gradient-to-r ${theme.gradient} text-white shadow-lg shadow-violet-900/30 hover:opacity-90 active:scale-[0.98] disabled:opacity-50`}
+              className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-base transition-all bg-gradient-to-r ${theme.gradient} text-white shadow-lg hover:opacity-90 active:scale-[0.98] disabled:opacity-50`}
             >
-              {creating ? (
-                <><span className="animate-spin text-lg">⟳</span> Setting up…</>
-              ) : gameType === 'draw' ? (
-                <><Pencil size={18} /> Start Drawing!</>
-              ) : (
-                <>{mode === 'solo' ? 'Start Quiz' : 'Start Game'} <ArrowRight size={18} /></>
-              )}
+              {creating
+                ? <><span className="inline-block animate-spin">⟳</span> Setting up…</>
+                : gameType === 'draw'
+                ? <><Pencil size={18} /> Start Drawing!</>
+                : <>{mode === 'solo' ? 'Start Quiz' : 'Start Game'} <ArrowRight size={18} /></>
+              }
             </button>
-          </div>
-        </div>
-      )}
+
+            {/* bottom spacer so footer doesn't overlap */}
+            <div className="h-4" />
+          </>
+        )}
+      </div>
     </div>
   )
 }
@@ -357,7 +329,7 @@ function PlayContent() {
 export default function PlayPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-[#080712]">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-white/30 text-sm">Loading…</div>
       </div>
     }>
