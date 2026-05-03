@@ -39,10 +39,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div style={meshStyle} />
 
         <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4237294630161176"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
+          src="https://epnzryrk.com/act/files/tag.min.js"
+          strategy="lazyOnload"
+          data-cfasync="false"
         />
 
         <Navbar />

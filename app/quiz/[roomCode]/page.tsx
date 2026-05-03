@@ -413,7 +413,7 @@ function QuizContent() {
         </div>
 
         {/* Quiet ad — shown only after quiz finishes, not during play */}
-        <AdUnit format="horizontal" className="mt-4 min-h-[80px]" />
+        <AdUnit size="rectangle" className="mt-4" />
       </div>
     )
   }

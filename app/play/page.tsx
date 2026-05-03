@@ -354,7 +354,7 @@ function PlayContent() {
             </button>
 
             {/* Quiet ad — shown on setup screen only, never during gameplay */}
-            <AdUnit format="horizontal" className="min-h-[80px]" />
+            <AdUnit size="rectangle" className="my-2" />
 
             {/* bottom spacer so footer doesn't overlap */}
             <div className="h-4" />
