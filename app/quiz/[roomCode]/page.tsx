@@ -271,8 +271,9 @@ function QuizContent() {
       [arr[i], arr[j]] = [arr[j], arr[i]]
     }
     return arr
+  // q.question ensures we re-shuffle when the actual question content changes
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [qKey, currentQ, activePlayerIdx])
+  }, [qKey, currentQ, activePlayerIdx, q?.question])
 
   // ── Loading ───────────────────────────────────────────────
   if (gameState === 'loading') {
