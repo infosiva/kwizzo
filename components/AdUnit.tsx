@@ -4,22 +4,15 @@ import { useEffect, useRef, useState } from 'react'
 interface AdUnitProps {
   size?: 'banner' | 'rectangle'
   className?: string
-  /** 'affiliate' = rotating affiliate banners (earns now, no approval needed)
-   *  'adsterra'  = Adsterra iframe unit (needs real key set below)
-   *  'auto'      = affiliate first, placeholder if Adsterra not configured */
-  mode?: 'affiliate' | 'adsterra' | 'auto'
 }
 
-// ── Adsterra zone keys — replace with real keys from adsterra.com dashboard ──
-// Until real keys are set, component falls back to affiliate banners automatically
-const ADSTERRA_KEY_BANNER = process.env.NEXT_PUBLIC_ADSTERRA_BANNER_KEY || ''
-const ADSTERRA_KEY_RECT   = process.env.NEXT_PUBLIC_ADSTERRA_RECT_KEY   || ''
+// ── Adsterra keys for kwizzo.app (approved 2026-05-04) ───────────────────────
+const ADSTERRA_KEY_RECT   = '9a40a58b1898e8a5fce935ff449fbdbb'  // 300×250
+const ADSTERRA_KEY_BANNER = '54177a1fe29737ce46c5992d808519b1'  // 728×90
+const ADSTERRA_KEY_NATIVE = 'bd0a0dcfebb3aec68d5c6c609f785492'  // Native Banner
+const ADSTERRA_SOCIAL_BAR = '7a6e14140c287c0d036b05b87774ad4d'  // Social Bar
 
-// ── Affiliate banners — earn commission immediately, no approval needed ────────
-// Hostinger: $60–$150 per hosting sale (60% commission)
-// Namecheap: 35% on domains/hosting
-// Coursera:  45% on course purchases
-// Amazon:    up to 10% on anything
+// ── Affiliate fallback banners — rotate every 8s ──────────────────────────────
 const AFFILIATE_BANNERS = [
   {
     label: 'Hostinger',
@@ -69,23 +62,16 @@ const AFFILIATE_BANNERS = [
 
 function AffiliateBanner({ size }: { size: 'banner' | 'rectangle' }) {
   const [idx, setIdx] = useState(0)
-
   useEffect(() => {
     const t = setInterval(() => setIdx(i => (i + 1) % AFFILIATE_BANNERS.length), 8000)
     return () => clearInterval(t)
   }, [])
-
   const b = AFFILIATE_BANNERS[idx]
-
   if (size === 'banner') {
     return (
-      <a
-        href={b.url}
-        target="_blank"
-        rel="noopener noreferrer sponsored"
+      <a href={b.url} target="_blank" rel="noopener noreferrer sponsored"
         className={`flex items-center gap-4 w-full px-5 py-3 rounded-xl bg-gradient-to-r ${b.bg} border ${b.border} hover:opacity-90 transition-opacity`}
-        style={{ minHeight: 60 }}
-      >
+        style={{ minHeight: 60 }}>
         <span className="text-2xl">{b.icon}</span>
         <div className="flex-1 min-w-0">
           <div className="text-white font-semibold text-sm truncate">{b.headline}</div>
@@ -95,15 +81,10 @@ function AffiliateBanner({ size }: { size: 'banner' | 'rectangle' }) {
       </a>
     )
   }
-
   return (
-    <a
-      href={b.url}
-      target="_blank"
-      rel="noopener noreferrer sponsored"
+    <a href={b.url} target="_blank" rel="noopener noreferrer sponsored"
       className={`flex flex-col gap-2 w-full px-5 py-4 rounded-xl bg-gradient-to-br ${b.bg} border ${b.border} hover:opacity-90 transition-opacity`}
-      style={{ minHeight: 180 }}
-    >
+      style={{ minHeight: 180 }}>
       <span className="text-3xl">{b.icon}</span>
       <div className="text-white font-bold text-base">{b.headline}</div>
       <div className="text-white/50 text-sm">{b.sub}</div>
@@ -112,32 +93,44 @@ function AffiliateBanner({ size }: { size: 'banner' | 'rectangle' }) {
   )
 }
 
-export default function AdUnit({ size = 'rectangle', className = '', mode = 'auto' }: AdUnitProps) {
-  const adKey   = size === 'banner' ? ADSTERRA_KEY_BANNER : ADSTERRA_KEY_RECT
-  const width   = size === 'banner' ? 728 : 300
-  const height  = size === 'banner' ? 90  : 250
-  const ref     = useRef<HTMLDivElement>(null)
-  const loaded  = useRef(false)
+// Social Bar — injected once into <body>, shows as sticky bottom bar
+function SocialBar() {
+  const loaded = useRef(false)
+  useEffect(() => {
+    if (loaded.current) return
+    loaded.current = true
+    const s = document.createElement('script')
+    s.async = true
+    s.setAttribute('data-cfasync', 'false')
+    s.src = `//pl29336976.profitablecpmratenetwork.com/7a/6e/14/7a6e14140c287c0d036b05b87774ad4d.js`
+    document.body.appendChild(s)
+  }, [])
+  return null
+}
 
-  const useAdsterra = (mode === 'adsterra' || mode === 'auto') && !!adKey
+export { SocialBar }
+
+export default function AdUnit({ size = 'rectangle', className = '' }: AdUnitProps) {
+  const key    = size === 'banner' ? ADSTERRA_KEY_BANNER : ADSTERRA_KEY_RECT
+  const width  = size === 'banner' ? 728 : 300
+  const height = size === 'banner' ? 90  : 250
+  const ref    = useRef<HTMLDivElement>(null)
+  const loaded = useRef(false)
 
   useEffect(() => {
-    if (!useAdsterra || loaded.current || !ref.current) return
+    if (loaded.current || !ref.current) return
     loaded.current = true
     const s = document.createElement('script')
     s.type = 'text/javascript'
     s.setAttribute('data-cfasync', 'false')
-    s.text = `(function(){var o={key:'${adKey}',format:'iframe',height:${height},width:${width},params:{}};var s=document.createElement('script');s.type='text/javascript';s.setAttribute('data-cfasync','false');s.src='//epnzryrk.com/act/files/tag.min.js';document.currentScript.parentNode.appendChild(s);window.atOptions=o;})();`
+    s.text = `(function(){var o={key:'${key}',format:'iframe',height:${height},width:${width},params:{}};var d=document.createElement('script');d.type='text/javascript';d.setAttribute('data-cfasync','false');d.src='//www.highperformanceformat.com/${key}/invoke.js';var c=document.currentScript||document.scripts[document.scripts.length-1];c.parentNode.insertBefore(d,c.nextSibling);window.atOptions=o;})();`
     ref.current.appendChild(s)
-  }, [adKey, height, width, useAdsterra])
+  }, [key, height, width])
 
   return (
     <div className={`relative w-full overflow-hidden ${className}`}>
       <div className="text-[9px] text-white/10 text-center mb-0.5 uppercase tracking-widest">Sponsored</div>
-      {useAdsterra
-        ? <div ref={ref} style={{ width, maxWidth: '100%', minHeight: height }} />
-        : <AffiliateBanner size={size} />
-      }
+      <div ref={ref} style={{ width, maxWidth: '100%', minHeight: height }} />
     </div>
   )
 }
