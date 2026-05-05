@@ -172,6 +172,8 @@ Return ONLY valid JSON — no markdown, no explanation outside JSON:
   const rawResponse = await aiChat(
     [{ role: 'user', content: userMessage }],
     systemPrompt,
+    2048,
+    'best',
   )
 
   const jsonStr = extractJSON(rawResponse)

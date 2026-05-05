@@ -1,205 +1,215 @@
 /**
- * lib/ai.ts — Universal AI fallback chain
+ * lib/ai.ts — Universal AI client (canonical template)
  *
- * Priority order (free first, paid last resort):
- *   1. Groq      — llama-3.3-70b-versatile  (free, very fast, high quality)
- *   2. Groq      — gemma2-9b-it              (free lighter fallback within Groq)
- *   3. Gemini    — gemini-2.0-flash          (free, latest stable Google)
- *   4. Gemini    — gemini-2.5-flash-preview  (free preview, most capable Google)
- *   5. Cerebras  — llama3.1-70b              (free, very fast inference)
- *   6. Together  — llama3.3-70b-free         (free tier, OpenAI-compatible)
- *   7. Anthropic — claude-haiku-4-5          (paid, absolute last resort)
+ * Features:
+ *   - Quality tiers: 'fast' | 'balanced' | 'best' — caller picks the right
+ *     model class for the task; each provider routes to the appropriate model.
+ *   - Multi-key rotation: add GROQ_API_KEY_1, GROQ_API_KEY_2 etc. to multiply
+ *     free-tier capacity. Keys are rotated on quota/rate-limit errors.
+ *   - Fallback chain: Groq → Gemini → Cerebras → Anthropic (paid last resort)
+ *   - In-memory response cache (1h TTL) via aiCached()
  *
- * Models are picked at runtime — upgrading = change one string here.
- * Errors from each provider are logged so you know which are failing.
+ * Quality routing:
+ *   'fast'     → small/instant models  (8b class)   — simple formatting, classification
+ *   'balanced' → mid-tier              (70b class)  — default; most tasks
+ *   'best'     → largest available     (scout/235b) — complex reasoning, strategy
  *
- * Lesson learned from NinjaPA (2026-05): always have ≥3 free providers
- * so a single exhausted credit balance never takes the product down.
+ * Usage:
+ *   import { aiChat, aiCached } from '@/lib/ai'
+ *   const reply = await aiChat(messages)                        // balanced
+ *   const plan  = await aiChat(messages, system, 2048, 'best')  // best models
+ *
+ * Capacity scaling (add to .env):
+ *   GROQ_API_KEY_1=gsk_...     (free at console.groq.com)
+ *   GROQ_API_KEY_2=gsk_...
+ *   GEMINI_API_KEY_1=AIza...   (free at aistudio.google.com)
+ *   CEREBRAS_API_KEY=csk_...   (free at cloud.cerebras.ai)
  */
-import Groq from 'groq-sdk'
-import { GoogleGenerativeAI } from '@google/generative-ai'
-import Anthropic from '@anthropic-ai/sdk'
-import OpenAI from 'openai'
 import config from '@/vertical.config'
 
-// ── Model roster ─────────────────────────────────────────────────────────────
-// Change these strings to upgrade without touching caller code
-const GROQ_PRIMARY    = 'llama-3.3-70b-versatile'        // best free Groq model
-const GROQ_FALLBACK   = 'gemma2-9b-it'                   // lighter Groq fallback
-const GEMINI_PRIMARY  = 'gemini-2.0-flash'               // latest stable free Gemini
-const GEMINI_HEAVY    = 'gemini-2.5-flash-preview-05-20' // most capable free preview
-const CEREBRAS_MODEL  = 'llama3.1-70b'                   // free, very fast
-const TOGETHER_MODEL  = 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free' // free tier
-const CLAUDE_FALLBACK = 'claude-haiku-4-5-20251001'      // cheapest Claude (paid)
-
-// ── Lazy clients — instantiated at request time, not build time ──────────────
-function groq()      { return new Groq({ apiKey: process.env.GROQ_API_KEY! }) }
-function gemini()    { return new GoogleGenerativeAI(process.env.GEMINI_API_KEY!) }
-function cerebras()  {
-  return new OpenAI({
-    apiKey: process.env.CEREBRAS_API_KEY!,
-    baseURL: 'https://api.cerebras.ai/v1',
-  })
-}
-function together()  {
-  return new OpenAI({
-    apiKey: process.env.TOGETHER_API_KEY!,
-    baseURL: 'https://api.together.xyz/v1',
-  })
-}
-function anthropic() { return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! }) }
-
+// ── Types ─────────────────────────────────────────────────────────────────────
+export type Quality = 'fast' | 'balanced' | 'best'
 type Msg = { role: 'user' | 'assistant'; content: string }
+export interface AIResponse { text: string; provider: string; model: string }
 
-// Race a promise against a timeout — rejects with 'timeout' if too slow
-function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<T>((_, reject) =>
-      setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)
-    ),
-  ])
+// ── Model tiers per provider ──────────────────────────────────────────────────
+const GROQ_TIERS: Record<Quality, string[]> = {
+  fast:     ['llama-3.1-8b-instant'],
+  balanced: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'],
+  best:     ['meta-llama/llama-4-scout-17b-16e-instruct', 'qwen/qwen3-32b', 'llama-3.3-70b-versatile'],
 }
 
-export async function aiChat(messages: Msg[], systemPrompt?: string): Promise<string> {
-  const system    = systemPrompt ?? config.aiSystemPrompt
-  const groqMsgs  = [{ role: 'system' as const, content: system }, ...messages]
-  const TIMEOUT   = 8000   // 8s per provider — Vercel Hobby limit is 10s total
+const GEMINI_TIERS: Record<Quality, string[]> = {
+  fast:     ['gemini-2.0-flash-lite'],
+  balanced: ['gemini-2.0-flash', 'gemini-2.0-flash-lite'],
+  best:     ['gemini-2.5-flash', 'gemini-2.0-flash'],
+}
 
-  // ── 1. Groq llama-3.3-70b (free, fast, high quality) ────────────────────
-  if (process.env.GROQ_API_KEY) {
-    try {
-      const res = await withTimeout(
-        groq().chat.completions.create({
-          model:       GROQ_PRIMARY,
-          messages:    groqMsgs,
-          max_tokens:  3000,
-          temperature: 0.95,
-        }),
-        TIMEOUT, 'Groq primary'
-      )
-      const text = res.choices[0]?.message?.content
-      if (text) return text
-    } catch (e: any) {
-      console.warn('[AI] Groq primary failed:', e?.message ?? e)
-    }
+const CEREBRAS_TIERS: Record<Quality, string[]> = {
+  fast:     ['llama3.1-8b'],
+  balanced: ['gpt-oss-120b', 'llama3.1-8b'],
+  best:     ['qwen-3-235b-a22b-instruct-2507', 'gpt-oss-120b'],
+}
 
-    // ── 2. Groq gemma2-9b (free, lighter fallback) ──────────────────────
-    try {
-      const res = await withTimeout(
-        groq().chat.completions.create({
-          model:       GROQ_FALLBACK,
-          messages:    groqMsgs,
-          max_tokens:  3000,
-          temperature: 0.95,
-        }),
-        TIMEOUT, 'Groq fallback'
-      )
-      const text = res.choices[0]?.message?.content
-      if (text) return text
-    } catch (e: any) {
-      console.warn('[AI] Groq fallback failed:', e?.message ?? e)
-    }
+const CLAUDE_TIERS: Record<Quality, string> = {
+  fast:     'claude-haiku-4-5-20251001',
+  balanced: 'claude-haiku-4-5-20251001',
+  best:     'claude-sonnet-4-6',
+}
+
+// ── Key rotation helper ───────────────────────────────────────────────────────
+function getKeys(service: string): string[] {
+  const keys: string[] = []
+  const plain = process.env[`${service}_API_KEY`] || process.env[`${service}_TOKEN`]
+  if (plain) keys.push(plain)
+  for (let i = 1; i <= 10; i++) {
+    const k = process.env[`${service}_API_KEY_${i}`] || process.env[`${service}_TOKEN_${i}`]
+    if (k) keys.push(k)
+    else break
   }
+  return [...new Set(keys)]
+}
 
-  // ── 3. Gemini 2.0 Flash (free tier, very fast) ──────────────────────────
-  if (process.env.GEMINI_API_KEY) {
-    try {
-      const model   = gemini().getGenerativeModel({ model: GEMINI_PRIMARY, systemInstruction: system })
-      const history = messages.slice(0, -1).map(m => ({
-        role:  m.role === 'user' ? 'user' : 'model',
-        parts: [{ text: m.content }],
-      }))
-      const chat = model.startChat({ history })
-      const res  = await withTimeout(
-        chat.sendMessage(messages.at(-1)!.content),
-        TIMEOUT, 'Gemini 2.0'
-      )
-      const text = res.response.text()
-      if (text) return text
-    } catch (e: any) {
-      console.warn('[AI] Gemini 2.0 failed:', e?.message ?? e)
-    }
-
-    // ── 4. Gemini 2.5 Flash Preview (free, most capable Google) ──────────
-    try {
-      const model = gemini().getGenerativeModel({ model: GEMINI_HEAVY, systemInstruction: system })
-      const chat  = model.startChat({
-        history: messages.slice(0, -1).map(m => ({
-          role:  m.role === 'user' ? 'user' : 'model',
-          parts: [{ text: m.content }],
-        }))
-      })
-      const res  = await withTimeout(
-        chat.sendMessage(messages.at(-1)!.content),
-        TIMEOUT, 'Gemini 2.5'
-      )
-      const text = res.response.text()
-      if (text) return text
-    } catch (e: any) {
-      console.warn('[AI] Gemini 2.5 failed:', e?.message ?? e)
-    }
-  }
-
-  // ── 5. Cerebras llama3.1-70b (free, very fast inference) ────────────────
-  if (process.env.CEREBRAS_API_KEY) {
-    try {
-      const res = await withTimeout(
-        cerebras().chat.completions.create({
-          model:      CEREBRAS_MODEL,
-          messages:   groqMsgs,
-          max_tokens: 3000,
-        }),
-        TIMEOUT, 'Cerebras'
-      )
-      const text = res.choices[0]?.message?.content
-      if (text) return text
-    } catch (e: any) {
-      console.warn('[AI] Cerebras failed:', e?.message ?? e)
-    }
-  }
-
-  // ── 6. Together AI llama3.3-70b-free (free tier) ────────────────────────
-  if (process.env.TOGETHER_API_KEY) {
-    try {
-      const res = await withTimeout(
-        together().chat.completions.create({
-          model:      TOGETHER_MODEL,
-          messages:   groqMsgs,
-          max_tokens: 3000,
-        }),
-        TIMEOUT, 'Together'
-      )
-      const text = res.choices[0]?.message?.content
-      if (text) return text
-    } catch (e: any) {
-      console.warn('[AI] Together failed:', e?.message ?? e)
-    }
-  }
-
-  // ── 7. Claude Haiku (paid, absolute last resort) ─────────────────────────
-  const res = await withTimeout(
-    anthropic().messages.create({
-      model:      CLAUDE_FALLBACK,
-      max_tokens: 3000,
-      system,
-      messages,
-    }),
-    20000, 'Claude Haiku'
+// ── Error classification ──────────────────────────────────────────────────────
+function isQuotaError(msg: string): boolean {
+  const m = msg.toLowerCase()
+  return (
+    m.includes('exhausted') || m.includes('rate_limit') || m.includes('rate limit') ||
+    m.includes('quota') || m.includes('exceeded') || m.includes('billing') ||
+    m.includes('credit') || m.includes('limit reached') || m.includes('timed out') ||
+    m.includes('401') || m.includes('403') || m.includes('invalid_api_key') ||
+    m.includes('unauthorized') || m.includes('not configured') || m.includes('no keys') ||
+    m.includes('model_not_active') || m.includes('model not found') ||
+    m.includes('not supported') || m.includes('overloaded') ||
+    m.includes('service unavailable') || m.includes('529')
   )
-  return (res.content[0] as { text: string }).text
 }
 
-// ── In-memory response cache (per-process, 1h TTL) ───────────────────────────
-// Use aiCached() to avoid calling the AI for identical prompts within the hour.
-// Key should be deterministic for the same logical request.
-const cache = new Map<string, { text: string; ts: number }>()
-const TTL   = 60 * 60 * 1000
+const TIMEOUT_MS = 30_000
+
+function withTimeout<T>(promise: Promise<T>, label: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error(`${label} timed out after ${TIMEOUT_MS / 1000}s`)), TIMEOUT_MS)
+    promise.then(v => { clearTimeout(t); resolve(v) }, e => { clearTimeout(t); reject(e) })
+  })
+}
+
+// ── Generic OpenAI-compatible fetch ──────────────────────────────────────────
+async function callOpenAICompat(
+  baseUrl: string, providerName: string, key: string, model: string,
+  system: string, messages: Msg[], maxTokens: number,
+): Promise<string> {
+  const res = await fetch(`${baseUrl}/chat/completions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
+    body: JSON.stringify({
+      model, max_tokens: maxTokens,
+      messages: [{ role: 'system', content: system }, ...messages],
+    }),
+  })
+  if (!res.ok) {
+    const e = await res.text()
+    throw new Error(`${providerName}/${model} ${res.status}: ${e.slice(0, 200)}`)
+  }
+  const data = await res.json() as any
+  return data.choices?.[0]?.message?.content || ''
+}
+
+// ── Provider callers (model tier + key rotation) ──────────────────────────────
+async function callProvider(
+  baseUrl: string, providerName: string, service: string,
+  models: string[], system: string, messages: Msg[], maxTokens: number,
+): Promise<{ text: string; model: string }> {
+  const keys = getKeys(service)
+  if (keys.length === 0) throw new Error(`${service} not configured`)
+
+  for (const model of models) {
+    for (const key of keys) {
+      try {
+        const text = await withTimeout(
+          callOpenAICompat(baseUrl, providerName, key, model, system, messages, maxTokens),
+          `${providerName}/${model}`,
+        )
+        if (text) return { text, model }
+      } catch (e: any) {
+        const msg = (e.message || '').slice(0, 150)
+        if (isQuotaError(msg)) {
+          console.warn(`[AI] ${providerName}/${model} quota/skip: ${msg.slice(0, 80)}`)
+          continue
+        }
+        throw e
+      }
+    }
+  }
+  throw new Error(`All ${providerName} models/keys exhausted`)
+}
+
+async function callAnthropic(
+  quality: Quality, system: string, messages: Msg[], maxTokens: number,
+): Promise<{ text: string; model: string }> {
+  const key = getKeys('ANTHROPIC')[0]
+  if (!key) throw new Error('ANTHROPIC not configured')
+  const model = CLAUDE_TIERS[quality]
+  const { default: Anthropic } = await import('@anthropic-ai/sdk')
+  const client = new Anthropic({ apiKey: key })
+  const res = await withTimeout(
+    client.messages.create({ model, max_tokens: maxTokens, system, messages }),
+    'Anthropic',
+  )
+  return { text: (res.content[0] as { text: string }).text, model }
+}
+
+// ── Core callAI — used by all projects ───────────────────────────────────────
+export async function callAI(
+  system: string,
+  messages: Msg[],
+  maxTokens = 1024,
+  quality: Quality = 'balanced',
+): Promise<AIResponse> {
+  const providers = [
+    { name: 'groq',      fn: () => callProvider('https://api.groq.com/openai/v1',                          'Groq',     'GROQ',     GROQ_TIERS[quality],     system, messages, maxTokens) },
+    { name: 'gemini',    fn: () => callProvider('https://generativelanguage.googleapis.com/v1beta/openai', 'Gemini',   'GEMINI',   GEMINI_TIERS[quality],   system, messages, maxTokens) },
+    { name: 'cerebras',  fn: () => callProvider('https://api.cerebras.ai/v1',                              'Cerebras', 'CEREBRAS', CEREBRAS_TIERS[quality], system, messages, maxTokens) },
+    { name: 'anthropic', fn: () => callAnthropic(quality, system, messages, maxTokens) },
+  ]
+
+  const tried: string[] = []
+  for (const { name, fn } of providers) {
+    try {
+      const { text, model } = await fn()
+      if (text) {
+        if (tried.length) console.warn(`[AI] fell back to ${name}/${model} after: ${tried.join(' → ')}`)
+        return { text, provider: name, model }
+      }
+    } catch (e: any) {
+      const msg = (e.message || '').slice(0, 120)
+      tried.push(`${name}(${msg})`)
+      console.warn(`[AI] ${name} failed — trying next. Reason: ${msg}`)
+    }
+  }
+  throw new Error(`All AI providers exhausted. Tried: ${tried.join(' | ')}`)
+}
+
+// ── Convenience wrapper (backward-compatible with old aiChat signature) ────────
+export async function aiChat(
+  messages: Msg[],
+  systemPrompt?: string,
+  maxTokens = 700,
+  quality: Quality = 'balanced',
+): Promise<string> {
+  const system = systemPrompt ?? config.aiSystemPrompt
+  const { text } = await callAI(system, messages, maxTokens, quality)
+  return text
+}
+
+// ── In-memory response cache (1h TTL) ────────────────────────────────────────
+const _cache = new Map<string, { text: string; ts: number }>()
+const TTL    = 60 * 60 * 1000
 
 export async function aiCached(key: string, fn: () => Promise<string>): Promise<string> {
-  const hit = cache.get(key)
+  const hit = _cache.get(key)
   if (hit && Date.now() - hit.ts < TTL) return hit.text
   const text = await fn()
-  cache.set(key, { text, ts: Date.now() })
+  _cache.set(key, { text, ts: Date.now() })
   return text
 }
