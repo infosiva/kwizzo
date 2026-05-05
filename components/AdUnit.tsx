@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 interface AdUnitProps {
   size?: 'banner' | 'rectangle'
   className?: string
+  slot?: string    // forward-compat with AdSense slot IDs (unused internally)
+  format?: string  // forward-compat (unused internally)
 }
 
 // ── Adsterra keys for kwizzo.app (approved 2026-05-04) ───────────────────────
