@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title:       config.metaTitle,
-  description: 'Join 10,000+ players! AI-generated quizzes for all ages. No sign-up required!',
+  description: 'Play AI-generated quizzes for all ages - no sign-up needed! Join 10,000+ players and start your quiz journey today!',
   keywords:    config.keywords,
 }
 

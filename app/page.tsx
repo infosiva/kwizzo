@@ -49,12 +49,12 @@ export default function HomePage() {
           </h1>
 
           <p className="text-white/50 text-base sm:text-lg mb-8 max-w-lg mx-auto">
-            AI creates age-perfect questions for every player. Trusted by 10,000+ players. Pick a topic, add names, and let the battle begin.
+            AI creates age-perfect questions for every player. Trusted by 10,000+ players. 100% free, no sign-up required. Pick a topic, add names, and let the battle begin.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
             <Link href="/play?mode=solo" className={btn.primary + ' text-base px-8 py-4 font-black tracking-wide'}>
-              START PLAYING SOLO <ArrowRight size={18} />
+              Start Your Quiz Adventure <ArrowRight size={18} />
             </Link>
             <Link href="/play?mode=group" className={btn.secondary + ' text-base px-8 py-4 font-black tracking-wide'}>
               <Users size={16} /> MULTIPLAYER
