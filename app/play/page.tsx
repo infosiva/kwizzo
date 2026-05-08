@@ -6,6 +6,8 @@ import config from '@/vertical.config'
 import { isAiTool } from '@/vertical.config'
 import { theme, btn } from '@/lib/theme'
 import { isProUser, startCheckout } from '@/lib/pro'
+import { useGate } from '@/lib/shared/useGate'
+import RegisterGate from '@/lib/shared/RegisterGate'
 
 function getParam(key: string): string {
   if (typeof window === 'undefined') return ''
@@ -45,6 +47,8 @@ function PlayContent() {
   const [customTopic, setCustomTopic] = useState('')
   const [proLoading,  setProLoading]  = useState(false)
   const [step,        setStep]        = useState<'topic' | 'players'>(defaultSubject ? 'players' : 'topic')
+
+  const { count: gateCount, showGate, increment: gateIncrement, onRegistered, dismissGate } = useGate('kwizzo', 3)
 
   useEffect(() => { setIsPro(isProUser()) }, [])
 
@@ -102,6 +106,8 @@ function PlayContent() {
     if (gameType === 'draw' && valid.length < 2) {
       setError('Draw & Guess needs at least 2 players.'); return
     }
+    gateIncrement()
+    if (showGate) return
     setCreating(true)
     try {
       const code = String(Math.floor(1000 + Math.random() * 9000))
@@ -408,6 +414,19 @@ function PlayContent() {
           </>
         )}
       </div>
+
+      {showGate && (
+        <RegisterGate
+          freeUsed={gateCount}
+          freeLimit={3}
+          freeFeature="game rounds"
+          lockedFeature="unlimited games, tournaments & leaderboards"
+          accentColor="#7c3aed"
+          site="kwizzo"
+          onSuccess={onRegistered}
+          onDismiss={dismissGate}
+        />
+      )}
     </div>
   )
 }
