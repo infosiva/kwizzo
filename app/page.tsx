@@ -66,6 +66,12 @@ export default function HomePage() {
               <span key={f} className="text-xs text-violet-300/70 bg-violet-500/10 border border-violet-500/20 px-3 py-1 rounded-full">{f}</span>
             ))}
           </div>
+
+          <div className="flex flex-col items-center gap-0.5 text-xs opacity-50 mt-3">
+            <span>✓ 3 free rounds — no account needed</span>
+            <span>✓ Register free for unlimited access</span>
+            <span>✓ No credit card ever</span>
+          </div>
         </div>
 
         {/* Fake leaderboard — decorative social proof */}
@@ -173,11 +179,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── AD — between steps and CTA ── */}
-      <div className="px-4 sm:px-6 pb-6 max-w-2xl mx-auto w-full">
-        <AdUnit size="banner" />
-      </div>
-
       {/* ── CTA FOOTER ──────────────────────────────────────── */}
       <section className="py-12 sm:py-16 px-4 sm:px-6 glass border-t border-white/[0.05]">
         <div className="max-w-2xl mx-auto text-center">
@@ -188,8 +189,18 @@ export default function HomePage() {
             <Link href="/play?mode=solo"  className={btn.primary  + ' text-base px-10 py-4 font-black'}>Play Solo ⚡</Link>
             <Link href="/play?mode=group" className={btn.secondary + ' text-base px-10 py-4 font-black'}>Play with Family 👨‍👩‍👧‍👦</Link>
           </div>
+          <div className="flex flex-col items-center gap-0.5 text-xs opacity-50 mt-3">
+            <span>✓ 3 free rounds — no account needed</span>
+            <span>✓ Register free for unlimited access</span>
+            <span>✓ No credit card ever</span>
+          </div>
         </div>
       </section>
+
+      {/* ── AD — bottom of page ── */}
+      <div className="px-4 sm:px-6 py-6 max-w-2xl mx-auto w-full">
+        <AdUnit size="banner" />
+      </div>
     </div>
   )
 }
