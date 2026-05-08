@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { aiChat } from '@/lib/ai'
 import config from '@/vertical.config'
 import { isAiTool } from '@/vertical.config'
+import { AI_LIMITER } from '@/lib/rateLimit'
 
 // Allow up to 60s on Vercel Hobby — AI chains can take 20-40s across providers
 export const maxDuration = 60
@@ -193,6 +194,9 @@ Return ONLY valid JSON — no markdown, no explanation outside JSON:
 }
 
 export async function POST(req: NextRequest) {
+  const limited = AI_LIMITER.check(req)
+  if (limited) return limited
+
   try {
     const body = await req.json()
     const { topic, members } = body as {

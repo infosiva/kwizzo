@@ -106,8 +106,8 @@ function PlayContent() {
     if (gameType === 'draw' && valid.length < 2) {
       setError('Draw & Guess needs at least 2 players.'); return
     }
-    gateIncrement()
-    if (showGate) return
+    const allowed = await gateIncrement()
+    if (!allowed) return
     setCreating(true)
     try {
       const code = String(Math.floor(1000 + Math.random() * 9000))
