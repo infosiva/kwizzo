@@ -5,6 +5,7 @@ import './globals.css'
 import config from '@/vertical.config'
 import { getMeshStyle, getScrollbarColor, COLOR_MAP } from '@/lib/themeColors'
 import Navbar from '@/components/Navbar'
+import ChatBot from '@/components/ChatBot'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -51,6 +52,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="flex-1">
           {children}
         </main>
+
+        <ChatBot />
 
         <footer className="border-t border-white/[0.06] py-8 px-6">
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-white/40 text-sm">
