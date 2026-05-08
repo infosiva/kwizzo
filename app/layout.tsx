@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import Script from 'next/script'
 import './globals.css'
 import config from '@/vertical.config'
 import { getMeshStyle, getScrollbarColor, COLOR_MAP } from '@/lib/themeColors'
 import Navbar from '@/components/Navbar'
 import ChatBot from '@/components/ChatBot'
+import Providers from '@/components/Providers'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -39,19 +39,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Dynamic mesh gradient bg — changes per vertical */}
         <div style={meshStyle} />
 
-        {/* AdSense auto-ads — activates automatically once site is approved */}
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4237294630161176"
-          crossOrigin="anonymous"
-          strategy="lazyOnload"
-        />
-
         <Navbar />
 
-        <main className="flex-1">
-          {children}
-        </main>
+        <Providers>
+          <main className="flex-1">
+            {children}
+          </main>
+        </Providers>
 
         <ChatBot />
 

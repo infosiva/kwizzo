@@ -3,7 +3,6 @@ import { ArrowRight, Sparkles, Zap, Users, Star } from 'lucide-react'
 import config from '@/vertical.config'
 import { theme, btn } from '@/lib/theme'
 import { isAiTool } from '@/vertical.config'
-import AdUnit from '@/components/AdUnit'
 
 const FEATURES = [
   { icon: '🎲', title: 'Never the same quiz twice', desc: 'AI generates fresh questions every round — even on the same topic.' },
@@ -197,10 +196,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── AD — bottom of page ── */}
-      <div className="px-4 sm:px-6 py-6 max-w-2xl mx-auto w-full">
-        <AdUnit size="banner" />
-      </div>
+
     </div>
   )
 }

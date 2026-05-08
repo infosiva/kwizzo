@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { ArrowRight, Trophy, RotateCcw, Home, CheckCircle, XCircle } from 'lucide-react'
 import { theme, btn } from '@/lib/theme'
-import AdUnit from '@/components/AdUnit'
 import ProWall from '@/components/ProWall'
 import { isProUser, FREE_QUESTION_LIMIT } from '@/lib/pro'
 import type { Question } from '@/app/api/quiz/generate/route'
@@ -422,8 +421,6 @@ function QuizContent() {
           </button>
         </div>
 
-        {/* Quiet ad — shown only after quiz finishes, not during play */}
-        <AdUnit size="rectangle" className="mt-4" />
       </div>
     )
   }
