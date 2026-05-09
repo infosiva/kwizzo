@@ -178,3 +178,47 @@ body {
   transform: translateY(-4px) scale(1.02);
   box-shadow: 0 12px 40px rgba(139,92,246,0.25);
 }
+
+/* Magic UI — shimmer animation */
+@keyframes shimmer-slide {
+  to {
+    transform: translate(calc(100cqw - 100%), 0);
+  }
+}
+
+.animate-shimmer-slide {
+  animation: shimmer-slide var(--speed, 3s) ease-in-out infinite alternate;
+}
+
+/* Magic UI — animate-in utilities */
+@keyframes slide-in-from-top-4 {
+  from {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation-fill-mode: both;
+}
+
+.slide-in-from-top-4 {
+  animation-name: slide-in-from-top-4;
+}
+
+.fade-in {
+  animation-name: fade-in-opacity;
+}
+
+@keyframes fade-in-opacity {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.duration-300 {
+  animation-duration: 300ms;
+}
