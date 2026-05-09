@@ -6,6 +6,9 @@ import { ArrowRight, Zap, Users, Star, Trophy, Sparkles, Crown, CheckCircle2, XC
 import config from '@/vertical.config'
 import { theme, btn } from '@/lib/theme'
 import { isAiTool } from '@/vertical.config'
+import { ShimmerButton } from '@/components/magicui/shimmer-button'
+import { NumberTicker } from '@/components/magicui/number-ticker'
+import { AnimatedList } from '@/components/magicui/animated-list'
 
 /* ── helpers ─────────────────────────────────────────────── */
 const PRO_KEY = 'kwizzo-pro'
@@ -66,30 +69,11 @@ const CONFETTI = Array.from({ length: 26 }, (_, i) => ({
   rotate: i % 3 === 0 ? 45 : 0,
 }))
 
-/* ── count-up hook ───────────────────────────────────────── */
-function useCountUp(target: number, duration = 1600, start = false) {
-  const [count, setCount] = useState(0)
-  useEffect(() => {
-    if (!start) return
-    let frame = 0
-    const totalFrames = Math.round((duration / 1000) * 60)
-    const timer = setInterval(() => {
-      frame++
-      const progress = frame / totalFrames
-      const eased = 1 - Math.pow(1 - progress, 3)
-      setCount(Math.round(eased * target))
-      if (frame >= totalFrames) clearInterval(timer)
-    }, 1000 / 60)
-    return () => clearInterval(timer)
-  }, [target, duration, start])
-  return count
-}
 
 /* ── stat item with count-up ─────────────────────────────── */
 function StatItem({ target, suffix, label }: { target: number; suffix: string; label: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
-  const count = useCountUp(target, 1400, visible)
 
   useEffect(() => {
     const el = ref.current
@@ -99,14 +83,14 @@ function StatItem({ target, suffix, label }: { target: number; suffix: string; l
     return () => obs.disconnect()
   }, [])
 
-  const display = target >= 1000
-    ? count >= 1000 ? `${(count / 1000).toFixed(0)}k` : count.toString()
-    : count.toString()
-
   return (
     <div ref={ref} className="text-center">
       <div className={`text-2xl sm:text-3xl font-black ${theme.gradientText} tabular-nums`}>
-        {display}{suffix}
+        {visible ? (
+          <NumberTicker value={target} suffix={suffix} className="font-bold text-3xl text-white" />
+        ) : (
+          <span>0{suffix}</span>
+        )}
       </div>
       <div className="text-white/40 text-xs mt-1">{label}</div>
     </div>
@@ -269,10 +253,10 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-7">
-            <Link href="/play?mode=solo"
-              className={btn.primary + ' text-base px-9 py-4 font-black tracking-wide text-lg'}
-              style={{ boxShadow: '0 0 30px rgba(139,92,246,0.5), 0 4px 20px rgba(0,0,0,0.4)' }}>
-              ⚡ Start Playing Free <ArrowRight size={18} />
+            <Link href="/play?mode=solo">
+              <ShimmerButton background="rgba(124, 58, 237, 1)" shimmerColor="#e9d5ff" className="px-8 py-4 text-lg font-semibold">
+                ⚡ Start Playing Free →
+              </ShimmerButton>
             </Link>
             <Link href="/play?mode=group" className={btn.secondary + ' text-base px-9 py-4 font-black tracking-wide text-lg'}>
               <Users size={16} /> Family Mode
@@ -348,7 +332,7 @@ export default function HomePage() {
           <p className="text-white/40 text-sm mt-2">Rankings update live after every question — no mercy</p>
         </div>
 
-        <div className="max-w-lg mx-auto space-y-3">
+        <AnimatedList delay={800} className="w-full max-w-lg mx-auto">
           {LEADERBOARD.map((p, i) => (
             <div key={p.name}
               className={`flex items-center gap-4 px-5 py-4 rounded-2xl border transition-all duration-700 ${i === 0 ? 'border-yellow-500/50 bg-gradient-to-r from-yellow-500/10 to-amber-400/5' : 'border-white/10 bg-white/[0.04]'}`}
@@ -381,7 +365,7 @@ export default function HomePage() {
               </div>
             </div>
           ))}
-        </div>
+        </AnimatedList>
 
         <p className="text-center text-white/30 text-xs mt-4">
           Sample leaderboard — your family&apos;s scores will appear here in real time
