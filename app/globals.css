@@ -157,6 +157,26 @@ body {
   100% { transform: rotate(360deg) translateY(0); }
 }
 
+/* ── Animated blob background ───────────────────────────── */
+@keyframes meshBlob1 {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  33%       { transform: translate(40px,-60px) scale(1.12); }
+  66%       { transform: translate(-30px,40px) scale(0.9); }
+}
+@keyframes meshBlob2 {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  40%       { transform: translate(-50px,50px) scale(1.08); }
+  70%       { transform: translate(40px,-30px) scale(0.94); }
+}
+@keyframes meshBlob3 {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  30%       { transform: translate(30px,50px) scale(0.92); }
+  60%       { transform: translate(-40px,-40px) scale(1.1); }
+}
+.mesh-blob1 { animation: meshBlob1 16s ease-in-out infinite; }
+.mesh-blob2 { animation: meshBlob2 20s ease-in-out 4s infinite; }
+.mesh-blob3 { animation: meshBlob3 14s ease-in-out 8s infinite; }
+
 /* ── Hero text shimmer gradient ─────────────────────────── */
 @keyframes textGlow {
   0%, 100% { filter: drop-shadow(0 0 20px rgba(139,92,246,0.5)); }
