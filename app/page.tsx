@@ -9,6 +9,14 @@ import { isAiTool } from '@/vertical.config'
 import { ShimmerButton } from '@/components/magicui/shimmer-button'
 import { NumberTicker } from '@/components/magicui/number-ticker'
 import { AnimatedList } from '@/components/magicui/animated-list'
+import GuidedTour, { type TourStep } from '@/components/GuidedTour'
+
+const KWIZZO_TOUR: TourStep[] = [
+  { target: '#hero-play-btn', title: 'Play a quiz free', icon: '⚡', body: 'Pick any topic — AI generates fresh questions instantly. No account needed.', placement: 'bottom' },
+  { target: '#subjects', title: 'Choose a subject', icon: '🎯', body: 'Science, history, sport, pop culture — tap any card to start that quiz.', placement: 'top' },
+  { target: '#leaderboard', title: 'Live leaderboard', icon: '🏆', body: 'Rankings update in real-time as each answer comes in — family drama guaranteed.', placement: 'top' },
+  { target: '#why-pro', title: 'Go unlimited with Pro', icon: '👑', body: 'Remove limits and unlock every category for the whole family.', placement: 'top' },
+]
 
 /* ── helpers ─────────────────────────────────────────────── */
 const PRO_KEY = 'kwizzo-pro'
@@ -253,7 +261,7 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-7">
-            <Link href="/play?mode=solo">
+            <Link href="/play?mode=solo" id="hero-play-btn">
               <ShimmerButton background="rgba(124, 58, 237, 1)" shimmerColor="#e9d5ff" className="px-8 py-4 text-lg font-semibold">
                 ⚡ Start Playing Free →
               </ShimmerButton>
@@ -598,6 +606,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      <GuidedTour steps={KWIZZO_TOUR} storageKey="kwizzo_tour_v1" accentColor="#7c3aed" />
     </div>
   )
 }
