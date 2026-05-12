@@ -576,7 +576,7 @@ function QuizContent() {
 
       {/* Result + explanation */}
       {gameState === 'answered' && (
-        <div className={`${theme.card} p-4 mb-24 border fade-up ${isCorrect ? 'border-green-500/30' : 'border-red-500/30'}`}>
+        <div className={`${theme.card} p-4 mb-6 border fade-up ${isCorrect ? 'border-green-500/30' : 'border-red-500/30'}`}>
           <div className={`flex items-center gap-2 font-bold mb-1 text-sm ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
             {isCorrect
               ? <><CheckCircle size={16} />{streak >= 3 ? ` ${streak} in a row, ${displayName(activeName)}! 🔥` : ` Correct! Well done, ${displayName(activeName)}!`}</>
@@ -589,7 +589,7 @@ function QuizContent() {
 
       {/* Next button — sticky at bottom so it's always visible without scrolling */}
       {gameState === 'answered' && (
-        <div className="fixed bottom-0 left-0 right-0 px-3 pb-5 pt-3 bg-gradient-to-t from-[#080712] via-[#080712]/90 to-transparent z-20">
+        <div className="fixed bottom-0 left-0 right-0 px-3 pt-3 bg-gradient-to-t from-[#080712] via-[#080712]/90 to-transparent z-20" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}>
           <button onClick={handleNext} className={btn.primary + ' w-full justify-center py-4 text-base max-w-2xl mx-auto'}>
             {currentQ + 1 >= totalQsForPlayer ? (
               activePlayerIdx + 1 < members.length

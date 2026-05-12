@@ -252,7 +252,7 @@ function PlayContent() {
                         <button
                           key={s.id}
                           onClick={() => selectSubject(s.id)}
-                          className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                          className={`flex items-center gap-1.5 px-3 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap min-h-[44px] ${
                             subject === s.id
                               ? `bg-gradient-to-r ${theme.gradient} text-white shadow-lg scale-105`
                               : 'bg-white/[0.06] hover:bg-white/[0.12] text-white/60 border border-white/[0.08]'
@@ -360,12 +360,13 @@ function PlayContent() {
                         <div className="w-px h-4 bg-white/[0.10] shrink-0" />
                         <input
                           className="w-10 bg-transparent text-white/60 text-sm text-center font-semibold placeholder:text-white/20 outline-none shrink-0"
-                          type="number"
-                          placeholder="Age"
-                          min="3" max="110"
+                          type="text"
                           inputMode="numeric"
+                          pattern="[0-9]*"
+                          placeholder="Age"
+                          maxLength={3}
                           value={m.age}
-                          onChange={e => updateMember(i, 'age', e.target.value)}
+                          onChange={e => updateMember(i, 'age', e.target.value.replace(/\D/g, ''))}
                         />
                         <span className="text-white/20 text-xs shrink-0">yrs</span>
                         {members.length > 1 && (
