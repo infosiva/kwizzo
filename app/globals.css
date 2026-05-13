@@ -242,3 +242,6 @@ body {
 .duration-300 {
   animation-duration: 300ms;
 }
+
+/* ── Mobile: prevent horizontal overflow on all devices ── */
+html, body { overflow-x: hidden; max-width: 100%; }
