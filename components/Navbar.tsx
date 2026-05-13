@@ -40,11 +40,11 @@ export default function Navbar() {
               </div>
             ) : (
               <button onClick={() => setAuthOpen(true)} className="px-4 py-2 rounded-full text-sm font-bold text-white transition-all hover:scale-105" style={{ background: 'linear-gradient(135deg, #7c3aed, #a855f7)' }}>
-                Sign in free ⚡
+                Sign in for Free Play ⚡
               </button>
             )}
             <Link href="/play?mode=create" className="relative px-4 py-2 rounded-full text-sm font-bold text-white overflow-hidden transition-all hover:scale-105" style={{ background: 'linear-gradient(135deg, #7c3aed, #a855f7)' }}>
-              Play Free ⚡
+              Start Quiz for Free ⚡
             </Link>
           </div>
 
