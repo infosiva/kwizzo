@@ -7,6 +7,8 @@ import Navbar from '@/components/Navbar'
 import ChatBot from '@/components/ChatBot'
 import Providers from '@/components/Providers'
 import FeedbackWidget from '@/components/FeedbackWidget'
+import CookieConsent from "../components/CookieConsent";
+import Footer from "../components/Footer";
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -57,16 +59,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ChatBot />
         <FeedbackWidget siteName="Kwizzo" accentColor="#7c3aed" accentColor2="#a855f7" />
 
-        <footer className="border-t border-white/[0.06] py-8 px-6">
-          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-white/40 text-sm">
-            <span>© {new Date().getFullYear()} {config.name}. All rights reserved.</span>
-            <div className="flex gap-6">
-              <a href="/privacy" className="hover:text-white/70 transition-colors">Privacy</a>
-              <a href="/terms"   className="hover:text-white/70 transition-colors">Terms</a>
-              <a href="/contact" className="hover:text-white/70 transition-colors">Contact</a>
-            </div>
-          </div>
-        </footer>
+        <Footer siteName={config.name} />
+      <CookieConsent />
       </body>
     </html>
   )
