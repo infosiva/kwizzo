@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { Crown, CheckCircle2, Zap, Users } from 'lucide-react'
+import { StreakBar } from '@/components/Gamification'
 import config from '@/vertical.config'
 import { theme, btn } from '@/lib/theme'
 import { isAiTool } from '@/vertical.config'
@@ -244,10 +245,15 @@ export default function HomePage() {
         </div>
       )}
 
+      {/* ── STREAK BAR ── */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6">
+        <StreakBar streakKey="kwizzo-streak" />
+      </div>
+
       {/* ══════════════════════════════════════════
           HERO — two column, compact
       ══════════════════════════════════════════ */}
-      <section className="relative px-4 sm:px-6 pt-10 pb-8 max-w-6xl mx-auto">
+      <section className="relative px-4 sm:px-6 pt-4 pb-8 max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
 
           {/* LEFT — copy + CTAs */}
