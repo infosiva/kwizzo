@@ -4,13 +4,17 @@
  * Add more colours as needed when adding new presets.
  */
 export const COLOR_MAP: Record<string, { primary: string; secondary: string; base: string }> = {
-  violet:  { primary: '#7c3aed', secondary: '#3b82f6', base: '#080712' },
+  // Kwizzo — rich violet + electric blue, deep dark
+  violet:  { primary: '#7c3aed', secondary: '#6366f1', base: '#07060f' },
+  // Tutiq — bright emerald + teal, forest dark
+  emerald: { primary: '#059669', secondary: '#0d9488', base: '#030d09' },
+  // QuizBites — electric blue + cyan, navy dark
+  blue:    { primary: '#2563eb', secondary: '#0ea5e9', base: '#030b18' },
+  // Others
   indigo:  { primary: '#4f46e5', secondary: '#7c3aed', base: '#070812' },
-  blue:    { primary: '#2563eb', secondary: '#0ea5e9', base: '#07101a' },
   cyan:    { primary: '#0891b2', secondary: '#2563eb', base: '#051215' },
   teal:    { primary: '#0d9488', secondary: '#0891b2', base: '#051210' },
   green:   { primary: '#16a34a', secondary: '#0d9488', base: '#051208' },
-  emerald: { primary: '#059669', secondary: '#16a34a', base: '#05120a' },
   orange:  { primary: '#ea580c', secondary: '#d97706', base: '#130a02' },
   amber:   { primary: '#d97706', secondary: '#ea580c', base: '#120e02' },
   red:     { primary: '#dc2626', secondary: '#ea580c', base: '#130305' },
