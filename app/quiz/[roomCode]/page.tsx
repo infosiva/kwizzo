@@ -1,11 +1,12 @@
 'use client'
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { ArrowRight, Trophy, RotateCcw, Home, CheckCircle, XCircle } from 'lucide-react'
+import { ArrowRight, Trophy, RotateCcw, Home, CheckCircle, XCircle, Volume2, VolumeX } from 'lucide-react'
 import { theme, btn } from '@/lib/theme'
 import ProWall from '@/components/ProWall'
 import { isProUser, FREE_QUESTION_LIMIT } from '@/lib/pro'
 import type { Question } from '@/app/api/quiz/generate/route'
+import { useVoiceFeedback } from '@/lib/useVoiceFeedback'
 
 type Member = { name: string; age: string }
 type GameState = 'loading' | 'choosing' | 'playing' | 'answered' | 'finished' | 'pro-wall'
@@ -49,8 +50,10 @@ function QuizContent() {
   const [fastestSec,      setFastestSec]      = useState<number | null>(null) // fastest answer in seconds
   const [fastestBy,       setFastestBy]       = useState('')
   const [qKey,            setQKey]            = useState(0)       // changes on every new Q, triggers stagger animation
-  const [isPro,           setIsPro]           = useState(false)   // Pro subscription status
+  const [isPro,           setIsPro]           = useState(false)
+  const [voiceOn,         setVoiceOn]         = useState(true)
 
+  const { speakResult, speakQuestion, cancel: cancelVoice, supported: voiceSupported } = useVoiceFeedback({ pitch: 1.15, rate: 1.1 })
   const topRef = useRef<HTMLDivElement>(null)
 
   // Check Pro status once on mount
@@ -160,6 +163,7 @@ function QuizContent() {
     setGameState('answered')
 
     const correct    = opt === q.answer
+    if (voiceOn) speakResult(correct, correct ? undefined : (q.options?.[q.answer] ?? q.answer))
     const elapsed    = answerStartTime ? Math.round((Date.now() - answerStartTime) / 1000) : 99
     const activeName = members[activePlayerIdx]?.name ?? scores[0]?.name
 
@@ -465,8 +469,18 @@ function QuizContent() {
             <div className="text-white/35 text-xs truncate">Age {activeAge} · <span className="capitalize">{topicLabel}</span></div>
           </div>
         </div>
-        {/* Right: Q number + streak */}
+        {/* Right: voice toggle + Q number + streak */}
         <div className="shrink-0 text-right flex items-center gap-3">
+          {voiceSupported && (
+            <button
+              onClick={() => { setVoiceOn(v => !v); if (voiceOn) cancelVoice() }}
+              className="p-1.5 rounded-lg transition-colors"
+              style={{ background: voiceOn ? 'rgba(139,92,246,0.15)' : 'rgba(255,255,255,0.04)', color: voiceOn ? '#a78bfa' : 'rgba(255,255,255,0.2)' }}
+              title={voiceOn ? 'Mute voice' : 'Enable voice'}
+            >
+              {voiceOn ? <Volume2 size={14} /> : <VolumeX size={14} />}
+            </button>
+          )}
           {streak >= 2 && (
             <div className="text-right">
               <div className="text-orange-400 font-bold text-sm tabular-nums leading-tight">🔥 {streak}</div>
