@@ -18,7 +18,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-body' })
 
 export const metadata: Metadata = {
   title:       config.metaTitle,
-  description: 'Discover Kwizzo, the ultimate AI-generated quiz platform for all ages. Play for free, no sign-up needed! Join 10,000+ players and start your quiz journey today!',
+  description: 'Discover Kwizzo, the ultimate AI-generated quiz platform for all ages. Play for free, no sign-up needed. New quizzes every day across science, history, sports and more!',
   keywords:    config.keywords,
 }
 
@@ -66,6 +66,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <Footer siteName={config.name} />
       <CookieConsent />
+        {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
+        <script src="http://31.97.56.148:3098/t.js" data-site="kwizzo.app" defer></script>
       </body>
     </html>
   )
