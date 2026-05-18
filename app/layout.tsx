@@ -1,3 +1,4 @@
+'use client'
 import type { Metadata } from 'next'
 import { Nunito, Inter } from 'next/font/google'
 
@@ -5,6 +6,7 @@ const nunito = Nunito({ subsets: ['latin'], weight: ['700', '800', '900'], varia
 import './globals.css'
 import config from '@/vertical.config'
 import { getMeshStyle, getScrollbarColor, COLOR_MAP } from '@/lib/themeColors'
+import PageTracker from '@/components/PageTracker'
 import Navbar from '@/components/Navbar'
 import ChatBot from '@/components/ChatBot'
 import Providers from '@/components/Providers'
@@ -50,6 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="mesh-blob3" style={{ position: 'absolute', bottom: '-15%', left: '40%', width: 550, height: 550, borderRadius: '50%', background: `radial-gradient(circle, ${colors.primary}38 0%, transparent 65%)`, filter: 'blur(50px)' }} />
         </div>
 
+        <PageTracker site='kwizzo' />
         <Navbar />
 
         <Providers>
