@@ -3,12 +3,31 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { Crown, CheckCircle2, Zap, Users } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { StreakBar } from '@/components/Gamification'
 import config from '@/vertical.config'
 import { theme, btn } from '@/lib/theme'
 import { isAiTool } from '@/vertical.config'
 import { ShimmerButton } from '@/components/magicui/shimmer-button'
 import GuidedTour, { type TourStep } from '@/components/GuidedTour'
+import { siteConfig } from '@/site.config'
+
+/* Fire-and-forget user stats */
+function postStats() {
+  if (typeof window === 'undefined') return
+  try {
+    fetch('http://31.97.56.148:3099/api/stats', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        site: 'kwizzo.app',
+        path: window.location.pathname,
+        userAgent: navigator.userAgent,
+        timestamp: new Date().toISOString(),
+      }),
+    }).catch(() => {/* ignore */})
+  } catch {/* ignore */}
+}
 
 const KWIZZO_TOUR: TourStep[] = [
   { target: '#hero-play-btn', title: 'Play a quiz free', icon: '⚡', body: 'Pick any topic — AI generates fresh questions instantly. No account needed.', placement: 'bottom' },
@@ -184,6 +203,8 @@ export default function HomePage() {
   const [upgrading, setUpgrading] = useState(false)
   const [lbVisible, setLbVisible] = useState(false)
 
+  useEffect(() => { postStats() }, [])
+
   useEffect(() => {
     if (typeof window === 'undefined') return
     const params = new URLSearchParams(window.location.search)
@@ -257,14 +278,18 @@ export default function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
 
           {/* LEFT — copy + CTAs */}
-          <div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+          >
             {/* Badge */}
             <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${theme.badge} text-xs font-bold mb-5 border border-violet-500/30 uppercase tracking-widest`}>
               <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse inline-block" />
               Free · No sign-up needed
             </div>
 
-            {/* Headline — compact, mixed case */}
+            {/* Headline */}
             <h1 className="text-4xl sm:text-5xl font-black leading-tight tracking-tight mb-4">
               <span className="text-white">The AI quiz game</span>
               <br />
@@ -277,8 +302,7 @@ export default function HomePage() {
 
             {/* Sub */}
             <p className="text-white/55 text-base mb-6 leading-relaxed max-w-md">
-              AI generates age-perfect questions for every player — kids get easy, adults get hard.{' '}
-              <strong className="text-white/80">No account. Starts in 30 seconds.</strong>
+              {siteConfig.subheadline}
             </p>
 
             {/* Handwriting guide */}
@@ -289,22 +313,22 @@ export default function HomePage() {
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-3 mb-5" id="hero-play-btn">
               <Link href="/play?mode=solo">
-                <ShimmerButton background="rgba(124, 58, 237, 1)" shimmerColor="#e9d5ff" className="px-7 py-3.5 text-base font-semibold">
-                  ⚡ Play free now →
+                <ShimmerButton background="rgba(124, 58, 237, 1)" shimmerColor="#e9d5ff" className="px-7 py-3.5 text-base font-semibold min-h-[48px]">
+                  ⚡ {siteConfig.ctaPrimary} →
                 </ShimmerButton>
               </Link>
-              <Link href="/play?mode=group" className={btn.secondary + ' text-sm px-7 py-3.5 font-bold'}>
-                <Users size={15} /> Family mode
+              <Link href="/play?mode=group" className={btn.secondary + ' text-sm px-7 py-3.5 font-bold min-h-[48px]'}>
+                <Users size={15} /> {siteConfig.ctaSecondary}
               </Link>
             </div>
 
             {/* Trust pills */}
             <div className="flex flex-wrap gap-2">
-              {['✓ No account', '✓ Any device', '✓ Fresh AI questions', '✓ All ages'].map(f => (
+              {siteConfig.trustPills.map(f => (
                 <span key={f} className="text-xs text-violet-300/70 bg-violet-500/10 border border-violet-500/20 px-2.5 py-1 rounded-full">{f}</span>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* RIGHT — live game preview */}
           <div className="lg:pl-4">
@@ -313,6 +337,32 @@ export default function HomePage() {
               Live preview — this is what a real game looks like
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════
+          FEATURES SECTION
+      ══════════════════════════════════════════ */}
+      <section id="features" className="py-12 px-4 sm:px-6 max-w-5xl mx-auto border-t border-white/[0.05]">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-black text-white mb-2">Everything you need for family quiz night</h2>
+          <p className="text-white/40 text-sm">AI-powered, free to start, works on any device</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {siteConfig.features.map((f, i) => (
+            <motion.div
+              key={f.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: i * 0.08 }}
+              viewport={{ once: true }}
+              className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-5 flex flex-col gap-2"
+            >
+              <span className="text-2xl">{f.icon}</span>
+              <div className="font-bold text-white text-sm">{f.title}</div>
+              <div className="text-white/45 text-xs leading-relaxed">{f.desc}</div>
+            </motion.div>
+          ))}
         </div>
       </section>
 

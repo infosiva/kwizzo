@@ -17,9 +17,28 @@ import Footer from "../components/Footer";
 const inter = Inter({ subsets: ['latin'], variable: '--font-body' })
 
 export const metadata: Metadata = {
-  title:       config.metaTitle,
-  description: 'Discover Kwizzo, the ultimate AI-generated quiz platform for all ages. Play for free, no sign-up needed. New quizzes every day across science, history, sports and more!',
+  title:       'Kwizzo — Fun Family Quiz Game with AI',
+  description: 'Create and play AI-powered quizzes with your family. Hundreds of topics, instant questions, all ages.',
   keywords:    config.keywords,
+  metadataBase: new URL('https://kwizzo.app'),
+  alternates:   { canonical: '/' },
+  openGraph: {
+    title:       'Kwizzo — Fun Family Quiz Game with AI',
+    description: 'Create and play AI-powered quizzes with your family. Hundreds of topics, instant questions, all ages.',
+    url:         'https://kwizzo.app',
+    siteName:    'Kwizzo',
+    type:        'website',
+    locale:      'en_US',
+  },
+  twitter: {
+    card:        'summary_large_image',
+    title:       'Kwizzo — Fun Family Quiz Game with AI',
+    description: 'Create and play AI-powered quizzes with your family. Hundreds of topics, instant questions, all ages.',
+  },
+  robots: {
+    index: true, follow: true,
+    googleBot: { index: true, follow: true },
+  },
 }
 
 // Derive CSS custom properties from vertical theme at build time
@@ -66,6 +85,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <Footer siteName={config.name} />
       <CookieConsent />
+        {/* JSON-LD structured data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'SoftwareApplication',
+            name: 'Kwizzo',
+            applicationCategory: 'GameApplication',
+            operatingSystem: 'Web',
+            offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+            description: 'Create and play AI-powered quizzes with your family. Hundreds of topics, instant questions, all ages.',
+            url: 'https://kwizzo.app',
+          })}}
+        />
         {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
         <script src="http://31.97.56.148:3098/t.js" data-site="kwizzo.app" defer></script>
             <Script async src="http://31.97.56.148:3100/script.js" data-website-id="4e586861-325d-496a-ae03-3b7ed959875c" strategy="afterInteractive" />

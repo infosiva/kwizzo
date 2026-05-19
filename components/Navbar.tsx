@@ -25,9 +25,11 @@ export default function Navbar() {
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-1 text-sm">
-            <Link href="/#how-it-works" className="px-3 py-1 rounded-full border border-white/10 text-white/60 hover:text-white hover:border-violet-500/40 transition-all">How it works</Link>
-            <Link href="/#subjects"     className="px-3 py-1 rounded-full border border-white/10 text-white/60 hover:text-white hover:border-violet-500/40 transition-all">Topics</Link>
-            <Link href="/#leaderboard"  className="px-3 py-1 rounded-full border border-white/10 text-white/60 hover:text-white hover:border-violet-500/40 transition-all">🏆 Leaderboard</Link>
+            <Link href="/"              className="px-3 py-1 rounded-full border border-white/10 text-white/60 hover:text-white hover:border-violet-500/40 transition-all">Home</Link>
+            <Link href="/#features"    className="px-3 py-1 rounded-full border border-white/10 text-white/60 hover:text-white hover:border-violet-500/40 transition-all">Features</Link>
+            <Link href="/#subjects"    className="px-3 py-1 rounded-full border border-white/10 text-white/60 hover:text-white hover:border-violet-500/40 transition-all">Topics</Link>
+            <Link href="/#why-pro"     className="px-3 py-1 rounded-full border border-white/10 text-white/60 hover:text-white hover:border-violet-500/40 transition-all">Pricing</Link>
+            <Link href="/about"        className="px-3 py-1 rounded-full border border-white/10 text-white/60 hover:text-white hover:border-violet-500/40 transition-all">About</Link>
           </div>
 
           {/* CTAs */}
@@ -55,9 +57,11 @@ export default function Navbar() {
 
         {open && (
           <div className="md:hidden border-t border-white/[0.06] px-6 py-4 flex flex-col gap-3 text-sm">
-            <Link href="/#how-it-works"    className="text-white/70 hover:text-white" onClick={() => setOpen(false)}>How it works</Link>
-            <Link href="/#subjects"        className="text-white/70 hover:text-white" onClick={() => setOpen(false)}>Topics</Link>
-            <Link href="/#leaderboard"     className="text-white/70 hover:text-white" onClick={() => setOpen(false)}>🏆 Leaderboard</Link>
+            <Link href="/"              className="text-white/70 hover:text-white" onClick={() => setOpen(false)}>Home</Link>
+            <Link href="/#features"    className="text-white/70 hover:text-white" onClick={() => setOpen(false)}>Features</Link>
+            <Link href="/#subjects"    className="text-white/70 hover:text-white" onClick={() => setOpen(false)}>Topics</Link>
+            <Link href="/#why-pro"     className="text-white/70 hover:text-white" onClick={() => setOpen(false)}>Pricing</Link>
+            <Link href="/about"        className="text-white/70 hover:text-white" onClick={() => setOpen(false)}>About</Link>
             <Link href="/play?mode=solo"   className="text-center py-2 rounded-full border border-white/10 text-white/70" onClick={() => setOpen(false)}>Solo</Link>
             {user ? (
               <>

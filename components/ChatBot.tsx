@@ -5,7 +5,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 // KwizBot — violet theme, bottom-right, family quiz assistant
 const ACCENT = '#7c3aed'
 const BOT_NAME = 'KwizBot'
-const WELCOME = '🎮 Hey there! I\'m KwizBot — your Kwizzo quiz buddy! Ask me anything about quizzes, topics to explore, or how to play. Let\'s learn together!'
+const WELCOME = 'Hi! Ready for a family quiz? I can help you create one.'
 const SYSTEM_PROMPT = `You are KwizBot, the friendly AI assistant for Kwizzo — a fun family quiz game platform powered by AI.
 Help players with quiz topics, explain answers, suggest fun categories, and encourage learning through play.
 Keep responses short, upbeat, and family-friendly. Use simple language suitable for all ages.`
