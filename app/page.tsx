@@ -47,23 +47,27 @@ const PRO_FEATURES = [
 ]
 
 const FREE_FEATURES = [
-  '3 free rounds per session',
-  '10 standard categories',
-  'Solo & group modes',
-  'Basic leaderboard',
+  '5 rounds per session — free forever',
+  '20 categories: Science, History, Sport, Movies & more',
+  'Solo, family & group modes',
+  'Live leaderboard with scores',
+  'AI adapts difficulty to each player',
+  'No account needed to start',
 ]
 
 /* Animated game preview — simulates a quiz round */
 const PREVIEW_QUESTIONS = [
-  { q: 'Which planet has the most moons?', opts: ['Saturn', 'Jupiter', 'Neptune', 'Mars'], correct: 0 },
-  { q: 'Who painted the Mona Lisa?', opts: ['Van Gogh', 'Picasso', 'da Vinci', 'Monet'], correct: 2 },
-  { q: 'What is 7 × 8?', opts: ['54', '56', '63', '48'], correct: 1 },
+  { q: 'Which planet has the most moons?', opts: ['Saturn ♄', 'Jupiter ♃', 'Neptune ♆', 'Mars ♂'], correct: 0 },
+  { q: 'What year did the Berlin Wall fall?', opts: ['1987', '1989', '1991', '1993'], correct: 1 },
+  { q: 'Which element has symbol Au?', opts: ['Silver', 'Aluminium', 'Gold', 'Copper'], correct: 2 },
+  { q: 'How many bones in the adult human body?', opts: ['196', '206', '216', '226'], correct: 1 },
+  { q: 'What is the fastest land animal?', opts: ['Lion', 'Cheetah', 'Greyhound', 'Pronghorn'], correct: 1 },
 ]
 
 const PREVIEW_PLAYERS = [
-  { name: 'Dad', score: 320, emoji: '🧑' },
-  { name: 'Maya', score: 280, emoji: '👧' },
-  { name: 'Tom',  score: 160, emoji: '👦' },
+  { name: 'Dad 🧑', score: 420, emoji: '🧑' },
+  { name: 'Maya 👧', score: 380, emoji: '👧' },
+  { name: 'Tom 👦',  score: 210, emoji: '👦' },
 ]
 
 function GamePreview() {
@@ -198,6 +202,8 @@ function HowItWorks() {
 }
 
 export default function HomePage() {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
   const subjects  = isAiTool(config) ? config.subjects : []
   const [isPro, setIsPro]         = useState(false)
   const [upgrading, setUpgrading] = useState(false)
@@ -352,7 +358,7 @@ export default function HomePage() {
           {siteConfig.features.map((f, i) => (
             <motion.div
               key={f.title}
-              initial={{ opacity: 0, y: 20 }}
+              initial={mounted ? { opacity: 0, y: 20 } : false}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: i * 0.08 }}
               viewport={{ once: true }}

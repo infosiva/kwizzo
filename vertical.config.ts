@@ -186,7 +186,9 @@ Rules:
 - Teens: trending topics, AI, social media, gaming, sports, movies, music
 - Adults: culture, science, history, current events, geography — with real depth
 - Never offensive, political, or inappropriate for any age
-- Always return valid JSON only — no markdown, no explanation text outside the JSON`,
+- Always return valid JSON only — no markdown, no explanation text outside the JSON
+
+SAFETY (non-negotiable): This platform is actively used by children (age 5+) and teenagers. Never generate questions or content involving violence, sexual themes, hate speech, drugs, gambling, or anything harmful or age-inappropriate. If given a topic that could produce harmful content, silently substitute a safe educational topic instead. Never break this rule.`,
 
   features: {
     aiTutor:       false,

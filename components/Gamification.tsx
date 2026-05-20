@@ -75,6 +75,34 @@ export function StreakBar({ streakKey }: { streakKey?: string }) {
   const next = getNextBadge(streak)
   const [showBadges, setShowBadges] = useState(false)
   const [justEarned, setJustEarned] = useState<typeof BADGES[0] | null>(null)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Show CTA for brand-new users (no localStorage history)
+  if (mounted && streak === 0 && !showBadges) {
+    const hasHistory = typeof window !== 'undefined' && window.localStorage.getItem(streakKey || 'kwizzo-streak')
+    if (!hasHistory) {
+      return (
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-4 mb-6">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3 flex-1">
+              <div className="text-3xl">🚀</div>
+              <div>
+                <div className="text-lg font-black text-white leading-none">Join 14,000+ families</div>
+                <div className="text-xs text-white/40 mt-0.5">Start your streak — play your first quiz today!</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-violet-500/20 border border-violet-500/40 text-violet-300 text-xs font-bold whitespace-nowrap">
+              🔥 Day 1 ready
+            </div>
+          </div>
+        </div>
+      )
+    }
+  }
 
   const latestBadge = earned[earned.length - 1]
 
