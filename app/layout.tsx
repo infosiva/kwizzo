@@ -30,6 +30,7 @@ export const metadata: Metadata = {
     siteName:    'Kwizzo',
     type:        'website',
     locale:      'en_US',
+    images: [{ url: '/og.png', width: 1200, height: 630 }],
   },
   twitter: {
     card:        'summary_large_image',
