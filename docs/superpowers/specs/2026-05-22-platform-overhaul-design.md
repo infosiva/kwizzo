@@ -1,320 +1,450 @@
-# Platform Overhaul — kwizzo / tutiq / quizbites
+# Platform Overhaul v2 — Clean Rebuild
 **Date:** 2026-05-22  
-**Status:** APPROVED — ready for implementation  
-**Scope:** All 3 ai-platform-template projects. Changes made once in kwizzo, propagated to tutiq + quizbites via their `site.config.ts`.
+**Status:** APPROVED  
+**Projects:** kwizzo · tutiq · quizbites (same template — build once, config drives everything)  
+**Approach:** FULL REBUILD. Not a patch. Delete page.tsx, rebuild from scratch with modern stack.
 
 ---
 
-## Problem Statement
+## Core Philosophy
 
-1. `'use client'` on `page.tsx` → entire homepage is client-rendered → GPTBot / ClaudeBot / PerplexityBot see a blank page → zero AI citation, poor SEO.
-2. Hero animation is a single `motion.div` fade — feels generic, not premium.
-3. Free tier value prop buried in a feature list — users scan past it.
-4. Playwright exists in kwizzo but not wired to CI; missing from tutiq entirely.
-5. FAQ schema hardcoded in `layout.tsx` — can't customise without touching infrastructure.
-6. Layout variants (split / centered / minimal) require JSX edits — no config switch.
-7. No runtime admin panel — all changes require developer + redeploy.
-8. `site.config.ts` shape doesn't capture layout preferences or section order.
+Stop thinking in "landing page sections". Think in **narrative arcs**:
 
----
+> User arrives → immediately understands the value → sees it working → trusts it → tries it free → wants more
 
-## Architecture Decision: Island Architecture (Option A)
+Every design decision answers: *does this move the user along that arc faster?*
 
-**Rule:** `app/page.tsx` is a **server component**. It renders all static content (H1, subheadline, trust pills, section headings, FAQ) as plain HTML — fully crawlable.
-
-Interactive islands are `'use client'` components imported into the server page:
-- `<HeroClient />` — stagger animation wrapper, mounts over server-rendered copy
-- `<GamePreview />` — animated quiz demo (already client)
-- `<GuidedTour />` — tour logic (already client)
-- `<ProCheck />` — localStorage pro status check
-
-**Key invariant:** The H1, subheadline, CTAs, trust pills, and FAQ section text must be readable by a crawler with JS disabled. Test: `curl https://kwizzo.app | grep -i "quiz"` must return content.
+The existing page is a feature list. We are building an **experience**.
 
 ---
 
-## 1. `site.config.ts` — Extended Schema
+## Stack — What We're Adding
 
-Add these new fields. All are optional with sensible defaults so existing configs don't break.
+| Tool | Purpose | Why |
+|------|---------|-----|
+| `framer-motion` v12 | All motion — already installed | Spring physics, layout animations, gestures |
+| `@radix-ui/react-accordion` | FAQ accordion | Accessible, unstyled, we control look |
+| CSS `@property` + Houdini | Aurora gradient animation | GPU-accelerated, zero JS |
+| `next/font` + variable fonts | Typography | Already in layout — extend it |
+| CSS `clip-path` animations | Section reveals | No library needed — pure CSS |
+| `react-intersection-observer` | Scroll triggers | Lighter than Framer viewport |
+
+**Not adding:** GSAP (overkill), Three.js (wrong product type), Lottie (heavy), Builder.io (vendor lock).
+
+---
+
+## New Page Architecture
+
+### Server / Client Split
+
+```
+app/page.tsx                    ← SERVER COMPONENT (no 'use client')
+  ├── <HeroSection />           ← server — H1, subheadline, CTAs as plain HTML
+  ├── <Suspense>
+  │     └── <HeroDemo />        ← client island — animated game preview
+  │   </Suspense>
+  ├── <SocialProofBar />        ← server — static trust strip  
+  ├── <HowItWorksSection />     ← server — 3-step static HTML
+  ├── <Suspense>
+  │     └── <FeaturesGrid />    ← client island — whileInView stagger
+  │   </Suspense>
+  ├── <PricingSection />        ← server — static pricing table HTML
+  ├── <FAQSection />            ← server — accordion (progressive enhancement)
+  └── <FinalCTA />              ← server — bottom CTA block
+```
+
+**Rule:** If it needs `useState` or `useEffect` → client island in `<Suspense>`. Everything else → server. Crawlers read the full page. JS enhances it.
+
+---
+
+## Section-by-Section Design
+
+### 1. HERO — Split Layout, Cinematic Entry
+
+**Left column (server-rendered, crawlable):**
+
+```
+[Animated badge pill]  ← CSS animation only, no JS
+  ● kwizzo · AI quiz · free to play
+
+[H1 — 2 lines max]
+  "Quiz night,
+   reinvented."        ← Short. Punchy. Not a feature list.
+
+[Subheadline — 1 sentence]
+  AI generates perfect questions for every age — play in 30 seconds, no account needed.
+
+[Free tier strip — 3 pills]
+  ⚡ 5 rounds free    👨‍👩‍👧 Any age    📱 Any device
+
+[Primary CTA]  [Secondary CTA]
+  Play Free Now →      Family Mode
+
+[Social proof — real only]
+  "Played by families in 40+ countries"  ← only if verifiable, else remove
+```
+
+**Right column (client island):**
+Live animated game demo — existing `GamePreview` component, kept as-is.
+
+**Entry animation (Framer Motion):**
+```ts
+// Container staggers children 0.06s apart
+// Each child: y: 24→0, opacity: 0→1, filter: blur(6px)→blur(0)
+// Spring: stiffness 80, damping 20 — slow, cinematic, not snappy
+// Respects prefers-reduced-motion: skip transforms, keep opacity
+```
+
+**Badge pill — CSS only (no JS hydration cost):**
+```css
+@keyframes badge-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(var(--color-primary), 0.4) }
+  50%       { box-shadow: 0 0 0 8px rgba(var(--color-primary), 0) }
+}
+```
+
+---
+
+### 2. SOCIAL PROOF BAR — Logo Marquee
+
+Infinite scroll marquee of tool categories / platforms the quiz covers.  
+Not fake logos. Use category icons: Science 🔬 · History 📜 · Sport ⚽ · Music 🎵 · Film 🎬 · Tech 💻
+
+```css
+/* CSS-only marquee — zero JS */
+@keyframes marquee { to { transform: translateX(-50%) } }
+.marquee-track { animation: marquee 20s linear infinite }
+```
+
+Gradient fade mask left/right edges via `mask-image`.
+
+---
+
+### 3. HOW IT WORKS — Numbered Steps (server-rendered)
+
+3 steps. Each: large number, icon, title, 1-sentence description.  
+Driven entirely by `siteConfig.howItWorks[]`.
+
+```
+  01              02               03
+Pick a topic   AI generates    Play together
+               fresh questions  live scores
+
+  ↑               ↑                ↑
+[Icon]          [Icon]           [Icon]
+[Title]         [Title]          [Title]
+[Desc]          [Desc]           [Desc]
+```
+
+On scroll: each step fades in with a slight left→right stagger (client island, `whileInView`).  
+Connecting line between steps animates width from 0→100% as user scrolls.
+
+---
+
+### 4. FEATURES GRID — Bento Layout
+
+Not a uniform 3-column grid. **Bento**: mixed card sizes, visual hierarchy.
+
+```
+┌─────────────────┬──────────┬──────────┐
+│  LARGE CARD     │ med card │ med card │
+│  (hero feature) │          │          │
+├──────────┬──────┴──────────┴──────────┤
+│ med card │   WIDE CARD (social/share) │
+└──────────┴───────────────────────────┘
+```
+
+Cards driven by `siteConfig.features[]` with an optional `size: 'large' | 'wide' | 'medium'` field.  
+Default: first feature gets `large`, last feature gets `wide`, rest `medium`.
+
+**Card animation:** `whileInView` with blur-in reveal. `once: true`. Stagger `0.1s` per card.  
+**Card hover:** `whileHover: { y: -4, borderColor: 'rgba(var(--color-primary), 0.4)' }` — subtle lift.
+
+---
+
+### 5. FREE vs PRO — Transparent Comparison
+
+Not a pricing table. A **transparent comparison** that makes free feel generous:
+
+```
+┌──────────────────────┬────────────────────────────┐
+│  FREE — always free  │  PRO — $5/mo               │
+├──────────────────────┼────────────────────────────┤
+│  ✓ 5 rounds/session  │  ✓ Unlimited rounds        │
+│  ✓ 10 categories     │  ✓ All 100+ categories     │
+│  ✓ Solo + group mode │  ✓ Custom quiz creation     │
+│  ✓ Live leaderboard  │  ✓ No ads                  │
+│  ✗ Custom quizzes    │  ✓ Export scorecards        │
+│  ✗ No-ad experience  │  ✓ Priority AI              │
+├──────────────────────┴────────────────────────────┤
+│  [Play Free Now]          [Upgrade to Pro →]      │
+└────────────────────────────────────────────────────┘
+```
+
+**Key UX principle:** Free column shows ✗ only for things users clearly want after experiencing the free tier (custom quizzes, no ads). Never show ✗ upfront on things they don't know they want yet. Sequence: impress first, gate second.
+
+Driven by `siteConfig.pricing[]` — each tier has `features[]` with `{ text, included: boolean }`.
+
+---
+
+### 6. FAQ — Accordion + Schema
+
+Visible accordion on page (server-rendered HTML, JS-enhanced with Radix).  
+Same data drives `FAQPage` JSON-LD in `<SchemaOrg />` server component.
+
+Single source of truth: `siteConfig.faq: Array<{ q: string; a: string }>`.
+
+4-6 questions. Written to answer what AI tools commonly ask about the product.
+
+---
+
+### 7. FINAL CTA BLOCK
+
+Full-width. High contrast. Single focus.
+
+```
+┌──────────────────────────────────────────────────┐
+│  [Aurora gradient bg — different from hero]      │
+│                                                  │
+│  Ready for quiz night?                           │
+│  Start free. No account. Works on any device.    │
+│                                                  │
+│         [ ⚡ Play Free Now → ]                   │
+│                                                  │
+└──────────────────────────────────────────────────┘
+```
+
+Pulsing glow on CTA button. `whileInView` entry. No other distractions.
+
+---
+
+## Config Shape — `site.config.ts` Full Schema
 
 ```ts
-layout: {
-  heroVariant: 'split' | 'centered' | 'minimal'  // default: 'split'
-  sectionOrder: Array<'features' | 'demo' | 'topics' | 'howItWorks' | 'pricing' | 'faq' | 'cta'>
-  showSections: {
-    demo: boolean        // live game preview panel
-    topics: boolean      // subject grid
-    howItWorks: boolean  // 3-step guide
-    pricing: boolean     // free vs pro table
-    faq: boolean         // FAQ accordion
-    newsletter: boolean  // email signup
-    affiliates: boolean  // affiliate banners
+export const siteConfig = {
+  // Identity
+  siteName: string
+  domain: string
+  themeColor: string        // maps to CSS var(--color-primary)
+
+  // Hero
+  heroBadge: string         // "kwizzo · AI quiz · free to play"
+  headline: string[]        // array of lines: ["Quiz night,", "reinvented."]
+  subheadline: string       // 1 sentence
+  ctaPrimary: { text: string; href: string }
+  ctaSecondary: { text: string; href: string }
+
+  // Free tier — shown in hero strip + gate
+  freeTier: {
+    pills: string[]         // max 3: ["5 rounds free", "Any age", "Any device"]
+    gateHeadline: string    // "You've used your 5 free rounds!"
+    gateSubtext: string     // "That was fun. Unlock unlimited for the family."
+    gateCtaText: string
+    gateCtaHref: string
+    gateSecondaryText: string  // "Play again free tomorrow"
+  }
+
+  // Social proof
+  socialProof: {
+    marqueeItems: string[]  // category icons + labels for marquee
+    stat?: string           // optional single stat if real: "40+ countries"
+  }
+
+  // How it works
+  howItWorks: Array<{
+    step: number
+    icon: string            // emoji
+    title: string
+    desc: string
+  }>
+
+  // Features — bento grid
+  features: Array<{
+    icon: string
+    title: string
+    desc: string
+    size?: 'large' | 'wide' | 'medium'  // default: medium
+  }>
+
+  // Pricing
+  pricing: {
+    free: {
+      name: string
+      price: string
+      period: string
+      features: Array<{ text: string; included: boolean }>
+      cta: { text: string; href: string }
+    }
+    pro: {
+      name: string
+      price: string
+      period: string
+      badge?: string
+      features: Array<{ text: string; included: boolean }>
+      cta: { text: string; href: string }
+    }
+  }
+
+  // FAQ — drives schema + accordion
+  faq: Array<{ q: string; a: string }>
+
+  // Final CTA
+  finalCta: {
+    headline: string
+    subtext: string
+    ctaText: string
+    ctaHref: string
+  }
+
+  // Layout control
+  layout: {
+    heroVariant: 'split' | 'centered' | 'minimal'
+    sectionOrder: string[]  // section IDs in render order
+    hideSections: string[]  // section IDs to hide
+  }
+
+  // SEO
+  seo: {
+    title: string
+    description: string
+    ogImage: string
+    llmsDescription: string  // plain text for /llms.txt
+  }
+
+  // Chatbot
+  chatbot: {
+    welcomeMessage: string
+    botName: string
+    placeholder: string
   }
 }
-
-freeTier: {
-  badge: string          // e.g. "5 rounds free · no sign-up"
-  headline: string       // e.g. "Free forever. No card."
-  bullets: string[]      // 3 max — shown in hero trust strip
-  gateMessage: string    // shown when free limit hit: "You've used your 3 free rounds"
-  gateCtaText: string    // e.g. "Unlock unlimited for $5/mo"
-  gateCtaHref: string    // e.g. "/pro"
-}
-
-faq: Array<{ q: string; a: string }>   // drives both FAQ schema + visible FAQ section
-
-animation: {
-  heroStagger: boolean   // word-by-word stagger on H1. default: true
-  featureCards: boolean  // whileInView stagger on feature grid. default: true
-  reducedMotion: boolean // respects prefers-reduced-motion. default: true
-}
-
-seo: {
-  // existing fields +
-  faqSchema: boolean         // inject FAQPage JSON-LD. default: true
-  appSchema: boolean         // inject SoftwareApplication JSON-LD. default: true
-  llmsTxt: string            // content for /llms.txt. auto-generated if empty.
-}
 ```
-
-**Why this shape:** Every visible text, section toggle, and animation preference is a config value. A future admin panel writes to this shape — no schema migration needed.
 
 ---
 
-## 2. Hero — Island Architecture + Framer Motion Stagger
+## Animation System — Global Rules
 
-### Server-rendered shell (`app/page.tsx` — server component)
-
-```
-<section>
-  <div class="hero-grid lg:grid-cols-2">
-    <!-- LEFT: static, crawlable -->
-    <div>
-      <FreeTierBadge />          ← server: renders from siteConfig.freeTier.badge
-      <H1Words />                ← server: splits headline into <span> words
-      <p>{siteConfig.subheadline}</p>
-      <HowItWorksSteps />        ← server: 3 static steps
-      <HeroCTAs />               ← server: Link tags, no JS needed
-      <TrustPills />             ← server: siteConfig.freeTier.bullets
-    </div>
-    <!-- RIGHT: client island -->
-    <HeroClient>
-      <GamePreview />
-    </HeroClient>
-  </div>
-</section>
-```
-
-### Client animation layer (`components/HeroClient.tsx`)
-
-Wraps the left column copy in `<AnimatePresence>`. On mount, triggers stagger over the pre-rendered word spans:
-
-```
-variants.container: staggerChildren: 0.04
-variants.word:      { hidden: { y: 16, opacity: 0 }, show: { y: 0, opacity: 1 } }
-transition:         { type: 'spring', stiffness: 120, damping: 20 }
-```
-
-**Why spring not easeOut:** Spring physics feel intentional. `easeOut` feels like a loading state. Every top-tier SaaS (Linear, Vercel, Cursor) uses spring for hero text.
-
-CTA buttons get:
-```
-whileHover: { scale: 1.03 }
-whileTap:   { scale: 0.97 }
-transition: { type: 'spring', stiffness: 400, damping: 17 }
-```
-
-Feature cards get:
-```
-whileInView: { opacity: 1, y: 0, filter: 'blur(0px)' }
-initial:     { opacity: 0, y: 20, filter: 'blur(4px)' }
-viewport:    { once: true, amount: 0.3 }
-transition:  { delay: index * 0.08 }
-```
-
-All animations respect `prefers-reduced-motion` via a `useReducedMotion()` hook — if true, skip transform animations, keep opacity only.
-
----
-
-## 3. Free Tier UX
-
-**Hero badge** (top of left column, above H1):
-```
-● Free · 5 rounds · no sign-up needed
-```
-Green pulse dot. Driven by `siteConfig.freeTier.badge`.
-
-**Trust strip** (below CTAs, above fold):
-3 pills from `siteConfig.freeTier.bullets`:
-- ✓ No account needed
-- ✓ 5 free rounds every session  
-- ✓ Works on any device
-
-**Gate message** (when limit hit — `ProWall` component):
-Full-screen overlay with:
-- Headline: `siteConfig.freeTier.gateMessage`
-- What they got for free (recap of session)
-- What they unlock with Pro (3 bullets)
-- Primary CTA: `siteConfig.freeTier.gateCtaText` → `/pro`
-- Secondary: "Play again free tomorrow" (reset tomorrow)
-
-**Principle:** Never surprise users with a paywall. Show free limits upfront in the hero. When the gate triggers, celebrate what they already got ("You finished 5 rounds!") before asking for upgrade.
-
----
-
-## 4. Config-Driven Layout Variants
-
-Three hero variants, all driven by `siteConfig.layout.heroVariant`:
-
-| Variant | Layout | Use case |
-|---------|--------|----------|
-| `split` | lg:grid-cols-2, copy left, demo right | Default — kwizzo, tutiq, quizbites |
-| `centered` | max-w-3xl centered, no demo panel | Content-heavy tools (complybuddy) |
-| `minimal` | Single column, compact, CTA-first | Mobile-optimised tools |
-
-Section visibility from `siteConfig.layout.showSections` — each section wrapped in `{siteConfig.layout.showSections.X && <Section />}`.
-
-Section order from `siteConfig.layout.sectionOrder` — page renders sections by iterating this array, looking up the component. Zero JSX changes to reorder.
-
----
-
-## 5. Playwright CI — Global Strategy
-
-**Local pre-push:** TypeScript check + `next build` only. Fast (~15s). Blocks on compile errors.
-
-**Post-deploy CI** (GitHub Actions — `.github/workflows/smoke.yml`):
-```yaml
-on: [push]
-jobs:
-  smoke:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-      - run: npm ci
-      - run: npx playwright install chromium
-      - run: BASE_URL=${{ vars.VERCEL_URL }} npx playwright test
-```
-
-**Global smoke spec** (`qa/smoke.spec.ts`) — same file across all 3 projects, driven by env:
+All animations live in `lib/motion.ts` — imported by every animated component:
 
 ```ts
-const routes = (process.env.SMOKE_ROUTES ?? '/,/play,/about').split(',')
+export const SPRING_CINEMATIC = { type: 'spring', stiffness: 80, damping: 20 }
+export const SPRING_SNAPPY    = { type: 'spring', stiffness: 400, damping: 17 }
+export const SPRING_BUTTON    = { type: 'spring', stiffness: 400, damping: 17 }
 
-// 1. All nav routes return 200
-// 2. H1 visible and non-empty
-// 3. Primary CTA visible and has href
-// 4. No horizontal overflow at 375px
-// 5. No console errors (filter known noise)
-// 6. schema: FAQPage present in <script type="application/ld+json">
-// 7. robots.txt allows GPTBot
-// 8. /llms.txt returns 200
-// 9. POST /api/quiz returns 200 within 10s
-// 10. AdBanner not visible on first paint (scroll-gated check)
-```
+export const FADE_UP = {
+  hidden: { opacity: 0, y: 24, filter: 'blur(6px)' },
+  show:   { opacity: 1, y: 0,  filter: 'blur(0px)' },
+}
 
-10 checks. Runs headless in ~25s on Chromium only (mobile test is separate job, runs weekly not on every push).
+export const STAGGER_CONTAINER = (delay = 0.06) => ({
+  hidden: {},
+  show: { transition: { staggerChildren: delay } },
+})
 
-**Failure behaviour:** GH Action fails → Vercel deployment marked failed → Slack/Telegram alert via site-watchdog webhook.
+export const CARD_HOVER = {
+  whileHover: { y: -4 },
+  whileTap:   { scale: 0.98 },
+  transition: SPRING_SNAPPY,
+}
 
----
+export const BUTTON_PRESS = {
+  whileHover: { scale: 1.03 },
+  whileTap:   { scale: 0.97 },
+  transition: SPRING_BUTTON,
+}
 
-## 6. Admin Panel — Phase 2 Architecture
-
-**Route:** `/admin/appearance` — protected by `ADMIN_SECRET` env var (checked in middleware).
-
-**Config store:** `public/site-config.json` — runtime-fetched at page load via `fetch('/site-config.json', { cache: 'no-store' })`. Falls back to compiled `site.config.ts` if file missing or fetch fails. Zero redeploy needed. Next.js `layout.tsx` fetches this as a server component so the config is resolved at request time, not build time.
-
-**Panel sections:**
-1. **Hero** — toggle variant (split/centered/minimal), edit headline + subheadline + CTA text
-2. **Sections** — drag to reorder, toggle visibility per section
-3. **Free tier** — edit badge text, gate message, bullets
-4. **Theme** — color picker → updates `themeColor` → live preview
-5. **Ads** — per-section toggle for AdBanner visibility
-6. **SEO** — edit FAQ questions/answers, OG title, description
-
-**Tech:** React `useState` form → `POST /api/admin/config` → writes `public/site-config.json` → page reloads with new config.
-
-**Why not Builder.io:** Adds vendor dependency + $20/mo. This achieves the same for content changes. Builder.io worth revisiting if a non-technical co-founder joins.
-
----
-
-## 7. Schema — Config-Driven JSON-LD
-
-Move all JSON-LD from hardcoded `layout.tsx` to a `SchemaOrg` server component:
-
-```tsx
-// components/SchemaOrg.tsx — server component, no JS shipped
-export function SchemaOrg({ config }: { config: SiteConfig }) {
-  const schemas = []
-  
-  if (config.seo.appSchema) schemas.push({
-    '@type': 'SoftwareApplication',
-    name: config.siteName,
-    ...
-  })
-  
-  if (config.seo.faqSchema && config.faq.length > 0) schemas.push({
-    '@type': 'FAQPage',
-    mainEntity: config.faq.map(({ q, a }) => ({
-      '@type': 'Question',
-      name: q,
-      acceptedAnswer: { '@type': 'Answer', text: a }
-    }))
-  })
-  
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
+// Reduced motion: return null variants if user prefers reduced motion
+export function useMotionVariants<T>(variants: T): T | null {
+  const reduce = useReducedMotion()
+  return reduce ? null : variants
 }
 ```
 
-FAQ items in `site.config.ts` drive both the schema AND a visible `<FAQSection>` accordion on the page — single source of truth.
+**Rules enforced globally:**
+- Never `transition: all` — specify exact properties
+- Never `scale(0)` entry — always start `scale(0.95)` minimum
+- Never `ease-in` on UI elements — always spring or `ease-out`
+- Duration: buttons 100–160ms, cards 200–300ms, page sections 400–600ms
+- Every `<motion.button>` and `<motion.a>` gets `BUTTON_PRESS` by default
 
 ---
 
-## 8. AI Crawlability Checklist
+## Playwright CI — 10-Check Global Spec
 
-Applied to all 3 projects:
+```ts
+// qa/smoke.spec.ts — identical across all 3 projects
+const BASE = process.env.BASE_URL ?? 'http://localhost:3000'
+const ROUTES = (process.env.SMOKE_ROUTES ?? '/,/play,/about').split(',')
 
-- [ ] `robots.txt` — already allows GPTBot/ClaudeBot/PerplexityBot in kwizzo. Copy to tutiq/quizbites.
-- [ ] `/llms.txt` — generated from `siteConfig.seo.llmsTxt`. Describes the tool in plain text for LLM context.
-- [ ] H1 server-rendered (island architecture fix above)
-- [ ] FAQ visible in HTML (not just schema) — `<FAQSection>` renders from `siteConfig.faq`
-- [ ] Segmented sitemap: `/sitemap.xml` (static) + `/blog-sitemap.xml` if blog exists
-- [ ] Submit to Bing Webmaster Tools (IndexNow) — `POST https://api.indexnow.org/indexnow` on deploy
+// 1. All routes return 200
+// 2. H1 present in server-rendered HTML (curl test — no JS)
+// 3. Primary CTA visible + has correct href
+// 4. No horizontal overflow at 375px mobile
+// 5. No JS console errors (filter known noise)
+// 6. FAQPage schema present in <script type="application/ld+json">
+// 7. /robots.txt allows GPTBot
+// 8. /llms.txt returns 200
+// 9. POST /api/quiz returns 200 within 10s
+// 10. AdBanner not visible on first paint (scroll-gated)
+```
+
+**GH Actions workflow** (`.github/workflows/smoke.yml`):
+- Trigger: every push to `main`
+- Wait for Vercel preview URL (via `vercel-action` or env var)
+- Run Playwright against preview URL
+- Fail build if any check fails
+- Telegram alert on failure (via site-watchdog webhook)
 
 ---
 
-## Implementation Plan
+## Admin Panel — `/admin/appearance`
 
-**Batch 1 — kwizzo (template project)**
-1. Extend `site.config.ts` schema (new fields with defaults)
-2. Refactor `page.tsx` → server component + `HeroClient.tsx` island
-3. Implement Framer Motion stagger + spring physics
-4. Build `SchemaOrg` server component (config-driven)
-5. Add `FreeTierBadge`, `TrustPills`, improved `ProWall` gate
-6. Add layout variant switching (heroVariant + sectionOrder + showSections)
-7. Update `qa/smoke.spec.ts` to 10-check global spec
-8. Add `.github/workflows/smoke.yml`
-9. Generate `/public/llms.txt`
-10. Build admin panel skeleton (`/admin/appearance`)
+**Phase 1 (this sprint):** Config editor only — edit `public/site-config.json` via form.  
+**Phase 2 (next sprint):** Live preview iframe alongside the form.  
+**Phase 3 (future):** Drag-to-reorder sections, widget-level toggles.
 
-**Batch 2 — propagate to tutiq**
-- Copy `site.config.ts` shape (fill tutiq-specific values)
-- Copy `qa/smoke.spec.ts` + GH Action
-- Copy `SchemaOrg`, `HeroClient`, layout system
-- Update tutiq `public/robots.txt`
+Auth: middleware checks `Authorization: Bearer ${ADMIN_SECRET}` header.  
+Store: `public/site-config.json` — fetched at runtime in `layout.tsx` (`cache: 'no-store'`), merges with compiled `site.config.ts` defaults.
 
-**Batch 3 — propagate to quizbites**
-- Same as tutiq propagation
+---
+
+## Implementation Order
+
+### Batch 1 — kwizzo (template)
+1. `lib/motion.ts` — global animation constants
+2. `site.config.ts` — extend to full schema above
+3. `app/page.tsx` — delete, rebuild as server component with client islands
+4. `components/HeroSection.tsx` — server, config-driven
+5. `components/HeroDemo.tsx` — client island (GamePreview wrapper)
+6. `components/FeaturesGrid.tsx` — bento layout, client island (whileInView)
+7. `components/PricingSection.tsx` — server, transparent comparison table
+8. `components/FAQSection.tsx` — Radix accordion, server-rendered HTML
+9. `components/SchemaOrg.tsx` — server component, config-driven JSON-LD
+10. `components/FinalCTA.tsx` — server + animation
+11. `components/MarqueeBar.tsx` — CSS-only, server-rendered
+12. `components/ProWall.tsx` — rebuilt gate with free recap
+13. `public/llms.txt` — generated from siteConfig.seo.llmsDescription
+14. `qa/smoke.spec.ts` — 10-check global spec
+15. `.github/workflows/smoke.yml` — GH Actions CI
+16. `app/admin/appearance/page.tsx` — Phase 1 config editor
+
+### Batch 2 — tutiq propagation
+Copy components, update `site.config.ts` with tutiq-specific values.
+
+### Batch 3 — quizbites propagation
+Same pattern.
 
 ---
 
 ## Success Criteria
 
-- `curl https://kwizzo.app | grep -i "quiz game"` → returns H1 content
-- Google Rich Results Test → FAQPage schema valid
-- Playwright 10-check smoke → all green
-- `site.config.ts` `heroVariant: 'centered'` → layout switches without touching JSX
-- Free tier badge visible above fold in hero
-- ProWall gate shows free recap + upgrade prompt, never surprise-blocks
-- GH Action fails build if Playwright fails post-deploy
-- `/llms.txt` returns 200 with tool description
+- `curl https://kwizzo.app | grep -i "quiz night"` → returns H1 in plain HTML
+- Google Rich Results Test → FAQPage + SoftwareApplication valid
+- Lighthouse Performance ≥ 85 on mobile
+- Playwright 10 checks → all green on every push
+- `siteConfig.layout.heroVariant = 'centered'` → layout switches, no JSX edits
+- `siteConfig.layout.hideSections = ['faq']` → FAQ gone, no JSX edits
+- Free tier pills visible above fold, no scroll needed
+- ProWall shows session recap before upgrade prompt
+- `/llms.txt` → 200 with product description
+- `/admin/appearance` → edits `site-config.json` → change visible on next page load (no redeploy)
