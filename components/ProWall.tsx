@@ -1,92 +1,102 @@
 'use client'
-import { useState } from 'react'
+// components/ProWall.tsx — shown when free tier limit hit
+// Shows what user accomplished first, then upgrade prompt. Never a cold wall.
+import { motion } from 'framer-motion'
+import { siteConfig } from '@/site.config'
+import { FADE_UP, BUTTON_PRESS, SPRING_CINEMATIC, useMotionVariants } from '@/lib/motion'
 import { theme, btn } from '@/lib/theme'
 import { startCheckout } from '@/lib/pro'
-import { Zap, CheckCircle, RotateCcw, Home } from 'lucide-react'
+import { CheckCircle, Zap, RotateCcw } from 'lucide-react'
+import { useState } from 'react'
+import Link from 'next/link'
 
 interface ProWallProps {
   questionsAnswered: number
   playerName:        string
   score:             number
-  onContinueFree:   () => void  // let them replay from Q1 on free
-  onNewGame:        () => void
+  onContinueFree:    () => void
+  onNewGame:         () => void
 }
-
-const PRO_FEATURES = [
-  'Unlimited questions per quiz',
-  'Type any custom topic',
-  'No ads during games',
-  'Per-player question banks',
-  'Priority AI (faster questions)',
-]
 
 export default function ProWall({ questionsAnswered, playerName, score, onContinueFree, onNewGame }: ProWallProps) {
   const [loading, setLoading] = useState(false)
   const [err,     setErr]     = useState('')
+  const vars = useMotionVariants(FADE_UP)
 
   async function upgrade() {
-    setLoading(true)
-    setErr('')
-    try {
-      await startCheckout()
-    } catch {
-      setErr('Could not open checkout — try again.')
-      setLoading(false)
-    }
+    setLoading(true); setErr('')
+    try { await startCheckout() }
+    catch { setErr('Could not open checkout — please try again.'); setLoading(false) }
   }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
-      <div className="w-full max-w-sm">
-
-        {/* Score recap */}
-        <div className={`${theme.card} p-5 mb-5 text-center`}>
-          <div className="text-3xl mb-2">🧠</div>
-          <p className="text-white/50 text-sm mb-1">Nice work, <span className="text-white font-bold">{playerName}</span>!</p>
-          <p className={`text-4xl font-extrabold ${theme.textAccentBold}`}>{score}<span className="text-white/30 text-2xl">/{questionsAnswered}</span></p>
-          <p className="text-white/30 text-xs mt-1">Free round complete · {questionsAnswered} questions</p>
+      <motion.div
+        variants={vars as Parameters<typeof motion.div>[0]['variants']}
+        initial="hidden"
+        animate="show"
+        className="w-full max-w-sm flex flex-col gap-4"
+      >
+        {/* Recap — celebrate what they got */}
+        <div className={`${theme.card} p-6 text-center`}>
+          <div className="text-4xl mb-3">🎉</div>
+          <p className="text-white/50 text-sm mb-1">
+            Nice work, <span className="text-white font-bold">{playerName}</span>!
+          </p>
+          <p className={`text-5xl font-black ${theme.textAccentBold}`}>
+            {score}<span className="text-white/30 text-2xl">/{questionsAnswered}</span>
+          </p>
+          <p className="text-white/30 text-xs mt-2">{siteConfig.freeTier.gateHeadline}</p>
         </div>
 
-        {/* Pro pitch */}
-        <div className={`rounded-2xl p-5 mb-4 bg-gradient-to-br ${theme.gradient} bg-opacity-10`}
-          style={{ background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.35)' }}>
-          <div className="flex items-center gap-2 mb-3">
+        {/* Upgrade pitch */}
+        <div
+          className="rounded-2xl p-5 border"
+          style={{ borderColor: 'rgba(139,92,246,0.4)', background: 'rgba(139,92,246,0.08)' }}
+        >
+          <div className="flex items-center gap-2 mb-4">
             <Zap size={18} className={theme.textAccent} />
-            <h2 className="text-white font-extrabold text-lg">Unlock Kwizzo Pro</h2>
+            <h2 className="text-white font-black text-lg">Unlock Kwizzo Pro</h2>
             <span className={`ml-auto text-xs font-black px-2.5 py-1 rounded-full bg-gradient-to-r ${theme.gradient} text-white`}>
-              £3.99/mo
+              {siteConfig.pricing.pro.price}{siteConfig.pricing.pro.period}
             </span>
           </div>
-          <ul className="space-y-2 mb-4">
-            {PRO_FEATURES.map(f => (
-              <li key={f} className="flex items-center gap-2 text-sm text-white/80">
-                <CheckCircle size={13} className="text-green-400 flex-shrink-0" />
-                {f}
+          <p className="text-white/50 text-sm mb-4">{siteConfig.freeTier.gateSubtext}</p>
+          <ul className="flex flex-col gap-2 mb-4">
+            {siteConfig.pricing.pro.features.filter(f => f.included).slice(0, 4).map(f => (
+              <li key={f.text} className="flex items-center gap-2 text-sm text-white/70">
+                <CheckCircle size={14} className="text-green-400 shrink-0" />
+                {f.text}
               </li>
             ))}
           </ul>
-          <button
+          {err && <p className="text-red-400 text-xs mb-3">{err}</p>}
+          <motion.button
+            {...BUTTON_PRESS}
+            transition={SPRING_CINEMATIC}
             onClick={upgrade}
             disabled={loading}
-            className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm bg-gradient-to-r ${theme.gradient} text-white shadow-lg hover:opacity-90 disabled:opacity-50 transition-all`}
+            className={`w-full py-3.5 rounded-xl bg-gradient-to-r ${theme.gradient} text-white font-bold text-sm disabled:opacity-60`}
           >
-            {loading ? <span className="animate-spin inline-block">⟳</span> : <Zap size={15} />}
-            {loading ? 'Opening checkout…' : 'Get Pro — £3.99/month'}
-          </button>
-          {err && <p className="text-red-400 text-xs text-center mt-2">{err}</p>}
-          <p className="text-white/25 text-[10px] text-center mt-2">Cancel anytime · Secure payment via Stripe</p>
+            {loading ? 'Opening checkout…' : siteConfig.freeTier.gateCtaText}
+          </motion.button>
         </div>
 
-        {/* Free fallback actions */}
-        <div className="flex gap-2">
-          <button onClick={onContinueFree} className={btn.secondary + ' flex-1 justify-center py-3 text-sm'}>
-            <RotateCcw size={14} /> Play again (free)
-          </button>
-          <button onClick={onNewGame} className={`flex-1 justify-center py-3 text-sm flex items-center gap-1.5 rounded-xl border border-white/[0.08] text-white/40 hover:text-white/70 transition-colors`}>
-            <Home size={14} /> New game
-          </button>
+        {/* Secondary actions */}
+        <div className="flex flex-col gap-2">
+          <motion.button
+            {...BUTTON_PRESS}
+            transition={SPRING_CINEMATIC}
+            onClick={onNewGame}
+            className={`${btn.secondary} w-full flex items-center justify-center gap-2 py-3 text-sm font-bold`}
+          >
+            <RotateCcw size={14} /> {siteConfig.freeTier.gateSecondaryText}
+          </motion.button>
+          <Link href="/" className="text-center text-white/30 text-xs hover:text-white/50 transition-colors py-2">
+            Back to home
+          </Link>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

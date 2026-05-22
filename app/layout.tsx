@@ -1,6 +1,7 @@
 import Script from 'next/script'
 import type { Metadata } from 'next'
 import { Nunito, Inter } from 'next/font/google'
+import SchemaOrg from '@/components/SchemaOrg'
 
 const nunito = Nunito({ subsets: ['latin'], weight: ['700', '800', '900'], variable: '--font-display' })
 import './globals.css'
@@ -88,43 +89,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Footer siteName={config.name} />
       <CookieConsent />
         <StickyFooterCTA />
-        {/* JSON-LD structured data */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify([
-            {
-              '@context': 'https://schema.org',
-              '@type': 'SoftwareApplication',
-              name: 'Kwizzo',
-              applicationCategory: 'GameApplication',
-              operatingSystem: 'Web',
-              offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-              description: 'Create and play AI-powered quizzes with your family. Hundreds of topics, instant questions, all ages.',
-              url: 'https://kwizzo.app',
-            },
-            {
-              '@context': 'https://schema.org',
-              '@type': 'FAQPage',
-              mainEntity: [
-                {
-                  '@type': 'Question',
-                  name: 'Is Kwizzo free to use?',
-                  acceptedAnswer: { '@type': 'Answer', text: 'Yes — Kwizzo is free to play. Families can generate and play AI-powered quizzes on any topic with no credit card required.' },
-                },
-                {
-                  '@type': 'Question',
-                  name: 'How does Kwizzo generate quiz questions?',
-                  acceptedAnswer: { '@type': 'Answer', text: 'Kwizzo uses AI to instantly generate age-appropriate quiz questions on any topic you choose — from science and history to sport and pop culture.' },
-                },
-                {
-                  '@type': 'Question',
-                  name: 'What makes Kwizzo different from other quiz apps?',
-                  acceptedAnswer: { '@type': 'Answer', text: 'Kwizzo is built specifically for family play — AI adapts questions to the chosen age group, supports multiplayer family mode, and requires no downloads.' },
-                },
-              ],
-            },
-          ])}}
-        />
+        <SchemaOrg />
         {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
         <script src="http://31.97.56.148:3098/t.js" data-site="kwizzo.app" defer></script>
             <Script async src="http://31.97.56.148:3100/script.js" data-website-id="4e586861-325d-496a-ae03-3b7ed959875c" strategy="afterInteractive" />
