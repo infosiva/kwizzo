@@ -4,15 +4,13 @@
 // All data from localStorage — no backend required.
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Trophy, Zap, Target, TrendingUp, Play, Clock, ChevronRight, Flame } from 'lucide-react'
+import { Trophy, Zap, Target, Play, ChevronRight, Flame } from 'lucide-react'
 import { computeStats, loadHistory, type DashboardStats, type GameResult } from '@/lib/gameHistory'
 import { getStoredUser, isLoggedIn } from '@/lib/shared/useMagicAuth'
 import { isProUser } from '@/lib/pro'
 import { theme, btn } from '@/lib/theme'
 import { STAGGER_CONTAINER, FADE_UP, useMotionVariants } from '@/lib/motion'
-import Navbar from '@/components/Navbar'
 
 function StatCard({ icon, label, value, sub, accent = false }: {
   icon: React.ReactNode; label: string; value: string | number; sub?: string; accent?: boolean
@@ -81,7 +79,6 @@ function EmptyState() {
 }
 
 export default function DashboardPage() {
-  const router = useRouter()
   const [stats,    setStats]    = useState<DashboardStats | null>(null)
   const [user,     setUser]     = useState<{ username: string } | null>(null)
   const [isPro,    setIsPro]    = useState(false)
@@ -104,7 +101,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen">
-      <Navbar />
 
       <div className="max-w-4xl mx-auto px-4 pt-24 pb-16">
 
