@@ -37,8 +37,11 @@ export default function Navbar() {
             <Link href="/play?mode=solo"   className="px-4 py-2 rounded-full text-sm text-white/70 border border-white/10 hover:border-violet-500/40 hover:text-white transition-all">Solo</Link>
             {user ? (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-white/70">Hi, {user.username || user.email.split('@')[0]}</span>
-                <button onClick={logout} className="px-3 py-1.5 rounded-full text-xs text-white/50 border border-white/10 hover:text-white hover:border-violet-500/40 transition-all">Sign out</button>
+                <Link href="/dashboard" className="px-3 py-1.5 rounded-full text-xs font-semibold text-violet-300 border border-violet-500/30 bg-violet-500/10 hover:bg-violet-500/20 transition-all">
+                  Dashboard
+                </Link>
+                <span className="text-xs text-white/50">{user.username || user.email?.split('@')[0]}</span>
+                <button onClick={logout} className="px-3 py-1.5 rounded-full text-xs text-white/40 border border-white/10 hover:text-white hover:border-violet-500/40 transition-all">Sign out</button>
               </div>
             ) : (
               <button onClick={() => setAuthOpen(true)} className="px-4 py-2 rounded-full text-sm font-bold text-white transition-all hover:scale-105" style={{ background: 'linear-gradient(135deg, #7c3aed, #a855f7)' }}>

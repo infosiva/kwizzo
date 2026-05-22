@@ -5,6 +5,7 @@ import { ArrowRight, Trophy, RotateCcw, Home, CheckCircle, XCircle, Volume2, Vol
 import { theme, btn } from '@/lib/theme'
 import ProWall from '@/components/ProWall'
 import { isProUser, FREE_QUESTION_LIMIT } from '@/lib/pro'
+import { saveGameResult } from '@/lib/gameHistory'
 import type { Question } from '@/app/api/quiz/generate/route'
 import { useVoiceFeedback } from '@/lib/useVoiceFeedback'
 
@@ -221,6 +222,23 @@ function QuizContent() {
         setStreak(0)
         setGameState('choosing')
       } else {
+        // Save result to localStorage history before showing results screen
+        try {
+          saveGameResult({
+            topic:       topic,
+            familyName,
+            players:     scores.map(s => ({
+              name:  s.name,
+              score: s.score,
+              total: playerQuestions[s.name]?.length || questions.length || 10,
+              age:   parseInt(s.age, 10) || 18,
+            })),
+            bestStreak,
+            fastestSec,
+            fastestBy,
+            durationSec: 0,
+          })
+        } catch {}
         setGameState('finished')
       }
     } else {
