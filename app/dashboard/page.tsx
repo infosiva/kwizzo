@@ -95,7 +95,21 @@ export default function DashboardPage() {
     setStats(computeStats())
   }, [])
 
-  if (!mounted || !stats) return null
+  // Show skeleton until localStorage is read (avoids blank flash)
+  if (!mounted || !stats) {
+    return (
+      <div className="min-h-screen">
+        <div className="max-w-4xl mx-auto px-4 pt-24 pb-16 animate-pulse">
+          <div className="h-8 w-48 rounded-xl bg-white/[0.06] mb-3" />
+          <div className="h-4 w-64 rounded-lg bg-white/[0.04] mb-10" />
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+            {[1,2,3,4].map(i => <div key={i} className="h-28 rounded-2xl bg-white/[0.04]" />)}
+          </div>
+          <div className="h-64 rounded-2xl bg-white/[0.04]" />
+        </div>
+      </div>
+    )
+  }
 
   const hasGames = stats.totalGames > 0
 
