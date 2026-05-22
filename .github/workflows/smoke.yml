@@ -1,0 +1,54 @@
+name: Smoke Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  smoke:
+    name: Playwright Smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Resolve deployment URL
+        id: url
+        run: |
+          URL="${VERCEL_URL:-https://kwizzo.app}"
+          echo "url=$URL" >> $GITHUB_OUTPUT
+          for i in $(seq 1 12); do
+            if curl -sf "$URL" > /dev/null; then echo "Live: $URL"; break; fi
+            echo "Waiting ($i/12)..."; sleep 5
+          done
+        env:
+          VERCEL_URL: ${{ vars.VERCEL_URL }}
+
+      - name: Run smoke tests
+        run: npx playwright test --reporter=github
+        env:
+          BASE_URL:     ${{ steps.url.outputs.url }}
+          SMOKE_ROUTES: '/,/play,/about'
+
+      - name: Telegram alert on failure
+        if: failure()
+        run: |
+          curl -s -X POST "$TELEGRAM_WEBHOOK" \
+            -H "Content-Type: application/json" \
+            -d "{\"text\": \"🚨 kwizzo smoke FAILED — ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" || true
+        env:
+          TELEGRAM_WEBHOOK: ${{ secrets.TELEGRAM_WEBHOOK_URL }}

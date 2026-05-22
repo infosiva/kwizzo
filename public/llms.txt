@@ -1,0 +1,24 @@
+# Kwizzo
+> AI-powered family quiz game. Create and play quizzes on any topic in 30 seconds, no account needed.
+
+## What this site does
+Kwizzo generates unique quiz questions on any topic instantly using AI. It supports family multiplayer with age-adaptive difficulty — kids get easier questions, adults get harder. Requires no account to start playing.
+
+## Who it's for
+Families with children of any age. Great for quiz nights, road trips, and learning at home. Suitable for ages 5 to adult.
+
+## Key features
+- Instant AI quiz generation on 100+ categories or any custom topic
+- Age-adaptive questions per player
+- Family multiplayer mode with live leaderboard
+- 5 free rounds per session — no account or card required
+- Works on any device in a browser — no download
+
+## Pricing
+Free tier: 5 rounds per session, 10 categories, solo and group modes.
+Pro tier: £3.99/month — unlimited rounds, all 100+ categories, custom quiz creation, no ads, export scorecards.
+
+## URLs
+Base: https://kwizzo.app
+Play: https://kwizzo.app/play
+Pricing: https://kwizzo.app/#pricing
