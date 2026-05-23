@@ -12,6 +12,7 @@ import Navbar from '@/components/Navbar'
 import ChatBot from '@/components/ChatBot'
 import Providers from '@/components/Providers'
 import FeedbackWidget from '@/components/FeedbackWidget'
+import BackToTop from '@/components/BackToTop'
 import CookieConsent from "../components/CookieConsent";
 import Footer from "../components/Footer";
 import StickyFooterCTA from "../components/StickyFooterCTA";
@@ -85,6 +86,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <ChatBot />
         <FeedbackWidget siteName="Kwizzo" accentColor="#7c3aed" accentColor2="#a855f7" />
+        <BackToTop accentColor="#7c3aed" />
 
         <Footer siteName={config.name} />
       <CookieConsent />
