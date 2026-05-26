@@ -92,13 +92,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <CookieConsent />
         <StickyFooterCTA />
         <SchemaOrg />
-        {/* VPS analytics — HTTP only, skip on production HTTPS */}
-        {process.env.NODE_ENV !== 'production' && (
-          <>
-            <script src="http://31.97.56.148:3098/t.js" data-site="kwizzo.app" defer></script>
-            <Script async src="http://31.97.56.148:3100/script.js" data-website-id="4e586861-325d-496a-ae03-3b7ed959875c" strategy="afterInteractive" />
-          </>
-        )}
+        <Script defer data-domain="kwizzo.app" src="https://plausible.io/js/script.js" strategy="afterInteractive" />
       </body>
     </html>
   )
