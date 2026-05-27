@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { STAGGER_CONTAINER, FADE_UP, SPRING_CINEMATIC, BUTTON_PRESS, useMotionVariants } from '@/lib/motion'
 import { siteConfig } from '@/site.config'
+import type { ContentOverrides } from '@/lib/content'
 import { ShimmerButton } from '@/components/magicui/shimmer-button'
 import { theme, btn } from '@/lib/theme'
 import Link from 'next/link'
@@ -20,7 +21,7 @@ const TOPIC_CHIPS = [
   { label: 'Food', emoji: '🍕' },
 ]
 
-export default function HeroClient() {
+export default function HeroClient({ overrides = {} }: { overrides?: ContentOverrides }) {
   const variants  = useMotionVariants(STAGGER_CONTAINER(0.06))
   const childVars = useMotionVariants(FADE_UP)
 
@@ -53,7 +54,10 @@ export default function HeroClient() {
         className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight"
         style={{ fontFamily: 'var(--font-display, system-ui)' }}
       >
-        {siteConfig.headline.map((line, i) => (
+        {(overrides.headline
+          ? [overrides.headline]
+          : siteConfig.headline
+        ).map((line, i) => (
           <span key={i} className="block">
             {i === 1
               ? (
@@ -78,7 +82,7 @@ export default function HeroClient() {
         variants={childVars as Parameters<typeof motion.p>[0]['variants']}
         className="text-white/55 text-base sm:text-lg leading-relaxed max-w-md"
       >
-        {siteConfig.subheadline}
+        {overrides.subheadline ?? siteConfig.subheadline}
       </motion.p>
 
       {/* Topic chips — scrollable on mobile */}
@@ -139,7 +143,7 @@ export default function HeroClient() {
               className="px-8 py-4 text-base font-black min-h-[56px]"
               style={{ boxShadow: '0 0 28px rgba(139,92,246,0.45)' }}
             >
-              {siteConfig.ctaPrimary.text}
+              {overrides.cta ?? siteConfig.ctaPrimary.text}
             </ShimmerButton>
           </Link>
         </motion.div>

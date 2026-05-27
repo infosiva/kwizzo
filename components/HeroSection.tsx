@@ -2,12 +2,14 @@
 // Static HTML that crawlers read. HeroClient mounts stagger animation on top.
 import { Suspense } from 'react'
 import { siteConfig } from '@/site.config'
+import { getContentOverrides } from '@/lib/content'
 import HeroClient from './HeroClient'
 import HeroDemo from './HeroDemo'
 
-export default function HeroSection() {
+export default async function HeroSection() {
   const isSplit    = siteConfig.layout.heroVariant === 'split'
   const isCentered = siteConfig.layout.heroVariant === 'centered'
+  const overrides  = await getContentOverrides()
 
   return (
     <section className="relative px-4 sm:px-6 pt-4 pb-8 max-w-6xl mx-auto">
@@ -18,7 +20,7 @@ export default function HeroSection() {
       }`}>
         {/* LEFT: HeroClient renders badge, H1, pills, CTAs — always first in DOM */}
         <div className="order-1">
-          <HeroClient />
+          <HeroClient overrides={overrides} />
         </div>
 
         {/* RIGHT: game demo — below copy on mobile, alongside on desktop */}
