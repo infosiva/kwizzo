@@ -9,7 +9,7 @@ export default function FeaturesGrid() {
   const itemVars      = useMotionVariants(FADE_UP)
 
   return (
-    <section id="features" className="py-14 px-4 sm:px-6 max-w-5xl mx-auto border-t border-white/[0.05]">
+    <section id="features" className="py-8 px-4 sm:px-6 max-w-5xl mx-auto border-t border-white/[0.05]">
       <div className="text-center mb-10">
         <h2 className="text-2xl font-black text-white mb-2">Everything you need</h2>
         <p className="text-white/40 text-sm">AI-powered, free to start, works on any device</p>

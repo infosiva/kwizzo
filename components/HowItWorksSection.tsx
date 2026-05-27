@@ -56,7 +56,7 @@ export default function HowItWorksSection() {
   const onPointerUp = () => setIsDragging(false)
 
   return (
-    <section id="how-it-works" className="py-14 border-t border-white/[0.05]">
+    <section id="how-it-works" className="py-8 border-t border-white/[0.05]">
       <div className="text-center mb-8 px-4">
         <h2 className="text-2xl font-black text-white mb-2">How it works</h2>
         <p className="text-white/40 text-sm">Three steps to quiz night</p>

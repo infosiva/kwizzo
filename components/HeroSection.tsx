@@ -10,7 +10,7 @@ export default function HeroSection() {
   const isCentered = siteConfig.layout.heroVariant === 'centered'
 
   return (
-    <section className="relative px-4 sm:px-6 pt-6 pb-10 max-w-6xl mx-auto">
+    <section className="relative px-4 sm:px-6 pt-4 pb-8 max-w-6xl mx-auto">
       <div className={`grid grid-cols-1 ${
         isSplit    ? 'lg:grid-cols-2 gap-8 lg:gap-12 items-center' :
         isCentered ? 'max-w-3xl mx-auto text-center' :

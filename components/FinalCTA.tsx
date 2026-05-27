@@ -11,7 +11,7 @@ export default function FinalCTA() {
   const vars = useMotionVariants(FADE_UP)
 
   return (
-    <section className="py-20 px-4 sm:px-6 border-t border-white/[0.05]">
+    <section className="py-10 px-4 sm:px-6 border-t border-white/[0.05]">
       <motion.div
         variants={vars as Parameters<typeof motion.div>[0]['variants']}
         initial="hidden"
