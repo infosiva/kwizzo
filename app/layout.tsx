@@ -6,10 +6,11 @@ import SchemaOrg from '@/components/SchemaOrg'
 const nunito = Nunito({ subsets: ['latin'], weight: ['700', '800', '900'], variable: '--font-display' })
 import './globals.css'
 import config from '@/vertical.config'
-import { getMeshStyle, getScrollbarColor, COLOR_MAP } from '@/lib/themeColors'
+import { getScrollbarColor, COLOR_MAP } from '@/lib/themeColors'
 import PageTracker from '@/components/PageTracker'
 import Navbar from '@/components/Navbar'
 import ChatBot from '@/components/ChatBot'
+import { getSiteFlags } from '@/lib/flags'
 import Providers from '@/components/Providers'
 import FeedbackWidget from '@/components/FeedbackWidget'
 import BackToTop from '@/components/BackToTop'
@@ -46,10 +47,10 @@ export const metadata: Metadata = {
 }
 
 // Derive CSS custom properties from vertical theme at build time
-const colors   = COLOR_MAP[config.themeColor] ?? COLOR_MAP['violet']
-const meshStyle = getMeshStyle(config.themeColor)
+const colors = COLOR_MAP[config.themeColor] ?? COLOR_MAP['violet']
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const flags = await getSiteFlags('kwizzo')
   return (
     <html
       lang="en"
@@ -66,14 +67,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${inter.variable} ${nunito.variable} min-h-full flex flex-col text-white`}
         style={{ background: colors.base, fontFamily: 'var(--font-body, system-ui)' }}
       >
-        {/* Dynamic mesh gradient bg — changes per vertical */}
-        <div style={meshStyle} />
-        {/* Animated blob overlays — adds depth and motion to background */}
-        <div style={{ position: 'fixed', inset: 0, zIndex: -1, overflow: 'hidden', pointerEvents: 'none' }}>
-          <div className="mesh-blob1" style={{ position: 'absolute', top: '-20%', left: '-10%', width: 700, height: 700, borderRadius: '50%', background: `radial-gradient(circle, ${colors.primary}55 0%, transparent 65%)`, filter: 'blur(60px)' }} />
-          <div className="mesh-blob2" style={{ position: 'absolute', top: '30%', right: '-15%', width: 600, height: 600, borderRadius: '50%', background: `radial-gradient(circle, ${colors.secondary}44 0%, transparent 65%)`, filter: 'blur(60px)' }} />
-          <div className="mesh-blob3" style={{ position: 'absolute', bottom: '-15%', left: '40%', width: 550, height: 550, borderRadius: '50%', background: `radial-gradient(circle, ${colors.primary}38 0%, transparent 65%)`, filter: 'blur(50px)' }} />
-        </div>
+        {/* Aurora background + grain */}
+        <div className="aurora aurora-primary" aria-hidden />
+        <div className="aurora aurora-secondary" aria-hidden />
+        <div className="aurora aurora-third" aria-hidden />
+        <div className="grain" aria-hidden />
 
         <PageTracker site='kwizzo' />
         <Navbar />
@@ -84,7 +82,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </main>
         </Providers>
 
-        <ChatBot />
+        {flags.chatbot && <ChatBot />}
         <FeedbackWidget siteName="Kwizzo" accentColor="#7c3aed" accentColor2="#a855f7" />
         <BackToTop accentColor="#7c3aed" />
 
@@ -93,6 +91,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <StickyFooterCTA />
         <SchemaOrg />
         <Script defer data-domain="kwizzo.app" src="https://plausible.io/js/script.js" strategy="afterInteractive" />
+        <Script defer data-site="kwizzo.app" src="http://31.97.56.148:3098/t.js" strategy="afterInteractive" />
       </body>
     </html>
   )
