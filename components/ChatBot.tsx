@@ -10,6 +10,8 @@ const SYSTEM_PROMPT = `You are KwizBot, the friendly AI assistant for Kwizzo —
 Help players with quiz topics, explain answers, suggest fun categories, and encourage learning through play.
 Keep responses short, upbeat, and family-friendly. Use simple language suitable for all ages.`
 
+const BOTTOM_OFFSET = 84 // px above bottom edge (button 52px + 8px gap + 24px margin)
+
 interface Message {
   role: 'user' | 'assistant'
   content: string
@@ -17,6 +19,7 @@ interface Message {
 
 export default function ChatBot() {
   const [open, setOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: WELCOME },
   ])
@@ -24,6 +27,13 @@ export default function ChatBot() {
   const [loading, setLoading] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -82,6 +92,44 @@ export default function ChatBot() {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() }
   }
 
+  // Panel positioning — mobile: full-width bottom sheet, desktop: corner panel
+  const panelStyle: React.CSSProperties = isMobile
+    ? {
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 9998,
+        height: `calc(100dvh - ${BOTTOM_OFFSET}px)`,
+        maxHeight: `calc(100dvh - ${BOTTOM_OFFSET}px)`,
+        borderRadius: '16px 16px 0 0',
+        background: '#0d0a1a',
+        border: '1px solid rgba(124,58,237,0.25)',
+        borderBottom: 'none',
+        boxShadow: '0 -8px 40px rgba(0,0,0,0.7), 0 0 40px rgba(124,58,237,0.12)',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        animation: 'kwiz-slide-bottom 0.25s cubic-bezier(0.23,1,0.32,1)',
+      }
+    : {
+        position: 'fixed',
+        bottom: BOTTOM_OFFSET + 4,
+        right: 24,
+        zIndex: 9998,
+        width: 370,
+        height: 500,
+        maxHeight: `calc(100dvh - ${BOTTOM_OFFSET + 20}px)`,
+        borderRadius: 16,
+        background: '#0d0a1a',
+        border: '1px solid rgba(124,58,237,0.25)',
+        boxShadow: '0 8px 40px rgba(0,0,0,0.7), 0 0 40px rgba(124,58,237,0.12)',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        animation: 'kwiz-slide-up 0.22s ease-out',
+      }
+
   return (
     <>
       {/* Floating button — bottom-right */}
@@ -110,19 +158,16 @@ export default function ChatBot() {
         )}
       </button>
 
-      {/* Chat panel — bottom-right */}
+      {/* Chat panel */}
       {open && (
-        <div style={{
-          position: 'fixed', bottom: 88, right: 24, zIndex: 9998,
-          width: 360, height: 500, borderRadius: 16,
-          background: '#0d0a1a', border: '1px solid rgba(124,58,237,0.25)',
-          boxShadow: '0 8px 40px rgba(0,0,0,0.7), 0 0 40px rgba(124,58,237,0.12)',
-          display: 'flex', flexDirection: 'column', overflow: 'hidden',
-          animation: 'kwiz-slide-up 0.22s ease-out',
-        }}>
+        <div style={panelStyle}>
           <style>{`
             @keyframes kwiz-slide-up {
               from { opacity: 0; transform: translateY(16px); }
+              to   { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes kwiz-slide-bottom {
+              from { opacity: 0; transform: translateY(100%); }
               to   { opacity: 1; transform: translateY(0); }
             }
             .kwiz-msg::-webkit-scrollbar { width: 4px; }
@@ -131,8 +176,9 @@ export default function ChatBot() {
             @keyframes kwiz-bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
           `}</style>
 
-          {/* Header */}
+          {/* Header — flexShrink:0 so it never collapses */}
           <div style={{
+            flexShrink: 0,
             padding: '12px 16px', borderBottom: '1px solid rgba(124,58,237,0.2)',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             background: 'linear-gradient(135deg, rgba(124,58,237,0.2) 0%, rgba(91,33,182,0.1) 100%)',
@@ -159,9 +205,9 @@ export default function ChatBot() {
             </button>
           </div>
 
-          {/* Messages */}
+          {/* Messages — flex:1 + minHeight:0 is critical for scroll to work inside flex */}
           <div className="kwiz-msg" style={{
-            flex: 1, overflowY: 'auto', padding: '14px 14px 6px',
+            flex: 1, minHeight: 0, overflowY: 'auto', padding: '14px 14px 6px',
             display: 'flex', flexDirection: 'column', gap: 10,
           }}>
             {messages.map((m, i) => (
@@ -171,7 +217,7 @@ export default function ChatBot() {
                   borderRadius: m.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
                   background: m.role === 'user' ? 'linear-gradient(135deg, #7c3aed, #5b21b6)' : 'rgba(124,58,237,0.1)',
                   border: m.role === 'user' ? 'none' : '1px solid rgba(124,58,237,0.2)',
-                  color: '#f0f0f0', fontSize: 13.5, lineHeight: 1.5,
+                  color: '#f0f0f0', fontSize: isMobile ? 15 : 13.5, lineHeight: 1.5,
                   wordBreak: 'break-word', whiteSpace: 'pre-wrap',
                 }}>
                   {m.content}
@@ -199,9 +245,12 @@ export default function ChatBot() {
             <div ref={bottomRef} />
           </div>
 
-          {/* Input */}
+          {/* Input — flexShrink:0 so it never gets pushed off screen */}
           <div style={{
-            padding: '10px 12px', borderTop: '1px solid rgba(124,58,237,0.15)',
+            flexShrink: 0,
+            padding: '10px 12px',
+            paddingBottom: isMobile ? 'max(10px, env(safe-area-inset-bottom))' : '10px',
+            borderTop: '1px solid rgba(124,58,237,0.15)',
             display: 'flex', gap: 8, alignItems: 'center',
             background: 'rgba(0,0,0,0.3)',
           }}>
@@ -215,7 +264,8 @@ export default function ChatBot() {
               style={{
                 flex: 1, background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.25)',
                 borderRadius: 10, padding: '9px 13px', color: '#f0f0f0',
-                fontSize: 13.5, outline: 'none', transition: 'border-color 0.15s',
+                fontSize: isMobile ? 16 : 13.5, // 16px prevents iOS zoom on focus
+                outline: 'none', transition: 'border-color 0.15s',
               }}
               onFocus={e => (e.target.style.borderColor = ACCENT)}
               onBlur={e => (e.target.style.borderColor = 'rgba(124,58,237,0.25)')}

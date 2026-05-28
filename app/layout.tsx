@@ -83,7 +83,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </Providers>
 
         {flags.chatbot && <ChatBot />}
-        <FeedbackWidget siteName="Kwizzo" accentColor="#7c3aed" accentColor2="#a855f7" />
+        <FeedbackWidget siteName="Kwizzo" accentColor="#7c3aed" accentColor2="#a855f7" position={flags.chatbot ? 'left' : 'right'} />
         <BackToTop accentColor="#7c3aed" />
 
         <Footer siteName={config.name} />
