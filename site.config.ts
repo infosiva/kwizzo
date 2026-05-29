@@ -43,14 +43,14 @@ export const siteConfig: SiteConfig = {
   domain:     'kwizzo.app',
   themeColor: 'violet',
 
-  heroBadge:    'kwizzo · AI quiz · free to play',
-  headline:     ['Quiz night,', 'reinvented.'],
-  subheadline:  'AI generates perfect questions for every age — play in 30 seconds, no account needed.',
-  ctaPrimary:   { text: '⚡ Play Free Now →', href: '/play?mode=solo' },
+  heroBadge:    '🎮 Free to play · No account needed',
+  headline:     ['Quiz night that never', 'repeats itself.'],
+  subheadline:  'AI generates fresh questions every round — any topic, every age. Never the same game twice. 30 seconds to start.',
+  ctaPrimary:   { text: '🎮 Play Free Tonight', href: '/play?mode=solo' },
   ctaSecondary: { text: '👨‍👩‍👧 Family Mode',     href: '/play?mode=group' },
 
   freeTier: {
-    pills:             ['⚡ 5 rounds free', '👨‍👩‍👧 Any age', '📱 Any device'],
+    pills:             ['🎮 5 rounds free', '👪 All ages', '📱 No download'],
     gateHeadline:      "You've used your 5 free rounds!",
     gateSubtext:       "That was fun. Unlock unlimited rounds for the whole family.",
     gateCtaText:       'Upgrade to Pro — £3.99/mo',
@@ -67,9 +67,9 @@ export const siteConfig: SiteConfig = {
   },
 
   howItWorks: [
-    { step: 1, icon: '🎯', title: 'Pick a topic',  desc: 'Choose from 100+ categories or type any topic you want.' },
-    { step: 2, icon: '⚡', title: 'AI generates',  desc: 'Fresh questions appear in seconds — never the same game twice.' },
-    { step: 3, icon: '🏆', title: 'Play together', desc: 'Live leaderboard updates as everyone answers. Crown the champion.' },
+    { step: 1, icon: '🎯', title: 'Pick your topic',   desc: 'Choose from Sports, History, Movies, Science and 100+ more — or type anything.' },
+    { step: 2, icon: '⚡', title: 'AI drops questions', desc: 'Fresh questions generated in seconds. Never the same game twice.' },
+    { step: 3, icon: '🏆', title: 'Battle it out',     desc: 'Live scores update as everyone answers. Crown the family champion.' },
   ],
 
   features: [
@@ -121,9 +121,9 @@ export const siteConfig: SiteConfig = {
   ],
 
   finalCta: {
-    headline: 'Ready for quiz night?',
-    subtext:  'Start free. No account. Works on any device.',
-    ctaText:  '⚡ Play Free Now →',
+    headline: 'Ready to play?',
+    subtext:  'Free forever. No account needed. Works on any device.',
+    ctaText:  '🎮 Start Playing Free',
     ctaHref:  '/play?mode=solo',
   },
 
@@ -149,7 +149,7 @@ export const siteConfig: SiteConfig = {
   ],
 
   chatbot: {
-    welcomeMessage: 'Hi! Ready for a family quiz? I can help you create one.',
+    welcomeMessage: 'Pick a topic and I\'ll generate a quiz that\'s never been played before — any subject, any age group.',
     botName:        'KwizBot',
     placeholder:    'Ask me about quizzes…',
   },

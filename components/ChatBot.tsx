@@ -127,7 +127,7 @@ export default function ChatBot() {
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        animation: 'kwiz-slide-up 0.22s ease-out',
+        animation: 'kwiz-slide-up 0.22s cubic-bezier(0.23,1,0.32,1)',
       }
 
   return (
@@ -146,6 +146,8 @@ export default function ChatBot() {
         }}
         onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.1)')}
         onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+        onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.97)')}
+        onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.1)')}
       >
         {open ? (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
