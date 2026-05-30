@@ -43,9 +43,9 @@ export const siteConfig: SiteConfig = {
   domain:     'kwizzo.app',
   themeColor: 'violet',
 
-  heroBadge:    '🎮 Free to play · No account needed',
-  headline:     ['Quiz night that never', 'repeats itself.'],
-  subheadline:  'AI generates fresh questions every round — any topic, every age. Never the same game twice. 30 seconds to start.',
+  heroBadge:    '⚡ 30-second setup · No account needed',
+  headline:     ['Build a quiz in 30 seconds.', 'See where your audience got lost.'],
+  subheadline:  'AI generates quiz questions from any topic — share async or live, get per-question drop-off insights.',
   ctaPrimary:   { text: '🎮 Play Free Tonight', href: '/play?mode=solo' },
   ctaSecondary: { text: '👨‍👩‍👧 Family Mode',     href: '/play?mode=group' },
 

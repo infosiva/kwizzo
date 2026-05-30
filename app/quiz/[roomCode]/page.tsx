@@ -1,13 +1,14 @@
 'use client'
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { ArrowRight, Trophy, RotateCcw, Home, CheckCircle, XCircle, Volume2, VolumeX } from 'lucide-react'
+import { ArrowRight, Trophy, RotateCcw, Home, CheckCircle, XCircle, Volume2, VolumeX, Link2 } from 'lucide-react'
 import { theme, btn } from '@/lib/theme'
 import ProWall from '@/components/ProWall'
 import { isProUser, FREE_QUESTION_LIMIT } from '@/lib/pro'
 import { saveGameResult } from '@/lib/gameHistory'
 import type { Question } from '@/app/api/quiz/generate/route'
 import { useVoiceFeedback } from '@/lib/useVoiceFeedback'
+import QuizInsights from '@/components/QuizInsights'
 
 type Member = { name: string; age: string }
 type GameState = 'loading' | 'choosing' | 'playing' | 'answered' | 'finished' | 'pro-wall'
@@ -20,6 +21,85 @@ type OptionKey = typeof OPTION_LABELS[number]
 function getSubjectParam(): string {
   if (typeof window === 'undefined') return ''
   return new URLSearchParams(window.location.search).get('subject') ?? ''
+}
+
+// Build per-question wrong-pct data from player scores + questions
+function buildInsights(
+  scores: { name: string; answers: boolean[] }[],
+  playerQuestions: Record<string, Question[]>,
+  sharedQuestions: Question[],
+) {
+  if (scores.length === 0) return []
+  // Use first player's question bank for question labels
+  const firstPlayer = scores[0]?.name ?? ''
+  const bank = playerQuestions[firstPlayer]?.length
+    ? playerQuestions[firstPlayer]
+    : sharedQuestions
+  if (!bank.length) return []
+
+  const questionCount = bank.length
+  const wrongCounts = new Array<number>(questionCount).fill(0)
+  let totalPlayers = 0
+
+  for (const s of scores) {
+    const playerBank = playerQuestions[s.name]?.length ? playerQuestions[s.name] : sharedQuestions
+    if (!playerBank.length) continue
+    totalPlayers++
+    for (let i = 0; i < Math.min(s.answers.length, questionCount); i++) {
+      if (!s.answers[i]) wrongCounts[i]++
+    }
+  }
+
+  if (totalPlayers === 0) return []
+  return bank.map((q, i) => ({
+    question: q.question,
+    percentWrong: Math.round((wrongCounts[i] / totalPlayers) * 100),
+  }))
+}
+
+// Share-link button component — shown prominently near top of results
+function ShareQuizLink({ roomCode, topic }: { roomCode: string; topic: string }) {
+  const [copied, setCopied] = useState(false)
+
+  function copyLink() {
+    const url = `${window.location.origin}/quiz/${roomCode}?subject=${encodeURIComponent(topic)}`
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }).catch(() => {
+      // Fallback: show the URL in a prompt
+      window.prompt('Copy this quiz link:', url)
+    })
+  }
+
+  return (
+    <div
+      className="flex items-center gap-3 rounded-2xl px-4 py-3 fade-up"
+      style={{
+        background: 'rgba(139,92,246,0.08)',
+        border: '1px solid rgba(139,92,246,0.22)',
+      }}
+    >
+      <Link2 size={16} className="text-violet-400 shrink-0" />
+      <div className="flex-1 min-w-0">
+        <p className="text-white/70 text-xs font-semibold">Share this quiz</p>
+        <p className="text-white/30 text-[10px] truncate">
+          kwizzo.app/quiz/{roomCode}?subject={topic}
+        </p>
+      </div>
+      <button
+        onClick={copyLink}
+        className="shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
+        style={{
+          background: copied ? 'rgba(34,197,94,0.15)' : 'rgba(139,92,246,0.18)',
+          border: copied ? '1px solid rgba(34,197,94,0.35)' : '1px solid rgba(139,92,246,0.35)',
+          color: copied ? '#86efac' : '#c4b5fd',
+        }}
+      >
+        {copied ? '✓ Copied!' : '🔗 Copy link'}
+      </button>
+    </div>
+  )
 }
 
 function QuizContent() {
@@ -415,6 +495,12 @@ function QuizContent() {
             })}
           </div>
         </div>
+
+        {/* Share quiz link — prominent */}
+        <ShareQuizLink roomCode={roomCode} topic={topic} />
+
+        {/* Per-question drop-off insights */}
+        <QuizInsights results={buildInsights(scores, playerQuestions, questions)} />
 
         {/* Fun stats strip */}
         {(bestStreak > 1 || fastestSec !== null) && (
