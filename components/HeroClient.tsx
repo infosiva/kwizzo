@@ -63,10 +63,11 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
         <BattleCounter />
       </motion.div>
 
-      {/* Headline — oversized arcade */}
+      {/* Headline — arcade, compact */}
       <motion.h1
         variants={childVars as Parameters<typeof motion.h1>[0]['variants']}
-        className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[0.95] tracking-tight"
+        className="font-black leading-[0.95] tracking-tight"
+        style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}
       >
         {(overrides.headline
           ? [overrides.headline]

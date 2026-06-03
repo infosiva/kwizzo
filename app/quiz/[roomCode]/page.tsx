@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { ArrowRight, Trophy, RotateCcw, Home, CheckCircle, XCircle, Volume2, VolumeX, Link2 } from 'lucide-react'
+import { ArrowRight, Trophy, RotateCcw, Home, CheckCircle, XCircle, Volume2, VolumeX, Link2, Share2 } from 'lucide-react'
 import { theme, btn } from '@/lib/theme'
 import ProWall from '@/components/ProWall'
 import { isProUser, FREE_QUESTION_LIMIT } from '@/lib/pro'
@@ -100,6 +100,59 @@ function ShareQuizLink({ roomCode, topic }: { roomCode: string; topic: string })
       </button>
     </div>
   )
+}
+
+// Share-score button — copies personalised score text to clipboard
+function ShareScoreButton({ score, total, topic }: { score: number; total: number; topic: string }) {
+  const [copied, setCopied] = useState(false)
+  const pct = Math.round((score / total) * 100)
+  const topicLabel = topic.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+
+  function shareScore() {
+    const text = `I scored ${pct}% on ${topicLabel} at kwizzo.app — try to beat me! 🧠`
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2500)
+    }).catch(() => {
+      window.prompt('Copy your score:', text)
+    })
+  }
+
+  return (
+    <button
+      onClick={shareScore}
+      className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all"
+      style={{
+        background: copied ? 'rgba(34,197,94,0.15)' : 'rgba(139,92,246,0.12)',
+        border: copied ? '1px solid rgba(34,197,94,0.35)' : '1px solid rgba(139,92,246,0.28)',
+        color: copied ? '#86efac' : '#c4b5fd',
+      }}
+    >
+      {copied ? <CheckCircle size={15} /> : <Share2 size={15} />}
+      {copied ? 'Copied!' : 'Share score'}
+    </button>
+  )
+}
+
+// Topic-specific tips shown during loading to fill dead time
+const TOPIC_TIPS: Record<string, string[]> = {
+  science: ['Water boils at 100°C at sea level — but lower on a mountain!', 'DNA contains about 3 billion base pairs.', 'Light travels at ~300,000 km per second.'],
+  history: ['The Great Wall of China was built over many centuries, not all at once.', 'Cleopatra lived closer in time to the Moon landing than to the pyramids being built.', 'The shortest war in history lasted 38–45 minutes.'],
+  geography: ['Russia spans 11 time zones.', 'Australia is wider than the Moon.', 'Canada has the most lakes of any country in the world.'],
+  maths: ['Zero is the only number that cannot be represented in Roman numerals.', 'A googol is 1 followed by 100 zeros.', 'The equals sign (=) was invented in 1557.'],
+  sports: ['A regulation football pitch is between 100–110 metres long.', 'The Olympics were held every 4 years since 776 BC.', 'Table tennis is the world\'s most participated sport.'],
+  music: ['The piano has 88 keys.', 'A guitar has 6 strings in standard tuning.', '"Happy Birthday" was the first song ever played in space.'],
+  movies: ['The Wilhelm Scream has appeared in hundreds of films since 1951.', 'The Lord of the Rings trilogy won 17 Oscars combined.', 'Pixar accidentally deleted Toy Story 2 during production.'],
+  technology: ['The first computer bug was an actual bug — a moth found in a relay in 1947.', 'There are more internet-connected devices than people on Earth.', 'The first website is still online: info.cern.ch.'],
+  nature: ['A group of flamingos is called a flamboyance.', 'Octopuses have three hearts.', 'Honey never spoils — archaeologists found 3,000-year-old honey in Egyptian tombs.'],
+  food: ['Apples are members of the rose family.', 'Strawberries are not technically berries — bananas are.', 'Chocolate was once used as currency by the Aztecs.'],
+  general: ['A day on Venus is longer than a year on Venus.', 'Sharks are older than trees.', 'The human body contains enough iron to make a small nail.'],
+}
+
+function getLoadingTip(topic: string): string {
+  const key = Object.keys(TOPIC_TIPS).find(k => topic.toLowerCase().includes(k)) ?? 'general'
+  const tips = TOPIC_TIPS[key]
+  return tips[Math.floor(Math.random() * tips.length)]
 }
 
 function QuizContent() {
@@ -386,6 +439,9 @@ function QuizContent() {
   }, [qKey, currentQ, activePlayerIdx, q?.question])
 
   // ── Loading ───────────────────────────────────────────────
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const loadingTip = useMemo(() => getLoadingTip(topic), [topic])
+
   if (gameState === 'loading') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-4 text-center">
@@ -399,11 +455,21 @@ function QuizContent() {
             <button onClick={() => router.push('/play')} className={btn.secondary}>← Back</button>
           </div>
         ) : (
-          <div className="flex gap-2 justify-center">
-            <div className={`w-2 h-2 rounded-full ${theme.solid} animate-bounce`} style={{ animationDelay: '0ms' }} />
-            <div className={`w-2 h-2 rounded-full ${theme.solid} animate-bounce`} style={{ animationDelay: '150ms' }} />
-            <div className={`w-2 h-2 rounded-full ${theme.solid} animate-bounce`} style={{ animationDelay: '300ms' }} />
-          </div>
+          <>
+            <div className="flex gap-2 justify-center mb-10">
+              <div className={`w-2 h-2 rounded-full ${theme.solid} animate-bounce`} style={{ animationDelay: '0ms' }} />
+              <div className={`w-2 h-2 rounded-full ${theme.solid} animate-bounce`} style={{ animationDelay: '150ms' }} />
+              <div className={`w-2 h-2 rounded-full ${theme.solid} animate-bounce`} style={{ animationDelay: '300ms' }} />
+            </div>
+            {/* Fun fact to fill wait time */}
+            <div
+              className="max-w-xs rounded-2xl px-5 py-4 fade-up"
+              style={{ background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.18)' }}
+            >
+              <p className="text-violet-400 text-[10px] font-bold uppercase tracking-widest mb-1.5">Did you know?</p>
+              <p className="text-white/60 text-sm leading-relaxed">{loadingTip}</p>
+            </div>
+          </>
         )}
       </div>
     )
@@ -453,13 +519,41 @@ function QuizContent() {
   // ── Finished ──────────────────────────────────────────────
   if (gameState === 'finished') {
     const medals = ['🥇', '🥈', '🥉']
+    // For single player: show their score. For multi: show winner's score in hero.
+    const heroPlayer = sortedScores[0]
+    const heroBank   = heroPlayer
+      ? (playerQuestions[heroPlayer.name]?.length ? playerQuestions[heroPlayer.name] : questions)
+      : questions
+    const heroTotal  = heroBank.length || 10
+    const heroPct    = heroPlayer ? Math.round((heroPlayer.score / heroTotal) * 100) : 0
+    const isSolo     = scores.length === 1
+
     return (
       <div className="min-h-screen px-4 py-12 max-w-xl mx-auto">
-        <div className="text-center mb-10 fade-up">
-          <div className="text-6xl mb-4">🏆</div>
-          <h1 className="text-3xl font-extrabold text-white mb-2">{familyName}</h1>
-          <p className={`${theme.textAccent} font-semibold`}>Quiz Complete!</p>
-          <p className="text-white/30 text-sm mt-1">Everyone played their own age-adapted round</p>
+        {/* ── Animated score hero ── */}
+        <div className="text-center mb-8 fade-up">
+          <div className="text-6xl mb-4">{heroPct >= 80 ? '🏆' : heroPct >= 50 ? '🎉' : '💪'}</div>
+          {/* Big animated score number */}
+          <div
+            className="text-8xl font-black mb-1 tabular-nums"
+            style={{
+              background: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            {heroPct}%
+          </div>
+          <p className="text-white/50 text-base mb-1">
+            {isSolo
+              ? `You got ${heroPlayer?.score ?? 0} out of ${heroTotal} correct`
+              : `${heroPlayer?.name ?? ''} leads with ${heroPlayer?.score ?? 0}/${heroTotal}`}
+          </p>
+          <h1 className="text-xl font-extrabold text-white mt-2">{familyName}</h1>
+          <p className={`${theme.textAccent} font-semibold text-sm`}>Quiz Complete!</p>
+          {!isSolo && (
+            <p className="text-white/30 text-xs mt-1">Everyone played their own age-adapted round</p>
+          )}
         </div>
 
         <div className={`${theme.card} p-6 mb-6 fade-up`}>
@@ -496,8 +590,19 @@ function QuizContent() {
           </div>
         </div>
 
-        {/* Share quiz link — prominent */}
-        <ShareQuizLink roomCode={roomCode} topic={topic} />
+        {/* Share row: copy score text + share quiz link */}
+        <div className="flex items-center gap-2 mb-4 fade-up">
+          {heroPlayer && (
+            <ShareScoreButton
+              score={heroPlayer.score}
+              total={heroTotal}
+              topic={topic}
+            />
+          )}
+          <div className="flex-1">
+            <ShareQuizLink roomCode={roomCode} topic={topic} />
+          </div>
+        </div>
 
         {/* Per-question drop-off insights */}
         <QuizInsights results={buildInsights(scores, playerQuestions, questions)} />

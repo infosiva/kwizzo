@@ -91,7 +91,7 @@ export default function HowItWorksSection() {
                   : 'rgba(255,255,255,0.02)',
                 border: active === i ? '1px solid rgba(139,92,246,0.3)' : '1px solid rgba(255,255,255,0.06)',
                 transform: active === i ? 'scale(1)' : 'scale(0.96)',
-                opacity: active === i ? 1 : 0.5,
+                opacity: active === i ? 1 : 0.75,
                 transition: 'transform 220ms cubic-bezier(0.23,1,0.32,1), opacity 220ms ease, border-color 220ms ease, background 220ms ease',
                 display: 'flex', flexDirection: 'column', gap: '12px',
               }}
