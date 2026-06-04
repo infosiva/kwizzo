@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #080712;
+  --background: #0d0d1a;
   --foreground: #f0eeff;
 }
 
@@ -22,19 +22,82 @@ body {
 
 /* mesh-bg is now inline style in layout.tsx — dynamic per vertical */
 
+/* ── Aurora background blobs ────────────────────────────── */
+.aurora {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: -1;
+  will-change: transform;
+}
+.aurora-primary {
+  top: -15%;
+  left: -10%;
+  width: min(700px, 90vw);
+  height: min(700px, 90vw);
+  background: radial-gradient(circle, color-mix(in srgb, var(--theme-primary, #7c3aed) 30%, transparent) 0%, transparent 70%);
+  animation: aurora-drift 18s ease-in-out infinite alternate;
+}
+.aurora-secondary {
+  top: 35%;
+  right: -12%;
+  width: min(550px, 80vw);
+  height: min(550px, 80vw);
+  background: radial-gradient(circle, color-mix(in srgb, var(--theme-secondary, #a78bfa) 20%, transparent) 0%, transparent 70%);
+  animation: aurora-drift 24s ease-in-out infinite alternate-reverse;
+}
+.aurora-third {
+  bottom: -10%;
+  left: 35%;
+  width: min(480px, 70vw);
+  height: min(480px, 70vw);
+  background: radial-gradient(circle, color-mix(in srgb, var(--theme-primary, #7c3aed) 18%, transparent) 0%, transparent 70%);
+  animation: aurora-drift 30s ease-in-out infinite alternate;
+}
+@keyframes aurora-drift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(30px, 20px) scale(1.08); }
+}
+
+/* ── Film grain overlay ─────────────────────────────────── */
+.grain {
+  position: fixed;
+  inset: -200%;
+  width: 400%;
+  height: 400%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.022;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain-shift 0.8s steps(1) infinite;
+}
+@keyframes grain-shift {
+  0%  { transform: translate(0,0); }
+  10% { transform: translate(-3%,-5%); }
+  20% { transform: translate(-7%, 3%); }
+  30% { transform: translate( 5%,-4%); }
+  40% { transform: translate(-4%, 6%); }
+  50% { transform: translate(-3%,-4%); }
+  60% { transform: translate( 5%, 3%); }
+  70% { transform: translate(-7%,-2%); }
+  80% { transform: translate(-3%, 6%); }
+  90% { transform: translate( 5%,-4%); }
+}
+
 /* ── Glass cards ────────────────────────────────────────── */
 .glass {
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
 }
 
 .glass-strong {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
 }
 
 /* ── Shimmer animation ──────────────────────────────────── */
@@ -149,6 +212,37 @@ body {
   50%       { box-shadow: 0 0 16px rgba(139,92,246,0.6), 0 0 40px rgba(139,92,246,0.3); }
 }
 .neon-glow { animation: neonPulse 2.5s ease-in-out infinite; }
+
+/* ── Vote bar fill — CSS-only, driven by --bar-target CSS var ── */
+@keyframes barFill {
+  from { width: 0%; }
+  to   { width: var(--bar-target, 0%); }
+}
+.vote-bar {
+  width: 0%;
+  animation: barFill 1.1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+/* ── Hero entry stagger — left panel elements ───────────────── */
+@keyframes heroEntry {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.hero-entry {
+  opacity: 0;
+  animation: heroEntry 0.45s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+/* ── Yellow + purple arcade orbs (override for kwizzo palette) ── */
+.aurora-primary {
+  background: radial-gradient(circle, rgba(234,179,8,0.18) 0%, transparent 70%);
+}
+.aurora-secondary {
+  background: radial-gradient(circle, rgba(139,92,246,0.16) 0%, transparent 70%);
+}
+.aurora-third {
+  background: radial-gradient(circle, rgba(234,179,8,0.10) 0%, transparent 70%);
+}
 
 /* ── Confetti spin ───────────────────────────────────────── */
 @keyframes confettiSpin {

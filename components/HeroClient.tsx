@@ -1,181 +1,131 @@
 'use client'
-import { motion } from 'framer-motion'
-import { useState } from 'react'
-import { STAGGER_CONTAINER, FADE_UP, SPRING_CINEMATIC, BUTTON_PRESS, useMotionVariants } from '@/lib/motion'
+import Link from 'next/link'
 import { siteConfig } from '@/site.config'
 import type { ContentOverrides } from '@/lib/content'
-import { ShimmerButton } from '@/components/magicui/shimmer-button'
-import { btn } from '@/lib/theme'
-import Link from 'next/link'
-import { Users, Gamepad2, Trophy, Zap } from 'lucide-react'
 
-const TOPIC_CHIPS = [
-  { label: 'Sports', emoji: '⚽' },
-  { label: 'History', emoji: '🏛️' },
-  { label: 'Movies', emoji: '🎬' },
-  { label: 'Science', emoji: '🔬' },
-  { label: 'Music', emoji: '🎵' },
-  { label: 'Geography', emoji: '🌍' },
-  { label: 'Food', emoji: '🍕' },
-  { label: 'Animals', emoji: '🦁' },
-]
-
-// Live battle counter — animates number up on mount
-function BattleCounter() {
-  const [count] = useState(1247)
+// Feature pill — no fake stats
+function FeaturePill() {
   return (
-    <div className="flex items-center gap-2 text-[11px] font-bold text-purple-300/60 uppercase tracking-widest">
-      <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-      {count.toLocaleString()} battles live right now
-    </div>
+    <span className="text-white/40 text-xs">
+      Free to play · no account needed
+    </span>
   )
 }
 
 export default function HeroClient({ overrides = {} }: { overrides?: ContentOverrides }) {
-  const variants  = useMotionVariants(STAGGER_CONTAINER(0.06))
-  const childVars = useMotionVariants(FADE_UP)
-
   return (
-    <motion.div
-      variants={variants as Parameters<typeof motion.div>[0]['variants']}
-      initial="hidden"
-      animate="show"
-      className="flex flex-col gap-5"
-    >
-      {/* Badge — Digitwist-inspired neon pill */}
-      <motion.div variants={childVars as Parameters<typeof motion.div>[0]['variants']}>
+    <div className="flex flex-col gap-5 hero-left">
+      {/* Badge */}
+      <div style={{ animationDelay: '0ms' }} className="hero-entry">
         <span
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest"
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-widest"
+          style={{
+            background: 'rgba(234,179,8,0.10)',
+            border: '1px solid rgba(234,179,8,0.30)',
+            color: '#fde047',
+            boxShadow: '0 0 16px rgba(234,179,8,0.12)',
+          }}
+        >
+          <span>⚡</span>
+          30-SECOND SETUP · NO ACCOUNT NEEDED
+        </span>
+      </div>
+
+      {/* Headline */}
+      <div style={{ animationDelay: '60ms' }} className="hero-entry">
+        <h1
+          className="font-black leading-[0.95] tracking-tight"
+          style={{ fontSize: 'clamp(2rem, 5vw, 3.2rem)' }}
+        >
+          <span className="block text-white">Build a quiz in 30 seconds.</span>
+          <span
+            className="block bg-clip-text text-transparent"
+            style={{
+              backgroundImage: 'linear-gradient(135deg, #eab308 0%, #a78bfa 60%, #8b5cf6 100%)',
+              filter: 'drop-shadow(0 0 32px rgba(234,179,8,0.35))',
+            }}
+          >
+            See where your audience got lost.
+          </span>
+        </h1>
+      </div>
+
+      {/* Subtext */}
+      <div style={{ animationDelay: '120ms' }} className="hero-entry">
+        <p className="text-white/50 text-base sm:text-lg leading-relaxed max-w-md">
+          AI generates questions from any topic — share async or live, get per-question drop-off insights.
+        </p>
+      </div>
+
+      {/* Topic input */}
+      <div style={{ animationDelay: '180ms' }} className="hero-entry">
+        <div className="relative max-w-md">
+          <input
+            type="text"
+            placeholder="Enter any topic — History, Science, React hooks..."
+            className="w-full rounded-xl px-4 py-3.5 text-sm font-medium text-white/80 outline-none transition-all duration-150"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(234,179,8,0.22)',
+              caretColor: '#eab308',
+            }}
+            onFocus={e => {
+              e.currentTarget.style.borderColor = 'rgba(234,179,8,0.55)'
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(234,179,8,0.10)'
+            }}
+            onBlur={e => {
+              e.currentTarget.style.borderColor = 'rgba(234,179,8,0.22)'
+              e.currentTarget.style.boxShadow = 'none'
+            }}
+          />
+          <span
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold px-2 py-0.5 rounded-md"
+            style={{ background: 'rgba(234,179,8,0.15)', color: '#fde047' }}
+          >
+            ⚡ AI
+          </span>
+        </div>
+      </div>
+
+      {/* CTAs */}
+      <div style={{ animationDelay: '240ms' }} className="hero-entry flex flex-col sm:flex-row gap-3">
+        <Link
+          href="/play?mode=solo"
+          className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-black text-base active:scale-[0.97] transition-transform duration-100"
+          style={{
+            background: '#eab308',
+            color: '#0d0d1a',
+            boxShadow: '0 0 32px rgba(234,179,8,0.45), 0 4px 16px rgba(0,0,0,0.4)',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLElement).style.background = '#facc15'
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.background = '#eab308'
+          }}
+        >
+          Play Free Tonight →
+        </Link>
+        <Link
+          href="/play?mode=group"
+          className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-sm active:scale-[0.97] transition-transform duration-100"
           style={{
             background: 'rgba(139,92,246,0.12)',
             border: '1px solid rgba(139,92,246,0.30)',
             color: '#c4b5fd',
-            boxShadow: '0 0 16px rgba(139,92,246,0.15)',
           }}
         >
-          <Gamepad2 size={11} className="text-violet-400" />
-          {siteConfig.heroBadge}
-        </span>
-      </motion.div>
-
-      {/* Live counter */}
-      <motion.div variants={childVars as Parameters<typeof motion.div>[0]['variants']}>
-        <BattleCounter />
-      </motion.div>
-
-      {/* Headline — arcade, compact */}
-      <motion.h1
-        variants={childVars as Parameters<typeof motion.h1>[0]['variants']}
-        className="font-black leading-[0.95] tracking-tight"
-        style={{ fontSize: 'clamp(2rem, 5vw, 3rem)' }}
-      >
-        {(overrides.headline
-          ? [overrides.headline]
-          : siteConfig.headline
-        ).map((line, i) => (
-          <span key={i} className="block">
-            {i === 1 ? (
-              <span
-                className="bg-clip-text text-transparent"
-                style={{
-                  backgroundImage: 'linear-gradient(135deg, #a78bfa 0%, #c084fc 50%, #f0abfc 100%)',
-                  filter: 'drop-shadow(0 0 40px rgba(167,139,250,0.55))',
-                }}
-              >
-                {line}
-              </span>
-            ) : (
-              <span className="text-white">{line}</span>
-            )}
-          </span>
-        ))}
-      </motion.h1>
-
-      {/* Subheadline */}
-      <motion.p
-        variants={childVars as Parameters<typeof motion.p>[0]['variants']}
-        className="text-white/50 text-base sm:text-lg leading-relaxed max-w-md"
-      >
-        {overrides.subheadline ?? siteConfig.subheadline}
-      </motion.p>
-
-      {/* Topic chips — quick-pick game launcher */}
-      <motion.div
-        variants={childVars as Parameters<typeof motion.div>[0]['variants']}
-        className="flex flex-wrap gap-2"
-        aria-label="Quiz topics"
-      >
-        {TOPIC_CHIPS.map(chip => (
-          <Link
-            key={chip.label}
-            href={`/play?mode=solo&topic=${chip.label.toLowerCase()}`}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-white/65 border border-white/[0.09] bg-white/[0.03] hover:bg-violet-500/18 hover:border-violet-500/35 hover:text-white transition-all duration-150 active:scale-[0.97]"
-          >
-            <span>{chip.emoji}</span>
-            {chip.label}
-          </Link>
-        ))}
-        <Link
-          href="/play?mode=solo"
-          className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold text-violet-300 border border-violet-500/25 bg-violet-500/10 hover:bg-violet-500/20 transition-all duration-150 active:scale-[0.97]"
-        >
-          + more
+          👨‍👩‍👧 Family Mode
         </Link>
-      </motion.div>
+      </div>
 
-      {/* Feature pills */}
-      <motion.div
-        variants={childVars as Parameters<typeof motion.div>[0]['variants']}
-        className="flex flex-wrap gap-2"
-      >
-        {[
-          { icon: <Zap size={10} className="text-yellow-400" />, label: 'AI-generated' },
-          { icon: <Trophy size={10} className="text-amber-400" />, label: 'Leaderboards' },
-          { icon: <Users size={10} className="text-violet-400" />, label: 'Multiplayer' },
-          { icon: null, label: 'Free to play' },
-        ].map(({ icon, label }) => (
-          <span
-            key={label}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full"
-            style={{
-              background: 'rgba(139,92,246,0.10)',
-              border: '1px solid rgba(139,92,246,0.22)',
-              color: '#c4b5fd',
-            }}
-          >
-            {icon}
-            {label}
-          </span>
-        ))}
-      </motion.div>
-
-      {/* CTAs */}
-      <motion.div
-        variants={childVars as Parameters<typeof motion.div>[0]['variants']}
-        className="flex flex-col sm:flex-row gap-3"
-        id="hero-play-btn"
-      >
-        <motion.div {...BUTTON_PRESS} transition={SPRING_CINEMATIC}>
-          <Link href={siteConfig.ctaPrimary.href}>
-            <ShimmerButton
-              background="rgba(109, 40, 217, 1)"
-              shimmerColor="#e9d5ff"
-              className="px-8 py-4 text-base font-black min-h-[56px]"
-              style={{ boxShadow: '0 0 32px rgba(139,92,246,0.5)' }}
-            >
-              {overrides.cta ?? siteConfig.ctaPrimary.text}
-            </ShimmerButton>
-          </Link>
-        </motion.div>
-        <motion.div {...BUTTON_PRESS} transition={SPRING_CINEMATIC}>
-          <Link
-            href={siteConfig.ctaSecondary.href}
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-white/75 border border-white/12 bg-white/[0.04] hover:bg-white/[0.08] hover:border-violet-500/30 transition-all duration-150 min-h-[56px] text-base active:scale-[0.97]"
-          >
-            <Users size={16} /> {siteConfig.ctaSecondary.text}
-          </Link>
-        </motion.div>
-      </motion.div>
-    </motion.div>
+      {/* Live mini-stats */}
+      <div style={{ animationDelay: '300ms' }} className="hero-entry flex items-center gap-3">
+        <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+        <FeaturePill />
+        <span className="text-white/20">·</span>
+        <span className="text-white/40 text-xs">🎮 Solo or multiplayer</span>
+      </div>
+    </div>
   )
 }

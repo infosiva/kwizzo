@@ -88,12 +88,25 @@ export default function RegisterGate({
           boxShadow: '0 32px 80px rgba(0,0,0,0.30)',
           overflow: 'hidden',
           animation: 'gateSlideUp 0.28s cubic-bezier(0.34,1.56,0.64,1)',
+          maxHeight: 'calc(100vh - 40px)',
+          display: 'flex', flexDirection: 'column',
+          position: 'relative',
         }}>
 
-          {/* Accent bar */}
-          <div style={{ height: 5, background: `linear-gradient(90deg,${accentColor},${accentColor}66)` }} />
+          {/* Close button */}
+          <button
+            onClick={onDismiss}
+            style={{
+              position: 'absolute', top: 14, right: 14, zIndex: 10,
+              background: 'none', border: 'none', fontSize: 22, cursor: 'pointer',
+              color: '#94a3b8', lineHeight: 1, padding: '2px 6px',
+            }}
+          >×</button>
 
-          <div style={{ padding: '28px 28px 24px' }}>
+          {/* Accent bar */}
+          <div style={{ height: 5, background: `linear-gradient(90deg,${accentColor},${accentColor}66)`, flexShrink: 0 }} />
+
+          <div style={{ padding: '28px 28px 24px', overflowY: 'auto' }}>
 
             {/* Usage bar */}
             <div style={{ marginBottom: 22 }}>

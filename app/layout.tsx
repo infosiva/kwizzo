@@ -73,6 +73,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <div className="aurora aurora-third" aria-hidden />
         <div className="grain" aria-hidden />
 
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          "name": "Kwizzo",
+          "url": "https://kwizzo.app",
+          "description": "Create and play AI-powered quizzes with your family. Hundreds of topics, instant questions, all ages.",
+          "applicationCategory": "GameApplication",
+          "operatingSystem": "Web",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        }) }} />
         <PageTracker site='kwizzo' />
         <Navbar />
 
