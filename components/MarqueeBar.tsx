@@ -1,24 +1,22 @@
 // components/MarqueeBar.tsx — arcade topic chip marquee, CSS-only, zero JS
 import { siteConfig } from '@/site.config'
 
-// Assign a color per item for visual variety — cycles through 5 colors
 const CHIP_COLORS = [
-  { bg: 'rgba(139,92,246,0.15)', border: 'rgba(139,92,246,0.30)', text: '#c4b5fd' }, // violet
-  { bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.28)', text: '#93c5fd' }, // blue
-  { bg: 'rgba(234,179,8,0.12)',  border: 'rgba(234,179,8,0.28)',  text: '#fde047' }, // yellow
-  { bg: 'rgba(34,197,94,0.12)',  border: 'rgba(34,197,94,0.25)',  text: '#86efac' }, // green
-  { bg: 'rgba(249,115,22,0.12)', border: 'rgba(249,115,22,0.28)', text: '#fdba74' }, // orange
+  { bg: 'rgba(236,72,153,0.08)', border: 'rgba(236,72,153,0.2)', text: '#be185d' },  // pink
+  { bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.2)', text: '#1d4ed8' },  // blue
+  { bg: 'rgba(234,179,8,0.08)',  border: 'rgba(234,179,8,0.2)',  text: '#92400e' },  // amber
+  { bg: 'rgba(34,197,94,0.08)',  border: 'rgba(34,197,94,0.2)',  text: '#065f46' },  // green
+  { bg: 'rgba(249,115,22,0.08)', border: 'rgba(249,115,22,0.2)', text: '#9a3412' },  // orange
 ]
 
 export default function MarqueeBar() {
-  // Duplicate items so CSS loop is seamless
   const items = [...siteConfig.socialProof.marqueeItems, ...siteConfig.socialProof.marqueeItems]
 
   return (
     <section
       aria-label="Quiz topic categories"
       className="py-4 overflow-hidden"
-      style={{ borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+      style={{ borderTop: '1px solid #f1f5f9', borderBottom: '1px solid #f1f5f9' }}
     >
       <div className="marquee-wrapper">
         <div className="marquee-track" style={{ gap: '10px' }}>

@@ -1,4 +1,7 @@
+'use client'
 import Link from "next/link";
+
+const ACCENT = '#ec4899'
 
 interface FooterLink {
   label: string;
@@ -9,17 +12,10 @@ interface FooterProps {
   siteName: string;
   tagline?: string;
   icon?: string;
-  /** Extra nav links alongside the always-present compliance links */
   extraLinks?: FooterLink[];
   className?: string;
 }
 
-/**
- * Canonical dark glass footer for all Siva projects.
- * Always includes: Privacy Policy, Terms, About, Contact.
- * Source of truth: shared-ui/src/layout/Footer.tsx
- * Usage: <Footer siteName="Kwizzo" icon="🎮" tagline="Quiz your family" />
- */
 export default function Footer({
   siteName,
   tagline,
@@ -39,36 +35,47 @@ export default function Footer({
   const allLinks = [...complianceLinks, ...extraLinks];
 
   return (
-    <footer className={`w-full border-t border-white/[0.06] bg-transparent mt-auto ${className}`}>
+    <footer
+      className={`w-full mt-auto ${className}`}
+      style={{ borderTop: '1px solid #e2e8f0', background: '#fff' }}
+    >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-        {/* Brand + links row */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
             {(icon || siteName) && (
               <div className="flex items-center gap-2 mb-1.5">
                 {icon && <span className="text-xl">{icon}</span>}
-                <span className="font-bold text-white text-sm">{siteName}</span>
+                <span className="font-black text-sm" style={{ color: '#0f172a' }}>{siteName}</span>
               </div>
             )}
             {tagline && (
-              <p className="text-white/40 text-xs max-w-xs">{tagline}</p>
+              <p className="text-xs max-w-xs" style={{ color: '#94a3b8' }}>{tagline}</p>
             )}
           </div>
 
-          <nav aria-label="Footer navigation" className="flex flex-wrap items-center gap-4 text-xs text-white/40">
+          <nav aria-label="Footer navigation" className="flex flex-wrap items-center gap-4 text-xs">
             {allLinks.map((link) => (
-              <Link key={link.href} href={link.href} className="hover:text-white/70 transition-colors">
+              <Link
+                key={link.href}
+                href={link.href}
+                className="transition-colors duration-150"
+                style={{ color: '#64748b' }}
+                onMouseEnter={e => (e.currentTarget.style.color = ACCENT)}
+                onMouseLeave={e => (e.currentTarget.style.color = '#64748b')}
+              >
                 {link.label}
               </Link>
             ))}
           </nav>
         </div>
 
-        {/* Bottom bar */}
-        <div className="mt-8 pt-6 border-t border-white/[0.04] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/30">
+        <div
+          className="mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs"
+          style={{ borderTop: '1px solid #f1f5f9', color: '#94a3b8' }}
+        >
           <span>© {year} {siteName}. All rights reserved.</span>
           <span className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#22c55e' }} />
             Built with AI
           </span>
         </div>

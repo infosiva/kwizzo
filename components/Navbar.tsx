@@ -5,6 +5,9 @@ import { Menu, X, Gamepad2, Zap } from 'lucide-react'
 import { useMagicAuth } from '@/lib/shared/useMagicAuth'
 import MagicAuthModal from '@/lib/shared/MagicAuthModal'
 
+const ACCENT = '#ec4899'
+const ACCENT_LIGHT = '#fdf2f8'
+
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [authOpen, setAuthOpen] = useState(false)
@@ -15,33 +18,27 @@ export default function Navbar() {
       <nav
         className="sticky top-0 z-50"
         style={{
-          background: 'rgba(8,7,18,0.75)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          borderBottom: '1px solid rgba(139,92,246,0.18)',
+          background: 'rgba(255,255,255,0.88)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '1px solid #e2e8f0',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
         }}
       >
-        {/* Top neon accent line */}
-        <div
-          style={{
-            height: 2,
-            background: 'linear-gradient(90deg, transparent 0%, #7c3aed 25%, #d946ef 50%, #7c3aed 75%, transparent 100%)',
-            animation: 'shimmer 3s linear infinite',
-            backgroundSize: '200% 100%',
-          }}
-        />
+        {/* Top pink accent line */}
+        <div style={{ height: 3, background: `linear-gradient(90deg, transparent, ${ACCENT} 30%, #f472b6 60%, ${ACCENT} 80%, transparent)` }} />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <span
               className="flex items-center justify-center w-8 h-8 rounded-xl font-black text-white"
-              style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 60%, #d946ef 100%)' }}
+              style={{ background: `linear-gradient(135deg, ${ACCENT} 0%, #f472b6 100%)` }}
             >
               <Gamepad2 size={16} strokeWidth={2.5} />
             </span>
-            <span className="font-black text-lg tracking-tight text-white" style={{ fontFamily: 'var(--font-display, system-ui)' }}>
-              Kwi<span style={{ color: '#a855f7' }}>zzo</span>
+            <span className="font-black text-lg tracking-tight" style={{ color: '#0f172a' }}>
+              Kwi<span style={{ color: ACCENT }}>zzo</span>
             </span>
           </Link>
 
@@ -55,7 +52,10 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-3 py-1.5 rounded-lg text-white/55 hover:text-white hover:bg-white/[0.06] transition-all duration-150 text-sm font-medium"
+                className="px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150"
+                style={{ color: '#64748b' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#0f172a'; (e.currentTarget as HTMLElement).style.background = '#f1f5f9' }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#64748b'; (e.currentTarget as HTMLElement).style.background = 'transparent' }}
               >
                 {link.label}
               </Link>
@@ -68,14 +68,16 @@ export default function Navbar() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/dashboard"
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-violet-300 border border-violet-500/30 bg-violet-500/10 hover:bg-violet-500/20 transition-all"
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                  style={{ color: ACCENT, border: `1px solid rgba(236,72,153,0.3)`, background: ACCENT_LIGHT }}
                 >
                   Dashboard
                 </Link>
-                <span className="text-xs text-white/40">{user.username || user.email?.split('@')[0]}</span>
+                <span className="text-xs" style={{ color: '#94a3b8' }}>{user.username || user.email?.split('@')[0]}</span>
                 <button
                   onClick={logout}
-                  className="px-3 py-1.5 rounded-lg text-xs text-white/35 border border-white/10 hover:text-white hover:border-white/25 transition-all"
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                  style={{ color: '#64748b', border: '1px solid #e2e8f0' }}
                 >
                   Sign out
                 </button>
@@ -83,18 +85,21 @@ export default function Navbar() {
             ) : (
               <button
                 onClick={() => setAuthOpen(true)}
-                className="px-4 py-2 rounded-lg text-sm text-white/60 border border-white/10 hover:border-violet-500/40 hover:text-white transition-all font-medium"
+                className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+                style={{ color: '#475569', border: '1px solid #e2e8f0', background: '#fff' }}
               >
                 Sign in
               </button>
             )}
             <Link
               href="/play?mode=solo"
-              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-black text-white transition-all duration-150 hover:scale-105 active:scale-[0.97]"
+              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-black text-white transition-all duration-150 active:scale-[0.97]"
               style={{
-                background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 60%, #d946ef 100%)',
-                boxShadow: '0 0 20px rgba(139,92,246,0.35)',
+                background: `linear-gradient(135deg, ${ACCENT}, #f472b6)`,
+                boxShadow: `0 4px 14px rgba(236,72,153,0.35)`,
               }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; (e.currentTarget as HTMLElement).style.boxShadow = `0 6px 20px rgba(236,72,153,0.45)` }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 14px rgba(236,72,153,0.35)` }}
             >
               <Zap size={14} strokeWidth={3} />
               Play Free
@@ -103,7 +108,8 @@ export default function Navbar() {
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden p-2 text-white/60 hover:text-white transition-colors"
+            className="md:hidden p-2 rounded-lg transition-colors"
+            style={{ color: '#475569' }}
             onClick={() => setOpen(!open)}
             aria-label="Toggle menu"
           >
@@ -113,7 +119,7 @@ export default function Navbar() {
 
         {/* Mobile menu */}
         {open && (
-          <div className="md:hidden border-t border-white/[0.06] px-4 py-4 flex flex-col gap-3">
+          <div className="md:hidden px-4 py-4 flex flex-col gap-3" style={{ borderTop: '1px solid #e2e8f0', background: '#fff' }}>
             {[
               { label: 'Topics',   href: '/#how-it-works' },
               { label: 'Features', href: '/#features' },
@@ -122,7 +128,8 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-white/65 hover:text-white py-1 font-medium transition-colors"
+                className="py-1 font-medium transition-colors"
+                style={{ color: '#475569' }}
                 onClick={() => setOpen(false)}
               >
                 {link.label}
@@ -131,12 +138,13 @@ export default function Navbar() {
 
             {user ? (
               <>
-                <span className="text-center text-white/40 text-xs pt-1">
+                <span className="text-center text-xs pt-1" style={{ color: '#94a3b8' }}>
                   Signed in as {user.email}
                 </span>
                 <button
                   onClick={() => { logout(); setOpen(false) }}
-                  className="text-center py-2.5 rounded-xl border border-white/10 text-white/50 text-sm font-medium"
+                  className="text-center py-2.5 rounded-xl text-sm font-medium"
+                  style={{ border: '1px solid #e2e8f0', color: '#64748b' }}
                 >
                   Sign out
                 </button>
@@ -144,7 +152,8 @@ export default function Navbar() {
             ) : (
               <button
                 onClick={() => { setAuthOpen(true); setOpen(false) }}
-                className="text-center py-2.5 rounded-xl border border-violet-500/30 text-violet-300 text-sm font-semibold bg-violet-500/10"
+                className="text-center py-2.5 rounded-xl text-sm font-semibold"
+                style={{ border: `1px solid rgba(236,72,153,0.3)`, color: ACCENT, background: ACCENT_LIGHT }}
               >
                 Sign in free
               </button>
@@ -153,7 +162,7 @@ export default function Navbar() {
             <Link
               href="/play?mode=solo"
               className="text-center py-3.5 rounded-xl font-black text-white text-base active:scale-[0.97] transition-transform"
-              style={{ background: 'linear-gradient(135deg, #7c3aed, #a855f7, #d946ef)' }}
+              style={{ background: `linear-gradient(135deg, ${ACCENT}, #f472b6)` }}
               onClick={() => setOpen(false)}
             >
               🎮 Play Free Now
@@ -167,7 +176,7 @@ export default function Navbar() {
         onClose={() => setAuthOpen(false)}
         onSuccess={u => { onSuccess(u); setAuthOpen(false) }}
         site="kwizzo"
-        accentColor="#7c3aed"
+        accentColor={ACCENT}
       />
     </>
   )

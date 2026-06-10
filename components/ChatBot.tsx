@@ -2,15 +2,14 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 
-// KwizBot — violet theme, bottom-right, family quiz assistant
-const ACCENT = '#7c3aed'
+const ACCENT = '#ec4899'
 const BOT_NAME = 'KwizBot'
 const WELCOME = 'Hi! Ready for a family quiz? I can help you create one.'
 const SYSTEM_PROMPT = `You are KwizBot, the friendly AI assistant for Kwizzo — a fun family quiz game platform powered by AI.
 Help players with quiz topics, explain answers, suggest fun categories, and encourage learning through play.
 Keep responses short, upbeat, and family-friendly. Use simple language suitable for all ages.`
 
-const BOTTOM_OFFSET = 84 // px above bottom edge (button 52px + 8px gap + 24px margin)
+const BOTTOM_OFFSET = 84
 
 interface Message {
   role: 'user' | 'assistant'
@@ -92,7 +91,6 @@ export default function ChatBot() {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() }
   }
 
-  // Panel positioning — mobile: full-width bottom sheet, desktop: corner panel
   const panelStyle: React.CSSProperties = isMobile
     ? {
         position: 'fixed',
@@ -103,10 +101,10 @@ export default function ChatBot() {
         height: `calc(100dvh - ${BOTTOM_OFFSET}px)`,
         maxHeight: `calc(100dvh - ${BOTTOM_OFFSET}px)`,
         borderRadius: '16px 16px 0 0',
-        background: '#0d0a1a',
-        border: '1px solid rgba(124,58,237,0.25)',
+        background: '#fff',
+        border: '1px solid rgba(236,72,153,0.2)',
         borderBottom: 'none',
-        boxShadow: '0 -8px 40px rgba(0,0,0,0.7), 0 0 40px rgba(124,58,237,0.12)',
+        boxShadow: '0 -8px 40px rgba(236,72,153,0.12), 0 -2px 20px rgba(0,0,0,0.08)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -121,9 +119,9 @@ export default function ChatBot() {
         height: 500,
         maxHeight: `calc(100dvh - ${BOTTOM_OFFSET + 20}px)`,
         borderRadius: 16,
-        background: '#0d0a1a',
-        border: '1px solid rgba(124,58,237,0.25)',
-        boxShadow: '0 8px 40px rgba(0,0,0,0.7), 0 0 40px rgba(124,58,237,0.12)',
+        background: '#fff',
+        border: '1px solid rgba(236,72,153,0.2)',
+        boxShadow: '0 8px 40px rgba(236,72,153,0.12), 0 2px 20px rgba(0,0,0,0.08)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -132,16 +130,17 @@ export default function ChatBot() {
 
   return (
     <>
-      {/* Floating button — bottom-right */}
+      {/* Floating button */}
       <button
         onClick={() => setOpen(o => !o)}
         aria-label={open ? 'Close chat' : 'Open KwizBot'}
         style={{
           position: 'fixed', bottom: 24, right: 24, zIndex: 9999,
           width: 52, height: 52, borderRadius: '50%',
-          background: ACCENT, border: 'none', cursor: 'pointer',
+          background: `linear-gradient(135deg, ${ACCENT}, #f472b6)`,
+          border: 'none', cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: `0 4px 20px ${ACCENT}66`,
+          boxShadow: `0 4px 20px rgba(236,72,153,0.4)`,
           transition: 'transform 0.2s, box-shadow 0.2s',
         }}
         onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.1)')}
@@ -174,40 +173,41 @@ export default function ChatBot() {
             }
             .kwiz-msg::-webkit-scrollbar { width: 4px; }
             .kwiz-msg::-webkit-scrollbar-track { background: transparent; }
-            .kwiz-msg::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.3); border-radius: 2px; }
+            .kwiz-msg::-webkit-scrollbar-thumb { background: rgba(236,72,153,0.3); border-radius: 2px; }
             @keyframes kwiz-bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
           `}</style>
 
-          {/* Header — flexShrink:0 so it never collapses */}
+          {/* Header */}
           <div style={{
             flexShrink: 0,
-            padding: '12px 16px', borderBottom: '1px solid rgba(124,58,237,0.2)',
+            padding: '12px 16px',
+            borderBottom: '1px solid rgba(236,72,153,0.15)',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            background: 'linear-gradient(135deg, rgba(124,58,237,0.2) 0%, rgba(91,33,182,0.1) 100%)',
+            background: 'rgba(236,72,153,0.04)',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{
                 width: 34, height: 34, borderRadius: '50%',
-                background: 'linear-gradient(135deg, #7c3aed, #5b21b6)',
+                background: `linear-gradient(135deg, ${ACCENT}, #f472b6)`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 16, boxShadow: '0 0 12px rgba(124,58,237,0.5)',
+                fontSize: 16, boxShadow: `0 0 12px rgba(236,72,153,0.3)`,
               }}>🎮</div>
               <div>
-                <div style={{ color: '#fff', fontWeight: 700, fontSize: 14 }}>{BOT_NAME}</div>
-                <div style={{ color: '#a78bfa', fontSize: 11, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <div style={{ color: '#0f172a', fontWeight: 700, fontSize: 14 }}>{BOT_NAME}</div>
+                <div style={{ color: '#64748b', fontSize: 11, display: 'flex', alignItems: 'center', gap: 4 }}>
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }}/>
                   Quiz expert · Online
                 </div>
               </div>
             </div>
-            <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', padding: 4 }}>
+            <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: 4 }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                 <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
               </svg>
             </button>
           </div>
 
-          {/* Messages — flex:1 + minHeight:0 is critical for scroll to work inside flex */}
+          {/* Messages */}
           <div className="kwiz-msg" style={{
             flex: 1, minHeight: 0, overflowY: 'auto', padding: '14px 14px 6px',
             display: 'flex', flexDirection: 'column', gap: 10,
@@ -217,9 +217,12 @@ export default function ChatBot() {
                 <div style={{
                   maxWidth: '82%', padding: '9px 13px',
                   borderRadius: m.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                  background: m.role === 'user' ? 'linear-gradient(135deg, #7c3aed, #5b21b6)' : 'rgba(124,58,237,0.1)',
-                  border: m.role === 'user' ? 'none' : '1px solid rgba(124,58,237,0.2)',
-                  color: '#f0f0f0', fontSize: isMobile ? 15 : 13.5, lineHeight: 1.5,
+                  background: m.role === 'user'
+                    ? `linear-gradient(135deg, ${ACCENT}, #f472b6)`
+                    : 'rgba(236,72,153,0.07)',
+                  border: m.role === 'user' ? 'none' : '1px solid rgba(236,72,153,0.15)',
+                  color: m.role === 'user' ? '#fff' : '#1e293b',
+                  fontSize: isMobile ? 15 : 13.5, lineHeight: 1.5,
                   wordBreak: 'break-word', whiteSpace: 'pre-wrap',
                 }}>
                   {m.content}
@@ -231,7 +234,7 @@ export default function ChatBot() {
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
                 <div style={{
                   padding: '10px 14px', borderRadius: '16px 16px 16px 4px',
-                  background: 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.2)',
+                  background: 'rgba(236,72,153,0.07)', border: '1px solid rgba(236,72,153,0.15)',
                   display: 'flex', gap: 4, alignItems: 'center',
                 }}>
                   {[0, 1, 2].map(d => (
@@ -247,14 +250,14 @@ export default function ChatBot() {
             <div ref={bottomRef} />
           </div>
 
-          {/* Input — flexShrink:0 so it never gets pushed off screen */}
+          {/* Input */}
           <div style={{
             flexShrink: 0,
             padding: '10px 12px',
             paddingBottom: isMobile ? 'max(10px, env(safe-area-inset-bottom))' : '10px',
-            borderTop: '1px solid rgba(124,58,237,0.15)',
+            borderTop: '1px solid rgba(236,72,153,0.12)',
             display: 'flex', gap: 8, alignItems: 'center',
-            background: 'rgba(0,0,0,0.3)',
+            background: '#fafafa',
           }}>
             <input
               ref={inputRef}
@@ -264,26 +267,31 @@ export default function ChatBot() {
               placeholder="Ask me about quizzes…"
               disabled={loading}
               style={{
-                flex: 1, background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.25)',
-                borderRadius: 10, padding: '9px 13px', color: '#f0f0f0',
-                fontSize: isMobile ? 16 : 13.5, // 16px prevents iOS zoom on focus
+                flex: 1, background: '#fff',
+                border: '1px solid #e2e8f0',
+                borderRadius: 10, padding: '9px 13px', color: '#0f172a',
+                fontSize: isMobile ? 16 : 13.5,
                 outline: 'none', transition: 'border-color 0.15s',
               }}
-              onFocus={e => (e.target.style.borderColor = ACCENT)}
-              onBlur={e => (e.target.style.borderColor = 'rgba(124,58,237,0.25)')}
+              onFocus={e => (e.target.style.borderColor = 'rgba(236,72,153,0.5)')}
+              onBlur={e => (e.target.style.borderColor = '#e2e8f0')}
             />
             <button
               onClick={send}
               disabled={loading || !input.trim()}
               style={{
                 width: 38, height: 38, borderRadius: 10, border: 'none',
-                background: input.trim() && !loading ? 'linear-gradient(135deg, #7c3aed, #5b21b6)' : 'rgba(255,255,255,0.06)',
+                background: input.trim() && !loading
+                  ? `linear-gradient(135deg, ${ACCENT}, #f472b6)`
+                  : '#f1f5f9',
                 cursor: input.trim() && !loading ? 'pointer' : 'not-allowed',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'background 0.15s', flexShrink: 0,
               }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke={input.trim() && !loading ? '#fff' : '#94a3b8'}
+                strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="22" y1="2" x2="11" y2="13"/>
                 <polygon points="22 2 15 22 11 13 2 9 22 2"/>
               </svg>

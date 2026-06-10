@@ -1,6 +1,7 @@
 'use client'
-// components/HeroDemo.tsx — CSS-only animated live results panel
-// Vote bars grow from 0% to final % using pure CSS keyframes (no React state needed)
+// components/HeroDemo.tsx — light theme live results panel
+
+const ACCENT = '#ec4899'
 
 const ANSWERS = [
   { letter: 'A', text: 'H₂O', pct: 67, isCorrect: true },
@@ -16,30 +17,30 @@ export default function HeroDemo() {
     <div
       className="rounded-2xl overflow-hidden select-none relative"
       style={{
-        background: 'linear-gradient(145deg, #0f0c1f 0%, #120e22 100%)',
-        border: '1px solid rgba(139,92,246,0.28)',
-        boxShadow: '0 0 64px rgba(234,179,8,0.08), 0 0 40px rgba(139,92,246,0.18), 0 0 0 1px rgba(139,92,246,0.06)',
+        background: '#fff',
+        border: '1.5px solid #e2e8f0',
+        boxShadow: '0 8px 40px rgba(0,0,0,0.08)',
       }}
     >
       {/* Header bar */}
       <div
         className="flex items-center justify-between px-4 py-3"
         style={{
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-          background: 'rgba(139,92,246,0.05)',
+          borderBottom: '1px solid #f1f5f9',
+          background: '#fdf2f8',
         }}
       >
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-          <span className="text-xs font-bold text-white/50">LIVE QUIZ</span>
+          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          <span className="text-xs font-bold" style={{ color: '#64748b' }}>LIVE QUIZ</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span
             className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
             style={{
-              background: 'rgba(234,179,8,0.15)',
-              border: '1px solid rgba(234,179,8,0.25)',
-              color: '#fde047',
+              background: 'rgba(236,72,153,0.10)',
+              border: '1px solid rgba(236,72,153,0.25)',
+              color: ACCENT,
             }}
           >
             ⚡ SCIENCE
@@ -47,9 +48,9 @@ export default function HeroDemo() {
           <span
             className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
             style={{
-              background: 'rgba(139,92,246,0.15)',
-              border: '1px solid rgba(139,92,246,0.25)',
-              color: '#c4b5fd',
+              background: '#f1f5f9',
+              border: '1px solid #e2e8f0',
+              color: '#475569',
             }}
           >
             ROUND 3
@@ -61,7 +62,7 @@ export default function HeroDemo() {
       <div className="px-5 pt-5 pb-2">
         <p
           className="text-sm font-bold leading-snug mb-1"
-          style={{ color: 'rgba(255,255,255,0.90)' }}
+          style={{ color: '#0f172a' }}
         >
           What is the chemical symbol for water?
         </p>
@@ -76,22 +77,23 @@ export default function HeroDemo() {
                 <span
                   className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-black shrink-0"
                   style={{
-                    background: ans.isCorrect ? 'rgba(34,197,94,0.25)' : 'rgba(255,255,255,0.06)',
-                    color: ans.isCorrect ? '#86efac' : 'rgba(255,255,255,0.35)',
+                    background: ans.isCorrect ? 'rgba(16,185,129,0.12)' : '#f8fafc',
+                    color: ans.isCorrect ? '#059669' : '#94a3b8',
+                    border: ans.isCorrect ? '1px solid rgba(16,185,129,0.25)' : '1px solid #e2e8f0',
                   }}
                 >
                   {ans.letter}
                 </span>
                 <span
                   className="font-semibold"
-                  style={{ color: ans.isCorrect ? '#86efac' : 'rgba(255,255,255,0.55)' }}
+                  style={{ color: ans.isCorrect ? '#059669' : '#475569' }}
                 >
                   {ans.text}
                 </span>
               </div>
               <span
                 className="font-black tabular-nums"
-                style={{ color: ans.isCorrect ? '#eab308' : 'rgba(255,255,255,0.30)' }}
+                style={{ color: ans.isCorrect ? ACCENT : '#94a3b8' }}
               >
                 {ans.pct}%
               </span>
@@ -99,7 +101,7 @@ export default function HeroDemo() {
             {/* Bar track */}
             <div
               className="w-full rounded-full overflow-hidden"
-              style={{ height: '7px', background: 'rgba(255,255,255,0.05)' }}
+              style={{ height: '7px', background: '#f1f5f9' }}
             >
               <div
                 className="h-full rounded-full vote-bar"
@@ -107,8 +109,8 @@ export default function HeroDemo() {
                   '--bar-target': `${ans.pct}%`,
                   animationDelay: `${0.4 + i * 0.12}s`,
                   background: ans.isCorrect
-                    ? 'linear-gradient(90deg, #22c55e, #eab308)'
-                    : 'rgba(139,92,246,0.35)',
+                    ? `linear-gradient(90deg, #10b981, ${ACCENT})`
+                    : '#e2e8f0',
                 } as React.CSSProperties}
               />
             </div>
@@ -117,15 +119,15 @@ export default function HeroDemo() {
       </div>
 
       {/* Divider */}
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }} />
+      <div style={{ borderTop: '1px solid #f1f5f9' }} />
 
       {/* Response counter */}
       <div className="px-5 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-          <span className="text-xs text-white/40 font-medium">
-            <span className="response-counter font-black text-white/60">847</span>
-            {' '}responses · <span className="text-yellow-400 font-bold">3 responses/sec</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+          <span className="text-xs font-medium" style={{ color: '#64748b' }}>
+            <span className="response-counter font-black" style={{ color: '#0f172a' }}>847</span>
+            {' '}responses · <span className="font-bold" style={{ color: ACCENT }}>3 responses/sec</span>
           </span>
         </div>
         <div className="flex items-center gap-1">
@@ -138,7 +140,7 @@ export default function HeroDemo() {
               {av}
             </span>
           ))}
-          <span className="text-[10px] text-white/35 font-medium ml-2">online now</span>
+          <span className="text-[10px] font-medium ml-2" style={{ color: '#94a3b8' }}>online now</span>
         </div>
       </div>
 
@@ -146,15 +148,15 @@ export default function HeroDemo() {
       <div
         className="mx-4 mb-4 px-4 py-2.5 rounded-xl flex items-center gap-2"
         style={{
-          background: 'rgba(34,197,94,0.08)',
-          border: '1px solid rgba(34,197,94,0.20)',
+          background: 'rgba(16,185,129,0.06)',
+          border: '1px solid rgba(16,185,129,0.2)',
         }}
       >
-        <span className="text-green-400 text-sm">✓</span>
-        <span className="text-xs font-bold text-green-400">
+        <span className="text-sm" style={{ color: '#059669' }}>✓</span>
+        <span className="text-xs font-bold" style={{ color: '#059669' }}>
           Correct! H₂O — 67% answered right
         </span>
-        <span className="ml-auto text-yellow-400 text-xs font-black">+100 pts</span>
+        <span className="ml-auto text-xs font-black" style={{ color: ACCENT }}>+100 pts</span>
       </div>
     </div>
   )
