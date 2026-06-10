@@ -36,18 +36,18 @@ export default function StickyFooterCTA() {
         right: 0,
         zIndex: 50,
         padding: '12px 20px',
-        background: 'rgba(10, 5, 20, 0.92)',
+        background: 'rgba(255,255,255,0.95)',
         backdropFilter: 'blur(16px)',
-        borderTop: '1px solid rgba(124,58,237,0.25)',
+        borderTop: '1px solid #e2e8f0',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         gap: '12px',
         flexWrap: 'wrap',
-        boxShadow: '0 -4px 24px rgba(124,58,237,0.15)',
+        boxShadow: '0 -4px 24px rgba(0,0,0,0.06)',
       }}
     >
-      <span style={{ color: '#e2d9ff', fontSize: '0.9375rem', fontWeight: 500 }}>
+      <span style={{ color: '#0f172a', fontSize: '0.9375rem', fontWeight: 500 }}>
         Play your first AI quiz — it&apos;s completely free
       </span>
       <Link
@@ -57,7 +57,7 @@ export default function StickyFooterCTA() {
           display: 'inline-block',
           padding: '10px 24px',
           minHeight: '44px',
-          background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+          background: 'linear-gradient(135deg, #ec4899, #f472b6)',
           color: '#fff',
           fontWeight: 700,
           fontSize: '0.9375rem',
@@ -76,7 +76,7 @@ export default function StickyFooterCTA() {
         style={{
           background: 'none',
           border: 'none',
-          color: '#9ca3af',
+          color: '#94a3b8',
           fontSize: '1.2rem',
           cursor: 'pointer',
           padding: '4px 8px',

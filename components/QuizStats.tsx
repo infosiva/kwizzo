@@ -22,8 +22,9 @@ function ShimmerCard({ children, delay = 0 }: { children: React.ReactNode; delay
       transition={{ duration: 0.4, delay, ease: [0.23, 1, 0.32, 1] }}
       className="relative overflow-hidden rounded-2xl flex-1 min-w-0"
       style={{
-        background: 'rgba(139,92,246,0.07)',
-        border: '1px solid rgba(139,92,246,0.2)',
+        background: '#fff',
+        border: '1px solid #e2e8f0',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
       }}
     >
       {/* Shimmer sweep overlay */}
@@ -79,9 +80,9 @@ export default function QuizStats() {
   if (!mounted) return null
 
   const pills: StatPill[] = [
-    { icon: <Zap size={14} className="text-violet-400" />,   label: 'Quizzes created',    value: stats.quizzes,   suffix: '' },
-    { icon: <HelpCircle size={14} className="text-purple-400" />, label: 'Questions generated', value: stats.questions, suffix: '' },
-    { icon: <Share2 size={14} className="text-fuchsia-400" />, label: 'Shares sent',        value: stats.shares,    suffix: '' },
+    { icon: <Zap size={14} style={{ color: '#ec4899' }} />,   label: 'Quizzes created',    value: stats.quizzes,   suffix: '' },
+    { icon: <HelpCircle size={14} style={{ color: '#f472b6' }} />, label: 'Questions generated', value: stats.questions, suffix: '' },
+    { icon: <Share2 size={14} style={{ color: '#ec4899' }} />, label: 'Shares sent',        value: stats.shares,    suffix: '' },
   ]
 
   // Only render if user has any activity
@@ -103,7 +104,7 @@ export default function QuizStats() {
         className="px-4 sm:px-6 py-6 max-w-6xl mx-auto"
         aria-label="Your quiz activity"
       >
-        <p className="text-xs font-bold text-white/30 uppercase tracking-widest mb-3 text-center">
+        <p className="text-xs font-bold uppercase tracking-widest mb-3 text-center" style={{ color: '#94a3b8' }}>
           Your activity
         </p>
         <div className="flex gap-3">
@@ -113,12 +114,12 @@ export default function QuizStats() {
                 {pill.icon}
                 <span
                   className="text-xl font-black tabular-nums"
-                  style={{ color: '#c4b5fd' }}
+                  style={{ color: '#ec4899' }}
                 >
                   <AnimatedCount value={pill.value} />
                 </span>
               </div>
-              <p className="text-[11px] text-white/40 leading-tight">{pill.label}</p>
+              <p className="text-[11px] leading-tight" style={{ color: '#94a3b8' }}>{pill.label}</p>
             </ShimmerCard>
           ))}
         </div>

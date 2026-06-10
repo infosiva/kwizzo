@@ -64,14 +64,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       } as React.CSSProperties}
       suppressHydrationWarning
     >
-      <body className={`${inter.variable} ${nunito.variable} min-h-full flex flex-col text-white`}
-        style={{ background: colors.base, fontFamily: 'var(--font-body, system-ui)' }}
+      <body className={`${inter.variable} ${nunito.variable} min-h-full flex flex-col`}
+        style={{
+          background: 'linear-gradient(-45deg, #fff7f9, #fce7f3, #f0fdf4, #f8fafc, #fdf4ff)',
+          backgroundSize: '400% 400%',
+          animation: 'bgGradientShift 18s ease infinite',
+          color: '#0f172a',
+          fontFamily: 'var(--font-body, system-ui)',
+        }}
       >
-        {/* Aurora background + grain */}
-        <div className="aurora aurora-primary" aria-hidden />
-        <div className="aurora aurora-secondary" aria-hidden />
-        <div className="aurora aurora-third" aria-hidden />
-        <div className="grain" aria-hidden />
+
 
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
           "@context": "https://schema.org",
@@ -93,8 +95,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </Providers>
 
         {flags.chatbot && <ChatBot />}
-        <FeedbackWidget siteName="Kwizzo" accentColor="#7c3aed" accentColor2="#a855f7" position={flags.chatbot ? 'left' : 'right'} />
-        <BackToTop accentColor="#7c3aed" />
+        <FeedbackWidget siteName="Kwizzo" accentColor="#ec4899" accentColor2="#f472b6" position={flags.chatbot ? 'left' : 'right'} />
+        <BackToTop accentColor="#ec4899" />
 
         <Footer siteName={config.name} />
       <CookieConsent />

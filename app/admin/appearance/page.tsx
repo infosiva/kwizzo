@@ -386,9 +386,9 @@ function AppearanceEditor() {
   const tabProps = { cfg: config, set }
 
   return (
-    <div className="min-h-screen bg-[#07060f] text-white">
+    <div className="min-h-screen" style={{ background: '#f8fafc', color: '#0f172a' }}>
       {/* Top bar */}
-      <div className="sticky top-0 z-50 border-b border-white/[0.07] bg-[#07060f]/90 backdrop-blur-xl">
+      <div className="sticky top-0 z-50" style={{ borderBottom: '1px solid #e2e8f0', background: 'rgba(248,250,252,0.9)', backdropFilter: 'blur(16px)' }}>
         <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="text-white font-black text-base">⚙️ Appearance</span>
@@ -402,8 +402,9 @@ function AppearanceEditor() {
               onClick={save}
               disabled={saving}
               className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${
-                saved ? 'bg-green-600 text-white' : 'bg-violet-600 hover:bg-violet-700 text-white disabled:opacity-60'
+                saved ? 'bg-green-600 text-white' : 'text-white disabled:opacity-60'
               }`}
+            style={!saved ? { background: 'linear-gradient(135deg, #ec4899, #f472b6)' } : {}}
             >
               {saving ? 'Saving…' : saved ? '✓ Saved' : 'Save changes'}
             </button>
