@@ -1,5 +1,6 @@
 import Groq from 'groq-sdk'
 import { NextRequest, NextResponse } from 'next/server'
+import { reportToTaskFlow } from '@/lib/reportToTaskFlow'
 
 let _groq: Groq | null = null
 function getGroq() { if (!_groq) _groq = new Groq({ apiKey: process.env.GROQ_API_KEY! }); return _groq }
@@ -40,6 +41,7 @@ SAFETY (non-negotiable): This platform is used by children, teenagers, and famil
       stream: true,
     })
 
+    void reportToTaskFlow({ project: 'kwizzo', agentName: 'ChatBot', status: 'completed', message: 'Chat message processed' })
     const readable = new ReadableStream({
       async start(controller) {
         const encoder = new TextEncoder()
