@@ -159,7 +159,7 @@ const config: VerticalConfig = {
   name:       'Kwizzo',
   tagline:    'The family quiz game where every age wins — powered by AI',
   domain:     'kwizzo.app',
-  themeColor: 'violet',
+  themeColor: 'amber',
 
   toolType:  'game',
   ageGroups: ['family'],

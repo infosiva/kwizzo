@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   },
 }
 
-const colors = COLOR_MAP[config.themeColor] ?? COLOR_MAP['violet']
+const colors = COLOR_MAP[config.themeColor] ?? COLOR_MAP['amber']
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const [flags, theme] = await Promise.all([
@@ -57,7 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   ])
 
   const themeCSS = buildThemeStyleTag(theme, {
-    background: '#fdf4ff',
+    background: '#0f0f23',
     primary: colors.primary,
     secondary: colors.secondary,
   })
@@ -80,10 +80,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className={`${inter.variable} ${nunito.variable} min-h-full flex flex-col`}
         style={{
-          background: 'linear-gradient(-45deg, #fff7f9, #fce7f3, #f0fdf4, #f8fafc, #fdf4ff)',
-          backgroundSize: '400% 400%',
-          animation: 'bgGradientShift 18s ease infinite',
-          color: '#0f172a',
+          background: '#0f0f23',
+          color: '#f1f5f9',
           fontFamily: 'var(--font-body, system-ui)',
         }}
       >
@@ -107,8 +105,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </Providers>
 
         {flags.chatbot && !isWidgetHidden(theme, 'chatbot') && <ChatBot />}
-        <FeedbackWidget siteName="Kwizzo" accentColor="#ec4899" accentColor2="#f472b6" position={flags.chatbot ? 'left' : 'right'} />
-        {!isWidgetHidden(theme, 'backToTop') && <BackToTop accentColor="#ec4899" />}
+        <FeedbackWidget siteName="Kwizzo" accentColor="#f59e0b" accentColor2="#fbbf24" position={flags.chatbot ? 'left' : 'right'} />
+        {!isWidgetHidden(theme, 'backToTop') && <BackToTop accentColor="#f59e0b" />}
         <Footer siteName={config.name} />
         {!isWidgetHidden(theme, 'cookieConsent') && <CookieConsent />}
         {!isWidgetHidden(theme, 'stickyFooterCTA') && <StickyFooterCTA />}
