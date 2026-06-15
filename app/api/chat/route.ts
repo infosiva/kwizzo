@@ -1,9 +1,17 @@
 import Groq from 'groq-sdk'
 import { NextRequest, NextResponse } from 'next/server'
 import { reportToTaskFlow } from '@/lib/reportToTaskFlow'
+import { aiChat } from '@/lib/ai'
+import { rateLimit } from '@/lib/rateLimit'
+
+const CHAT_LIMITER = rateLimit({ windowMs: 60 * 60 * 1000, max: 30, message: 'Too many chat requests — try again later.' })
 
 let _groq: Groq | null = null
-function getGroq() { if (!_groq) _groq = new Groq({ apiKey: process.env.GROQ_API_KEY! }); return _groq }
+function getGroq() {
+  if (!process.env.GROQ_API_KEY) return null
+  if (!_groq) _groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+  return _groq
+}
 
 export const runtime = 'nodejs'
 
@@ -13,6 +21,9 @@ interface Message {
 }
 
 export async function POST(req: NextRequest) {
+  const limited = CHAT_LIMITER.check(req)
+  if (limited) return limited
+
   try {
     const body = await req.json()
 
@@ -33,29 +44,64 @@ SAFETY (non-negotiable): This platform is used by children, teenagers, and famil
       ...messages.map((m: Message) => ({ role: m.role, content: m.content })),
     ]
 
-    const stream = await getGroq().chat.completions.create({
-      model: 'llama-3.1-8b-instant',
-      messages: chatMessages,
-      max_tokens: 300,
-      temperature: 0.7,
-      stream: true,
-    })
+    const encoder = new TextEncoder()
+    const groq = getGroq()
+
+    let groqStream: Awaited<ReturnType<Groq['chat']['completions']['create']>> | null = null
+    if (groq) {
+      try {
+        groqStream = await groq.chat.completions.create({
+          model: 'llama-3.1-8b-instant',
+          messages: chatMessages,
+          max_tokens: 300,
+          temperature: 0.7,
+          stream: true,
+        })
+      } catch (err) {
+        console.warn('[/api/chat] Groq failed, falling back to cascade', err)
+        groqStream = null
+      }
+    }
 
     void reportToTaskFlow({ project: 'kwizzo', agentName: 'ChatBot', status: 'completed', message: 'Chat message processed' })
-    const readable = new ReadableStream({
-      async start(controller) {
-        const encoder = new TextEncoder()
-        try {
-          for await (const chunk of stream) {
-            const text = chunk.choices[0]?.delta?.content ?? ''
-            if (text) controller.enqueue(encoder.encode(text))
+
+    if (groqStream) {
+      const stream = groqStream
+      const readable = new ReadableStream({
+        async start(controller) {
+          try {
+            for await (const chunk of stream) {
+              const text = chunk.choices[0]?.delta?.content ?? ''
+              if (text) controller.enqueue(encoder.encode(text))
+            }
+          } finally {
+            controller.close()
           }
-        } finally {
-          controller.close()
-        }
+        },
+      })
+      return new NextResponse(readable, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Transfer-Encoding': 'chunked',
+          'Cache-Control': 'no-cache',
+        },
+      })
+    }
+
+    // Groq unavailable — fall back to full Groq→Gemini→Claude cascade (non-streaming)
+    const text = await aiChat(
+      messages
+        .filter((m): m is Message & { role: 'user' | 'assistant' } => m.role !== 'system')
+        .map(m => ({ role: m.role, content: m.content })),
+      systemPrompt,
+      300,
+    )
+    const readable = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(text))
+        controller.close()
       },
     })
-
     return new NextResponse(readable, {
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
