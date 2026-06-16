@@ -350,4 +350,9 @@ pre {
   .badge-glow, .marquee-track, .line-grow, .cta-pulse {
     animation: none !important;
   }
+  .hero-entry {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
 }
