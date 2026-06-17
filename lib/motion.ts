@@ -32,8 +32,13 @@ export const BUTTON_PRESS = {
   whileTap:   { scale: 0.97 } as const,
 }
 
-/** Returns full variants when motion is OK, opacity-only when reduced. */
-export function useMotionVariants(full: object, reduced: object = FADE_IN) {
+export const STATIC_VISIBLE = {
+  hidden: { opacity: 1 },
+  show:   { opacity: 1 },
+}
+
+/** Returns full variants when motion is OK, static (always visible) when reduced. */
+export function useMotionVariants(full: object, reduced: object = STATIC_VISIBLE) {
   const reduce = useReducedMotion()
   return reduce ? reduced : full
 }
