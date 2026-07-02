@@ -12,9 +12,9 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
         <span
           className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest"
           style={{
-            background: 'rgba(236,72,153,0.08)',
-            border: '1px solid rgba(236,72,153,0.25)',
-            color: ACCENT,
+            background: 'rgba(236,72,153,0.10)',
+            border: '1px solid rgba(236,72,153,0.40)',
+            color: '#9d174d',
           }}
         >
           ⚡ 30-SECOND SETUP · NO ACCOUNT NEEDED
@@ -67,7 +67,7 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
           />
           <span
             className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold px-2 py-0.5 rounded-md"
-            style={{ background: 'rgba(236,72,153,0.10)', color: ACCENT }}
+            style={{ background: 'rgba(236,72,153,0.15)', color: '#9d174d' }}
           >
             ⚡ AI
           </span>
