@@ -1,8 +1,10 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 
 export default function StickyFooterCTA() {
+  const pathname = usePathname()
   const [visible, setVisible] = useState(false)
   const [dismissed, setDismissed] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -18,6 +20,9 @@ export default function StickyFooterCTA() {
     timerRef.current = setTimeout(() => setVisible(true), 3000)
     return () => { if (timerRef.current) clearTimeout(timerRef.current) }
   }, [])
+
+  // Quiz-play screen has its own sticky bottom action bar (timer/next button) — this CTA would overlap it
+  if (pathname?.startsWith('/quiz/')) return null
 
   function dismiss() {
     setDismissed(true)

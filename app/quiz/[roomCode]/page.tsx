@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { ArrowRight, Trophy, RotateCcw, Home, CheckCircle, XCircle, Volume2, VolumeX, Link2, Share2 } from 'lucide-react'
+import { ArrowRight, Trophy, RotateCcw, Home, CheckCircle, XCircle, Volume2, VolumeX, Link2, Share2, Triangle, Diamond, Circle, Square } from 'lucide-react'
 import { theme, btn } from '@/lib/theme'
 import ProWall from '@/components/ProWall'
 import { isProUser, FREE_QUESTION_LIMIT } from '@/lib/pro'
@@ -16,6 +16,15 @@ type PlayerScore = { name: string; age: string; score: number; answers: boolean[
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D'] as const
 type OptionKey = typeof OPTION_LABELS[number]
+
+// Kahoot-style mechanics constants
+const QUESTION_TIME_SEC = 20
+const TILE_STYLES = [
+  { bg: '#e21b3c', icon: Triangle },
+  { bg: '#1368ce', icon: Diamond },
+  { bg: '#d89e00', icon: Circle },
+  { bg: '#26890c', icon: Square },
+] as const
 
 // Read ?subject= without useSearchParams (avoids useSyncExternalStore / React #310)
 function getSubjectParam(): string {
@@ -103,9 +112,9 @@ function ShareQuizLink({ roomCode, topic }: { roomCode: string; topic: string })
 }
 
 // Share-score button — copies personalised score text to clipboard
-function ShareScoreButton({ score, total, topic }: { score: number; total: number; topic: string }) {
+function ShareScoreButton({ correct, total, topic }: { correct: number; total: number; topic: string }) {
   const [copied, setCopied] = useState(false)
-  const pct = Math.round((score / total) * 100)
+  const pct = Math.round((correct / total) * 100)
   const topicLabel = topic.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 
   function shareScore() {
@@ -178,7 +187,8 @@ function QuizContent() {
   const [members,         setMembers]         = useState<Member[]>([])
   const [streak,          setStreak]          = useState(0)       // current correct streak
   const [bestStreak,      setBestStreak]      = useState(0)
-  const [showScorePop,    setShowScorePop]    = useState(false)   // +1 float animation
+  const [showScorePop,    setShowScorePop]    = useState(false)   // points-earned float animation
+  const [lastPoints,      setLastPoints]      = useState(0)       // points earned on last correct answer
   const [answerAnim,      setAnswerAnim]      = useState<'bounce-in' | 'shake' | ''>('')
   const [answerStartTime, setAnswerStartTime] = useState(0)       // timestamp Q was shown
   const [fastestSec,      setFastestSec]      = useState<number | null>(null) // fastest answer in seconds
@@ -186,6 +196,7 @@ function QuizContent() {
   const [qKey,            setQKey]            = useState(0)       // changes on every new Q, triggers stagger animation
   const [isPro,           setIsPro]           = useState(false)
   const [voiceOn,         setVoiceOn]         = useState(true)
+  const [timeLeft,        setTimeLeft]        = useState(QUESTION_TIME_SEC) // countdown per question
 
   const { speakResult, speakQuestion, cancel: cancelVoice, supported: voiceSupported } = useVoiceFeedback({ pitch: 1.15, rate: 1.1 })
   const topRef = useRef<HTMLDivElement>(null)
@@ -198,8 +209,21 @@ function QuizContent() {
     if (gameState === 'playing') {
       topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       setAnswerStartTime(Date.now())
+      setTimeLeft(QUESTION_TIME_SEC)
     }
   }, [currentQ, activePlayerIdx, gameState])
+
+  // Countdown timer — auto-submits a "no answer" on expiry
+  useEffect(() => {
+    if (gameState !== 'playing') return
+    if (timeLeft <= 0) {
+      handleAnswer(null)
+      return
+    }
+    const id = setInterval(() => setTimeLeft(t => t - 1), 1000)
+    return () => clearInterval(id)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameState, timeLeft, currentQ, activePlayerIdx])
 
   const loadQuestions = useCallback(async (ms: Member[], topicId: string) => {
     setGameState('loading')
@@ -289,14 +313,14 @@ function QuizContent() {
     return bank[currentQ] ?? null
   }
 
-  function handleAnswer(opt: OptionKey) {
+  function handleAnswer(opt: OptionKey | null) {
     if (gameState !== 'playing') return
     const q = getCurrentQuestion()
     if (!q) return
     setSelected(opt)
     setGameState('answered')
 
-    const correct    = opt === q.answer
+    const correct    = opt !== null && opt === q.answer
     if (voiceOn) speakResult(correct, correct ? undefined : (q.options?.[q.answer] ?? q.answer))
     const elapsed    = answerStartTime ? Math.round((Date.now() - answerStartTime) / 1000) : 99
     const activeName = members[activePlayerIdx]?.name ?? scores[0]?.name
@@ -312,16 +336,22 @@ function QuizContent() {
       setFastestBy(displayName(activeName))
     }
 
+    // Speed-based scoring: instant answer ≈1000pts, last-second ≈500pts, wrong/timeout = 0
+    const points = correct
+      ? Math.round(500 + 500 * (timeLeft / QUESTION_TIME_SEC))
+      : 0
+
     // Score update
     setScores(prev => prev.map(s =>
       s.name === activeName
-        ? { ...s, score: s.score + (correct ? 1 : 0), answers: [...s.answers, correct] }
+        ? { ...s, score: s.score + points, answers: [...s.answers, correct] }
         : s
     ))
 
     // Animations
     setAnswerAnim(correct ? 'bounce-in' : 'shake')
     if (correct) {
+      setLastPoints(points)
       setShowScorePop(true)
       setTimeout(() => setShowScorePop(false), 900)
     }
@@ -525,7 +555,8 @@ function QuizContent() {
       ? (playerQuestions[heroPlayer.name]?.length ? playerQuestions[heroPlayer.name] : questions)
       : questions
     const heroTotal  = heroBank.length || 10
-    const heroPct    = heroPlayer ? Math.round((heroPlayer.score / heroTotal) * 100) : 0
+    const heroCorrect = heroPlayer?.answers.filter(Boolean).length ?? 0
+    const heroPct    = heroPlayer ? Math.round((heroCorrect / heroTotal) * 100) : 0
     const isSolo     = scores.length === 1
 
     return (
@@ -546,8 +577,8 @@ function QuizContent() {
           </div>
           <p className="text-white/50 text-base mb-1">
             {isSolo
-              ? `You got ${heroPlayer?.score ?? 0} out of ${heroTotal} correct`
-              : `${heroPlayer?.name ?? ''} leads with ${heroPlayer?.score ?? 0}/${heroTotal}`}
+              ? `You got ${heroCorrect} out of ${heroTotal} correct · ${heroPlayer?.score ?? 0} pts`
+              : `${heroPlayer?.name ?? ''} leads with ${heroPlayer?.score ?? 0} pts`}
           </p>
           <h1 className="text-xl font-extrabold text-white mt-2">{familyName}</h1>
           <p className={`${theme.textAccent} font-semibold text-sm`}>Quiz Complete!</p>
@@ -556,45 +587,77 @@ function QuizContent() {
           )}
         </div>
 
-        <div className={`${theme.card} p-6 mb-6 fade-up`}>
-          <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            <Trophy size={20} className={theme.textAccent} /> Final Leaderboard
-          </h2>
-          <div className="space-y-3">
-            {sortedScores.map((s, i) => {
+        {/* Podium — top 3 */}
+        {sortedScores.length > 0 && (
+          <div className="flex items-end justify-center gap-2 sm:gap-4 mb-6 px-2">
+            {[1, 0, 2].map(rank => {
+              const s = sortedScores[rank]
+              if (!s) return <div key={rank} className="flex-1 max-w-[120px]" />
               const playerBank = playerQuestions[s.name]?.length ? playerQuestions[s.name] : questions
-              const total      = playerBank.length || 10
+              const total = playerBank.length || 10
+              const heights = { 0: 'h-40 sm:h-48', 1: 'h-28 sm:h-36', 2: 'h-20 sm:h-28' } as const
+              const delays = { 0: '0ms', 1: '120ms', 2: '240ms' } as const
               return (
                 <div
                   key={s.name}
-                  className={`flex items-center gap-3 p-3 rounded-xl ${
-                    i === 0 ? `bg-gradient-to-r ${theme.gradient} bg-opacity-20` : 'glass'
-                  }`}
+                  className="flex-1 max-w-[120px] flex flex-col items-center podium-rise"
+                  style={{ animationDelay: delays[rank as 0 | 1 | 2] }}
                 >
-                  <span className="text-2xl w-8 flex-shrink-0">{medals[i] ?? `${i + 1}`}</span>
-                  <div className="flex-1">
-                    <div className="font-semibold text-white">{s.name}</div>
-                    <div className="text-white/40 text-xs">Age {s.age} · {i === 0 ? 'Leaderboard leader 🎉' : `${Math.round((s.score / total) * 100)}% correct`}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className={`text-xl font-extrabold ${i === 0 ? 'text-white' : theme.textAccent}`}>
-                      {s.score}/{total}
-                    </div>
-                    <div className="text-white/40 text-xs">
-                      {Math.round((s.score / total) * 100)}%
-                    </div>
+                  <span className="text-3xl mb-1">{medals[rank] ?? `${rank + 1}`}</span>
+                  <div className="font-bold text-white text-sm truncate max-w-full">{s.name}</div>
+                  <div className={`${theme.textAccent} font-extrabold text-lg`}>{s.score}</div>
+                  <div className="text-white/30 text-[10px] mb-2">pts</div>
+                  <div
+                    className={`w-full ${heights[rank as 0 | 1 | 2]} rounded-t-xl flex items-start justify-center pt-2`}
+                    style={{
+                      background: rank === 0
+                        ? 'linear-gradient(180deg, rgba(245,158,11,0.35), rgba(245,158,11,0.12))'
+                        : 'rgba(255,255,255,0.06)',
+                      border: rank === 0 ? '1px solid rgba(245,158,11,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                    }}
+                  >
+                    <span className="text-white/40 text-xs font-bold">{rank + 1}</span>
                   </div>
                 </div>
               )
             })}
           </div>
-        </div>
+        )}
+
+        {/* Ranks 4+ as a simple list */}
+        {sortedScores.length > 3 && (
+          <div className={`${theme.card} p-6 mb-6 fade-up`}>
+            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <Trophy size={20} className={theme.textAccent} /> Rest of the pack
+            </h2>
+            <div className="space-y-3">
+              {sortedScores.slice(3).map((s, i) => {
+                const playerBank = playerQuestions[s.name]?.length ? playerQuestions[s.name] : questions
+                const total      = playerBank.length || 10
+                const correctCount = s.answers.filter(Boolean).length
+                return (
+                  <div key={s.name} className="flex items-center gap-3 p-3 rounded-xl glass">
+                    <span className="text-2xl w-8 flex-shrink-0">{i + 4}</span>
+                    <div className="flex-1">
+                      <div className="font-semibold text-white">{s.name}</div>
+                      <div className="text-white/40 text-xs">Age {s.age} · {Math.round((correctCount / total) * 100)}% correct</div>
+                    </div>
+                    <div className="text-right">
+                      <div className={`text-xl font-extrabold ${theme.textAccent}`}>{s.score}</div>
+                      <div className="text-white/40 text-xs">pts</div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Share row: copy score text + share quiz link */}
         <div className="flex items-center gap-2 mb-4 fade-up">
           {heroPlayer && (
             <ShareScoreButton
-              score={heroPlayer.score}
+              correct={heroCorrect}
               total={heroTotal}
               topic={topic}
             />
@@ -719,7 +782,7 @@ function QuizContent() {
           <div className="text-center text-sm font-bold text-orange-400 fade-up">{encouragement}</div>
         )}
         {showScorePop && (
-          <div className={`absolute right-0 top-0 text-green-400 font-extrabold text-lg score-pop`}>+1</div>
+          <div className={`absolute right-0 top-0 text-green-400 font-extrabold text-lg score-pop`}>+{lastPoints}</div>
         )}
       </div>
 
@@ -738,31 +801,51 @@ function QuizContent() {
         <span className="text-white/25 text-xs">{totalQsForPlayer} questions</span>
       </div>
 
-      {/* Question */}
+      {/* Question + countdown timer */}
       <div className={`${theme.card} p-5 md:p-8 mb-5`}>
-        <div className={`text-xs font-bold ${theme.textAccent} uppercase tracking-widest mb-3`}>
-          Question {currentQ + 1}
+        <div className="flex items-center justify-between mb-3">
+          <div className={`text-xs font-bold ${theme.textAccent} uppercase tracking-widest`}>
+            Question {currentQ + 1}
+          </div>
+          {gameState === 'playing' && (
+            <div
+              className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-extrabold tabular-nums shrink-0"
+              style={{
+                background: `conic-gradient(var(--accent) ${(timeLeft / QUESTION_TIME_SEC) * 360}deg, rgba(255,255,255,0.08) 0deg)`,
+                color: timeLeft <= 5 ? '#f87171' : 'var(--foreground)',
+              }}
+            >
+              <span className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'var(--background)' }}>
+                {timeLeft}
+              </span>
+            </div>
+          )}
         </div>
         <p className="text-xl md:text-3xl font-bold text-white leading-tight">
           {q.question}
         </p>
       </div>
 
-      {/* Answer buttons */}
+      {/* Answer tiles — Kahoot-style 4-color blocks with shape markers */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-5">
         {options.map(([key, val], idx) => {
           const isCorrectKey = key === q.answer
           const isSelectedKey = key === selected
+          const tile = TILE_STYLES[idx % TILE_STYLES.length]
+          const Icon = tile.icon
 
-          let cardClass = `${theme.card} ${theme.cardHover} p-3.5 sm:p-4 rounded-2xl text-left w-full transition-all duration-200 flex items-start gap-3 cursor-pointer option-appear`
+          let tileClass = 'p-4 sm:p-5 rounded-2xl text-left w-full transition-all duration-200 flex items-center gap-3 cursor-pointer option-appear'
+          let tileStyle: React.CSSProperties = { background: tile.bg }
 
           if (gameState === 'answered') {
             if (isCorrectKey) {
-              cardClass = `bg-green-500/20 border border-green-500/40 p-3.5 sm:p-4 rounded-2xl text-left w-full flex items-start gap-3 ${answerAnim && isCorrectKey ? answerAnim : ''}`
+              tileClass += ` ${answerAnim && isCorrectKey ? answerAnim : ''}`
+              tileStyle = { background: '#26890c', boxShadow: '0 0 0 2px rgba(34,197,94,0.5)' }
             } else if (isSelectedKey) {
-              cardClass = `bg-red-500/20 border border-red-500/40 p-3.5 sm:p-4 rounded-2xl text-left w-full flex items-start gap-3 opacity-80 ${answerAnim && isSelectedKey ? answerAnim : ''}`
+              tileClass += ` ${answerAnim && isSelectedKey ? answerAnim : ''}`
+              tileStyle = { background: '#e21b3c', opacity: 0.85 }
             } else {
-              cardClass = 'glass p-3.5 sm:p-4 rounded-2xl text-left w-full flex items-start gap-3 opacity-40'
+              tileStyle = { background: tile.bg, opacity: 0.35 }
             }
           }
 
@@ -771,25 +854,13 @@ function QuizContent() {
               key={`${qKey}-${key}`}
               onClick={() => handleAnswer(key)}
               disabled={gameState === 'answered'}
-              className={cardClass}
-              style={gameState === 'playing' ? { animationDelay: `${idx * 60}ms` } : undefined}
+              className={tileClass}
+              style={{ ...tileStyle, ...(gameState === 'playing' ? { animationDelay: `${idx * 60}ms` } : {}) }}
             >
-              <span className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-colors ${
-                gameState === 'playing'
-                  ? `bg-gradient-to-br ${theme.gradient} text-white`
-                  : isCorrectKey
-                  ? 'bg-green-500 text-white'
-                  : isSelectedKey
-                  ? 'bg-red-500 text-white'
-                  : 'bg-white/10 text-white/50'
-              }`}>
-                {key}
+              <span className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center bg-black/15">
+                <Icon size={18} className="text-white" fill="white" />
               </span>
-              <span className={`text-sm md:text-base leading-snug font-medium pt-1 ${
-                gameState === 'answered' && !isCorrectKey && !isSelectedKey
-                  ? 'text-white/40'
-                  : 'text-white'
-              }`}>
+              <span className="text-sm md:text-base leading-snug font-bold pt-0.5 text-white">
                 {val}
               </span>
             </button>

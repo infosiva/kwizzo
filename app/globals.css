@@ -139,6 +139,13 @@ body {
 }
 .shake { animation: shake 0.45s ease; }
 
+/* ── Podium rise — results screen top-3 ─────────────────── */
+@keyframes podiumRise {
+  from { opacity: 0; transform: translateY(32px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.podium-rise { opacity: 0; animation: podiumRise 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
+
 /* ── Bounce in — correct answer ─────────────────────────── */
 @keyframes bounceIn {
   0%   { transform: scale(0.92); }
@@ -351,6 +358,11 @@ pre {
     animation: none !important;
   }
   .hero-entry {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  .podium-rise {
     opacity: 1 !important;
     transform: none !important;
     animation: none !important;
