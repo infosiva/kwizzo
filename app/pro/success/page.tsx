@@ -41,33 +41,33 @@ export default function ProSuccessPage() {
         padding: '40px 24px',
         position: 'relative',
         overflow: 'hidden',
-        background: 'linear-gradient(-45deg, #fdf2f8, #fce7f3, #f0fdf4, #ecfdf5, #fdf4ff)',
+        background: 'linear-gradient(-45deg, #fffbeb, #fef3c7, #f0fdf4, #ecfdf5, #fff7ed)',
         backgroundSize: '400% 400%',
         animation: 'gradientShift 12s ease infinite',
       }}>
         {/* floating orbs */}
-        <div style={{ position: 'absolute', top: '10%', left: '15%', width: 220, height: 220, borderRadius: '50%', background: 'rgba(236,72,153,0.12)', filter: 'blur(60px)', animation: 'floatUp 6s ease-in-out infinite' }} />
+        <div style={{ position: 'absolute', top: '10%', left: '15%', width: 220, height: 220, borderRadius: '50%', background: 'rgba(245, 158, 11,0.12)', filter: 'blur(60px)', animation: 'floatUp 6s ease-in-out infinite' }} />
         <div style={{ position: 'absolute', bottom: '15%', right: '10%', width: 280, height: 280, borderRadius: '50%', background: 'rgba(16,185,129,0.10)', filter: 'blur(80px)', animation: 'floatUp 8s ease-in-out infinite 2s' }} />
-        <div style={{ position: 'absolute', top: '50%', right: '25%', width: 160, height: 160, borderRadius: '50%', background: 'rgba(236,72,153,0.08)', filter: 'blur(40px)', animation: 'floatUp 7s ease-in-out infinite 1s' }} />
+        <div style={{ position: 'absolute', top: '50%', right: '25%', width: 160, height: 160, borderRadius: '50%', background: 'rgba(245, 158, 11,0.08)', filter: 'blur(40px)', animation: 'floatUp 7s ease-in-out infinite 1s' }} />
 
         <div className="success-card" style={{
           position: 'relative',
           zIndex: 1,
           background: 'rgba(255,255,255,0.85)',
           backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(236,72,153,0.15)',
+          border: '1px solid rgba(245, 158, 11,0.15)',
           borderRadius: 24,
           padding: '48px 40px',
           maxWidth: 440,
           width: '100%',
           textAlign: 'center',
-          boxShadow: '0 8px 40px rgba(236,72,153,0.12), 0 2px 8px rgba(0,0,0,0.04)',
+          boxShadow: '0 8px 40px rgba(245, 158, 11,0.12), 0 2px 8px rgba(0,0,0,0.04)',
         }}>
           <div style={{ fontSize: 64, marginBottom: 16, lineHeight: 1 }}>🎉</div>
           <h1 style={{ fontSize: 28, fontWeight: 900, color: '#0f172a', margin: '0 0 8px' }}>
             Welcome to{' '}
             <span style={{
-              background: 'linear-gradient(135deg, #ec4899, #f472b6)',
+              background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -88,7 +88,7 @@ export default function ProSuccessPage() {
             style={{
               display: 'inline-block',
               padding: '14px 36px',
-              background: 'linear-gradient(135deg, #ec4899, #f472b6)',
+              background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
               color: '#fff',
               fontWeight: 800,
               fontSize: 15,

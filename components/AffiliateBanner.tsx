@@ -1,8 +1,8 @@
 export default function AffiliateBanner() {
   return (
     <div className="my-6 rounded-xl p-4 text-center text-sm"
-      style={{ border: '1px solid rgba(236,72,153,0.18)', background: 'rgba(236,72,153,0.04)' }}>
-      <p className="mb-2 font-semibold" style={{ color: '#ec4899' }}>
+      style={{ border: '1px solid rgba(245, 158, 11,0.18)', background: 'rgba(245, 158, 11,0.04)' }}>
+      <p className="mb-2 font-semibold" style={{ color: '#f59e0b' }}>
         Host your own AI app for just $2.99/mo
       </p>
       <a
@@ -10,7 +10,7 @@ export default function AffiliateBanner() {
         target="_blank"
         rel="noopener noreferrer sponsored"
         className="inline-block rounded-lg px-4 py-2 text-xs font-bold text-white transition-opacity hover:opacity-90"
-        style={{ background: 'linear-gradient(135deg, #ec4899, #f472b6)' }}
+        style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)' }}
       >
         Get Hostinger →
       </a>

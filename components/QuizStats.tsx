@@ -80,9 +80,9 @@ export default function QuizStats() {
   if (!mounted) return null
 
   const pills: StatPill[] = [
-    { icon: <Zap size={14} style={{ color: '#ec4899' }} />,   label: 'Quizzes created',    value: stats.quizzes,   suffix: '' },
-    { icon: <HelpCircle size={14} style={{ color: '#f472b6' }} />, label: 'Questions generated', value: stats.questions, suffix: '' },
-    { icon: <Share2 size={14} style={{ color: '#ec4899' }} />, label: 'Shares sent',        value: stats.shares,    suffix: '' },
+    { icon: <Zap size={14} style={{ color: '#f59e0b' }} />,   label: 'Quizzes created',    value: stats.quizzes,   suffix: '' },
+    { icon: <HelpCircle size={14} style={{ color: '#fbbf24' }} />, label: 'Questions generated', value: stats.questions, suffix: '' },
+    { icon: <Share2 size={14} style={{ color: '#f59e0b' }} />, label: 'Shares sent',        value: stats.shares,    suffix: '' },
   ]
 
   // Only render if user has any activity
@@ -114,7 +114,7 @@ export default function QuizStats() {
                 {pill.icon}
                 <span
                   className="text-xl font-black tabular-nums"
-                  style={{ color: '#ec4899' }}
+                  style={{ color: '#f59e0b' }}
                 >
                   <AnimatedCount value={pill.value} />
                 </span>

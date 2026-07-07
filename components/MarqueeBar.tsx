@@ -2,7 +2,7 @@
 import { siteConfig } from '@/site.config'
 
 const CHIP_COLORS = [
-  { bg: 'rgba(236,72,153,0.08)', border: 'rgba(236,72,153,0.2)', text: '#be185d' },  // pink
+  { bg: 'rgba(219,39,119,0.08)', border: 'rgba(219,39,119,0.2)', text: '#be185d' },  // pink
   { bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.2)', text: '#1d4ed8' },  // blue
   { bg: 'rgba(234,179,8,0.08)',  border: 'rgba(234,179,8,0.2)',  text: '#92400e' },  // amber
   { bg: 'rgba(34,197,94,0.08)',  border: 'rgba(34,197,94,0.2)',  text: '#065f46' },  // green

@@ -1,7 +1,7 @@
 'use client'
 // components/HeroDemo.tsx — light theme live results panel
 
-const ACCENT = '#ec4899'
+const ACCENT = '#f59e0b'
 
 const ANSWERS = [
   { letter: 'A', text: 'H₂O', pct: 67, isCorrect: true },
@@ -27,7 +27,7 @@ export default function HeroDemo() {
         className="flex items-center justify-between px-4 py-3"
         style={{
           borderBottom: '1px solid #f1f5f9',
-          background: '#fdf2f8',
+          background: '#fffbeb',
         }}
       >
         <div className="flex items-center gap-2">
@@ -38,9 +38,9 @@ export default function HeroDemo() {
           <span
             className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
             style={{
-              background: 'rgba(236,72,153,0.10)',
-              border: '1px solid rgba(236,72,153,0.25)',
-              color: ACCENT,
+              background: 'rgba(245, 158, 11,0.10)',
+              border: '1px solid rgba(245, 158, 11,0.25)',
+              color: '#92400e',
             }}
           >
             ⚡ SCIENCE
