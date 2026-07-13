@@ -33,7 +33,7 @@ interface Props {
 
 export default function FeedbackWidget({
   siteName,
-  accentColor  = '#f59e0b',
+  accentColor  = '#3b82f6',
   accentColor2 = '#ef4444',
   apiEndpoint  = '/api/feedback',
   offset       = 24,
@@ -209,14 +209,14 @@ export default function FeedbackWidget({
                     >
                       <Star style={{
                         width: 26, height: 26,
-                        color: n <= (hover || rating) ? '#f59e0b' : 'rgba(255,255,255,0.15)',
-                        fill:  n <= (hover || rating) ? '#f59e0b' : 'transparent',
+                        color: n <= (hover || rating) ? '#3b82f6' : 'rgba(255,255,255,0.15)',
+                        fill:  n <= (hover || rating) ? '#3b82f6' : 'transparent',
                         transition: 'color 0.1s, fill 0.1s',
                       }} />
                     </button>
                   ))}
                   {rating > 0 && (
-                    <span style={{ marginLeft: 8, color: '#f59e0b', fontSize: 12, fontWeight: 700 }}>
+                    <span style={{ marginLeft: 8, color: '#3b82f6', fontSize: 12, fontWeight: 700 }}>
                       {['','Poor','Fair','Good','Great','Excellent'][rating]}
                     </span>
                   )}

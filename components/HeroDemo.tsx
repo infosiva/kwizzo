@@ -1,7 +1,7 @@
 'use client'
 // components/HeroDemo.tsx — light theme live results panel
 
-const ACCENT = '#f59e0b'
+const ACCENT = '#3b82f6'
 
 const ANSWERS = [
   { letter: 'A', text: 'H₂O', pct: 67, isCorrect: true },
@@ -38,8 +38,8 @@ export default function HeroDemo() {
           <span
             className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
             style={{
-              background: 'rgba(245, 158, 11,0.10)',
-              border: '1px solid rgba(245, 158, 11,0.25)',
+              background: 'rgba(59,130,246,0.10)',
+              border: '1px solid rgba(59,130,246,0.25)',
               color: '#92400e',
             }}
           >

@@ -1,7 +1,7 @@
 'use client'
 import Link from "next/link";
 
-const ACCENT = '#f59e0b'
+const ACCENT = '#3b82f6'
 
 interface FooterLink {
   label: string;

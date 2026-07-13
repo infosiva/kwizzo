@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import type { ContentOverrides } from '@/lib/content'
 
-const ACCENT = '#f59e0b'
+const ACCENT = '#3b82f6'
 
 export default function HeroClient({ overrides = {} }: { overrides?: ContentOverrides }) {
   return (
@@ -13,7 +13,7 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
           className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest"
           style={{
             background: 'rgba(15, 23, 42,0.55)',
-            border: '1px solid rgba(245, 158, 11,0.40)',
+            border: '1px solid rgba(59,130,246,0.40)',
             color: '#fde68a',
           }}
         >
@@ -57,8 +57,8 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
               color: '#0f172a',
             }}
             onFocus={e => {
-              e.currentTarget.style.borderColor = 'rgba(245, 158, 11,0.5)'
-              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(245, 158, 11,0.10)'
+              e.currentTarget.style.borderColor = 'rgba(59,130,246,0.5)'
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59,130,246,0.10)'
             }}
             onBlur={e => {
               e.currentTarget.style.borderColor = '#e2e8f0'
@@ -67,7 +67,7 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
           />
           <span
             className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold px-2 py-0.5 rounded-md"
-            style={{ background: 'rgba(245, 158, 11,0.22)', color: '#7c2d12' }}
+            style={{ background: 'rgba(59,130,246,0.22)', color: '#7c2d12' }}
           >
             ⚡ AI
           </span>
@@ -80,11 +80,11 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
           href="/play?mode=solo"
           className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-black text-base text-white active:scale-[0.97] transition-transform duration-100"
           style={{
-            background: `linear-gradient(135deg, ${ACCENT}, #fbbf24)`,
-            boxShadow: `0 4px 20px rgba(245, 158, 11,0.35)`,
+            background: `linear-gradient(135deg, ${ACCENT}, #60a5fa)`,
+            boxShadow: `0 4px 20px rgba(59,130,246,0.35)`,
           }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 28px rgba(245, 158, 11,0.45)` }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 20px rgba(245, 158, 11,0.35)` }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 28px rgba(59,130,246,0.45)` }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 20px rgba(59,130,246,0.35)` }}
         >
           Play Free Tonight →
         </Link>
@@ -96,7 +96,7 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
             border: '1.5px solid #e2e8f0',
             color: '#475569',
           }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(245, 158, 11,0.4)'; (e.currentTarget as HTMLElement).style.color = ACCENT }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(59,130,246,0.4)'; (e.currentTarget as HTMLElement).style.color = ACCENT }}
           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#e2e8f0'; (e.currentTarget as HTMLElement).style.color = '#475569' }}
         >
           👨‍👩‍👧 Family Mode

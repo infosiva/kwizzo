@@ -5,7 +5,7 @@ import { FADE_UP, BUTTON_PRESS, SPRING_CINEMATIC, useMotionVariants } from '@/li
 import Link from 'next/link'
 import { ShimmerButton } from '@/components/magicui/shimmer-button'
 
-const ACCENT = '#f59e0b'
+const ACCENT = '#3b82f6'
 
 export default function FinalCTA() {
   const vars = useMotionVariants(FADE_UP)
@@ -45,8 +45,8 @@ export default function FinalCTA() {
               key={pill}
               className="text-xs font-medium px-3 py-1 rounded-full"
               style={{
-                background: 'rgba(245, 158, 11,0.08)',
-                border: '1px solid rgba(245, 158, 11,0.2)',
+                background: 'rgba(59,130,246,0.08)',
+                border: '1px solid rgba(59,130,246,0.2)',
                 color: '#b45309',
               }}
             >

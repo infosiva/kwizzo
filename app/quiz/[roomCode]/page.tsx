@@ -611,9 +611,9 @@ function QuizContent() {
                     className={`w-full ${heights[rank as 0 | 1 | 2]} rounded-t-xl flex items-start justify-center pt-2`}
                     style={{
                       background: rank === 0
-                        ? 'linear-gradient(180deg, rgba(245,158,11,0.35), rgba(245,158,11,0.12))'
+                        ? 'linear-gradient(180deg, rgba(59,130,246,0.35), rgba(59,130,246,0.12))'
                         : 'rgba(255,255,255,0.06)',
-                      border: rank === 0 ? '1px solid rgba(245,158,11,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                      border: rank === 0 ? '1px solid rgba(59,130,246,0.4)' : '1px solid rgba(255,255,255,0.08)',
                     }}
                   >
                     <span className="text-white/40 text-xs font-bold">{rank + 1}</span>

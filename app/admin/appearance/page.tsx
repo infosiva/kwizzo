@@ -404,7 +404,7 @@ function AppearanceEditor() {
               className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${
                 saved ? 'bg-green-600 text-white' : 'text-white disabled:opacity-60'
               }`}
-            style={!saved ? { background: 'linear-gradient(135deg, #f59e0b, #fbbf24)' } : {}}
+            style={!saved ? { background: 'linear-gradient(135deg, #3b82f6, #60a5fa)' } : {}}
             >
               {saving ? 'Saving…' : saved ? '✓ Saved' : 'Save changes'}
             </button>

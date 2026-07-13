@@ -2,7 +2,7 @@
 import { siteConfig } from '@/site.config'
 import Link from 'next/link'
 
-const ACCENT = '#f59e0b'
+const ACCENT = '#3b82f6'
 
 export default function PricingSection() {
   const { free, pro } = siteConfig.pricing
@@ -50,7 +50,7 @@ export default function PricingSection() {
             href={free.cta.href}
             className="block text-center px-5 py-3 rounded-xl text-sm font-bold transition-all duration-150 active:scale-[0.97]"
             style={{ border: '1.5px solid #e2e8f0', color: '#475569', background: '#f8fafc' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(245, 158, 11,0.4)'; (e.currentTarget as HTMLElement).style.color = ACCENT }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(59,130,246,0.4)'; (e.currentTarget as HTMLElement).style.color = ACCENT }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#e2e8f0'; (e.currentTarget as HTMLElement).style.color = '#475569' }}
           >
             {free.cta.text}
@@ -62,20 +62,20 @@ export default function PricingSection() {
           className="rounded-2xl p-7 flex flex-col gap-5 relative overflow-hidden"
           style={{
             background: '#fff',
-            border: `1.5px solid rgba(245, 158, 11,0.35)`,
-            boxShadow: '0 4px 32px rgba(245, 158, 11,0.12)',
+            border: `1.5px solid rgba(59,130,246,0.35)`,
+            boxShadow: '0 4px 32px rgba(59,130,246,0.12)',
           }}
         >
           {/* Pink top accent */}
           <div
             className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl"
-            style={{ background: `linear-gradient(90deg, ${ACCENT}, #fbbf24)` }}
+            style={{ background: `linear-gradient(90deg, ${ACCENT}, #60a5fa)` }}
           />
 
           {pro.badge && (
             <span
               className="absolute top-5 right-5 text-[10px] font-black px-2.5 py-1 rounded-full text-white"
-              style={{ background: `linear-gradient(135deg, ${ACCENT}, #fbbf24)` }}
+              style={{ background: `linear-gradient(135deg, ${ACCENT}, #60a5fa)` }}
             >
               {pro.badge}
             </span>
@@ -93,9 +93,9 @@ export default function PricingSection() {
                 <span
                   className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
                   style={{
-                    background: 'rgba(245, 158, 11,0.10)',
+                    background: 'rgba(59,130,246,0.10)',
                     color: ACCENT,
-                    border: '1px solid rgba(245, 158, 11,0.2)',
+                    border: '1px solid rgba(59,130,246,0.2)',
                   }}
                 >
                   ✓
@@ -109,11 +109,11 @@ export default function PricingSection() {
             href={pro.cta.href}
             className="block text-center px-5 py-3.5 rounded-xl text-sm font-black text-white transition-all duration-150 active:scale-[0.97]"
             style={{
-              background: `linear-gradient(135deg, ${ACCENT}, #fbbf24)`,
-              boxShadow: `0 4px 16px rgba(245, 158, 11,0.35)`,
+              background: `linear-gradient(135deg, ${ACCENT}, #60a5fa)`,
+              boxShadow: `0 4px 16px rgba(59,130,246,0.35)`,
             }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = `0 6px 24px rgba(245, 158, 11,0.5)` }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 16px rgba(245, 158, 11,0.35)` }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = `0 6px 24px rgba(59,130,246,0.5)` }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 16px rgba(59,130,246,0.35)` }}
           >
             {pro.cta.text}
           </Link>

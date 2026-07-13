@@ -22,7 +22,7 @@ const MOCK_RESULTS: QuestionResult[] = [
 
 function getBarColor(pct: number): string {
   if (pct >= 60) return '#ef4444' // red — most struggled
-  if (pct >= 35) return '#f59e0b' // amber — some struggled
+  if (pct >= 35) return '#3b82f6' // amber — some struggled
   return '#22c55e'                // green — mostly got it
 }
 

@@ -5,8 +5,8 @@ import { Menu, X, Gamepad2, Zap } from 'lucide-react'
 import { useMagicAuth } from '@/lib/shared/useMagicAuth'
 import MagicAuthModal from '@/lib/shared/MagicAuthModal'
 
-const ACCENT = '#f59e0b'
-const ACCENT_LIGHT = '#fbbf24'
+const ACCENT = '#3b82f6'
+const ACCENT_LIGHT = '#60a5fa'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
@@ -26,14 +26,14 @@ export default function Navbar() {
         }}
       >
         {/* Top amber accent line */}
-        <div style={{ height: 3, background: `linear-gradient(90deg, transparent, ${ACCENT} 30%, #fbbf24 60%, ${ACCENT} 80%, transparent)` }} />
+        <div style={{ height: 3, background: `linear-gradient(90deg, transparent, ${ACCENT} 30%, #60a5fa 60%, ${ACCENT} 80%, transparent)` }} />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <span
               className="flex items-center justify-center w-8 h-8 rounded-xl font-black text-white"
-              style={{ background: `linear-gradient(135deg, ${ACCENT} 0%, #fbbf24 100%)` }}
+              style={{ background: `linear-gradient(135deg, ${ACCENT} 0%, #60a5fa 100%)` }}
             >
               <Gamepad2 size={16} strokeWidth={2.5} />
             </span>
@@ -69,7 +69,7 @@ export default function Navbar() {
                 <Link
                   href="/dashboard"
                   className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-                  style={{ color: ACCENT, border: `1px solid rgba(245,158,11,0.3)`, background: ACCENT_LIGHT }}
+                  style={{ color: ACCENT, border: `1px solid rgba(59,130,246,0.3)`, background: ACCENT_LIGHT }}
                 >
                   Dashboard
                 </Link>
@@ -95,11 +95,11 @@ export default function Navbar() {
               href="/play?mode=solo"
               className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-black text-white transition-all duration-150 active:scale-[0.97]"
               style={{
-                background: `linear-gradient(135deg, ${ACCENT}, #fbbf24)`,
-                boxShadow: `0 4px 14px rgba(245,158,11,0.35)`,
+                background: `linear-gradient(135deg, ${ACCENT}, #60a5fa)`,
+                boxShadow: `0 4px 14px rgba(59,130,246,0.35)`,
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; (e.currentTarget as HTMLElement).style.boxShadow = `0 6px 20px rgba(245,158,11,0.45)` }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 14px rgba(245,158,11,0.35)` }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; (e.currentTarget as HTMLElement).style.boxShadow = `0 6px 20px rgba(59,130,246,0.45)` }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 14px rgba(59,130,246,0.35)` }}
             >
               <Zap size={14} strokeWidth={3} />
               Play Free
@@ -153,7 +153,7 @@ export default function Navbar() {
               <button
                 onClick={() => { setAuthOpen(true); setOpen(false) }}
                 className="text-center py-2.5 rounded-xl text-sm font-semibold"
-                style={{ border: `1px solid rgba(245,158,11,0.3)`, color: ACCENT, background: ACCENT_LIGHT }}
+                style={{ border: `1px solid rgba(59,130,246,0.3)`, color: ACCENT, background: ACCENT_LIGHT }}
               >
                 Sign in free
               </button>
@@ -162,7 +162,7 @@ export default function Navbar() {
             <Link
               href="/play?mode=solo"
               className="text-center py-3.5 rounded-xl font-black text-white text-base active:scale-[0.97] transition-transform"
-              style={{ background: `linear-gradient(135deg, ${ACCENT}, #fbbf24)` }}
+              style={{ background: `linear-gradient(135deg, ${ACCENT}, #60a5fa)` }}
               onClick={() => setOpen(false)}
             >
               🎮 Play Free Now

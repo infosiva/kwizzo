@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0f0f23;
+  --background: #101026;
   --foreground: #f1f5f9;
-  --accent: #f59e0b;
-  --accent-2: #fbbf24;
-  --card: #1a1a3a;
+  --accent: #3b82f6;
+  --accent-2: #60a5fa;
+  --card: #181c3a;
   --card-foreground: #e2e8f0;
-  --border: #2d2b55;
-  --muted: #141430;
+  --border: #2b2f55;
+  --muted: #14172f;
   --muted-foreground: #94a3b8;
 }
 
@@ -36,14 +36,14 @@ body {
 /* ── Dark cards ────────────────────────────────────────── */
 .glass {
   background: rgba(26, 26, 58, 0.7);
-  border: 1px solid #2d2b55;
+  border: 1px solid #2b2f55;
   backdrop-filter: blur(16px) saturate(140%);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
 }
 
 .glass-strong {
   background: rgba(26, 26, 58, 0.9);
-  border: 1px solid #3d3a6a;
+  border: 1px solid #33376a;
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
 }
@@ -54,7 +54,7 @@ body {
   100% { background-position:  200% center; }
 }
 .shimmer {
-  background: linear-gradient(90deg, transparent 0%, rgba(245,158,11,0.10) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(59,130,246,0.10) 50%, transparent 100%);
   background-size: 200% 100%;
   animation: shimmer 2s linear infinite;
 }
@@ -75,21 +75,21 @@ body {
 
 /* ── Pulse glow ──────────────────────────────────────────── */
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 20px rgba(245,158,11,0.18); }
-  50%       { box-shadow: 0 0 40px rgba(245,158,11,0.40); }
+  0%, 100% { box-shadow: 0 0 20px rgba(59,130,246,0.18); }
+  50%       { box-shadow: 0 0 40px rgba(59,130,246,0.40); }
 }
 .pulse-glow { animation: pulseGlow 3s ease-in-out infinite; }
 
 /* ── Scrollbar ───────────────────────────────────────────── */
 ::-webkit-scrollbar       { width: 6px; }
-::-webkit-scrollbar-track { background: #141430; }
-::-webkit-scrollbar-thumb { background: #2d2b55; border-radius: 3px; }
+::-webkit-scrollbar-track { background: #14172f; }
+::-webkit-scrollbar-thumb { background: #2b2f55; border-radius: 3px; }
 
 /* ── Custom input styles ────────────────────────────────── */
 .input-dark {
   width: 100%;
-  background: #141430;
-  border: 1.5px solid #2d2b55;
+  background: #14172f;
+  border: 1.5px solid #2b2f55;
   border-radius: 12px;
   padding: 12px 16px;
   color: #f1f5f9;
@@ -97,13 +97,13 @@ body {
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .input-dark:focus {
-  border-color: rgba(245,158,11,0.5);
-  box-shadow: 0 0 0 3px rgba(245,158,11,0.10);
+  border-color: rgba(59,130,246,0.5);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.10);
 }
 .input-dark::placeholder { color: #94a3b8; }
 
 /* ── Star rating ────────────────────────────────────────── */
-.stars { color: #f59e0b; letter-spacing: 2px; }
+.stars { color: #3b82f6; letter-spacing: 2px; }
 
 /* ── Typing indicator ───────────────────────────────────── */
 @keyframes blink {
@@ -163,8 +163,8 @@ body {
 
 /* ── Neon glow pulse on borders ─────────────────────────── */
 @keyframes neonPulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(245,158,11,0.25), 0 0 20px rgba(245,158,11,0.12); }
-  50%       { box-shadow: 0 0 16px rgba(245,158,11,0.55), 0 0 40px rgba(245,158,11,0.28); }
+  0%, 100% { box-shadow: 0 0 8px rgba(59,130,246,0.25), 0 0 20px rgba(59,130,246,0.12); }
+  50%       { box-shadow: 0 0 16px rgba(59,130,246,0.55), 0 0 40px rgba(59,130,246,0.28); }
 }
 .neon-glow { animation: neonPulse 2.5s ease-in-out infinite; }
 
@@ -190,13 +190,13 @@ body {
 
 /* ── Amber aurora orbs (kwizzo gaming palette) ── */
 .aurora-primary {
-  background: radial-gradient(circle, rgba(245,158,11,0.18) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 70%);
 }
 .aurora-secondary {
   background: radial-gradient(circle, rgba(251,191,36,0.12) 0%, transparent 70%);
 }
 .aurora-third {
-  background: radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
 }
 
 /* ── Confetti spin ───────────────────────────────────────── */
@@ -245,7 +245,7 @@ body {
 }
 .game-card:hover {
   transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 12px 40px rgba(245,158,11,0.22);
+  box-shadow: 0 12px 40px rgba(59,130,246,0.22);
 }
 
 /* Magic UI — shimmer animation */
@@ -322,8 +322,8 @@ pre {
 
 /* ── Badge glow — CSS only, no JS hydration cost ──────────── */
 @keyframes badge-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.40); }
-  50%       { box-shadow: 0 0 0 8px rgba(245,158,11,0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.40); }
+  50%       { box-shadow: 0 0 0 8px rgba(59,130,246,0); }
 }
 .badge-glow { animation: badge-glow 2.5s ease-in-out infinite; }
 
@@ -347,8 +347,8 @@ pre {
 
 /* ── Pulse glow on final CTA button ───────────────────────── */
 @keyframes cta-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.55); }
-  50%       { box-shadow: 0 0 0 16px rgba(245,158,11,0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.55); }
+  50%       { box-shadow: 0 0 0 16px rgba(59,130,246,0); }
 }
 .cta-pulse { animation: cta-pulse 2s ease-in-out infinite; }
 

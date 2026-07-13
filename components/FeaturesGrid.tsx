@@ -1,7 +1,7 @@
 'use client'
 import { siteConfig } from '@/site.config'
 
-const ACCENT = '#f59e0b'
+const ACCENT = '#3b82f6'
 
 export default function FeaturesGrid() {
   return (
@@ -23,8 +23,8 @@ export default function FeaturesGrid() {
               animationDelay: `${i * 0.05}s`,
             }}
             onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.borderColor = 'rgba(245, 158, 11,0.3)'
-              ;(e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(245, 158, 11,0.08)'
+              (e.currentTarget as HTMLElement).style.borderColor = 'rgba(59,130,246,0.3)'
+              ;(e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(59,130,246,0.08)'
               ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'
             }}
             onMouseLeave={e => {
@@ -35,7 +35,7 @@ export default function FeaturesGrid() {
           >
             <span
               className="text-xl flex-shrink-0 mt-0.5 w-9 h-9 rounded-xl flex items-center justify-center"
-              style={{ background: 'rgba(245, 158, 11,0.08)', border: '1px solid rgba(245, 158, 11,0.15)' }}
+              style={{ background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.15)' }}
             >
               {f.icon}
             </span>

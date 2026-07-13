@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 
-const ACCENT = '#f59e0b'
+const ACCENT = '#3b82f6'
 const BOT_NAME = 'KwizBot'
 const WELCOME = 'Hi! Ready for a family quiz? I can help you create one.'
 const SYSTEM_PROMPT = `You are KwizBot, the friendly AI assistant for Kwizzo — a fun family quiz game platform powered by AI.
@@ -102,9 +102,9 @@ export default function ChatBot() {
         maxHeight: `calc(100dvh - ${BOTTOM_OFFSET}px)`,
         borderRadius: '16px 16px 0 0',
         background: '#fff',
-        border: '1px solid rgba(245, 158, 11,0.2)',
+        border: '1px solid rgba(59,130,246,0.2)',
         borderBottom: 'none',
-        boxShadow: '0 -8px 40px rgba(245, 158, 11,0.12), 0 -2px 20px rgba(0,0,0,0.08)',
+        boxShadow: '0 -8px 40px rgba(59,130,246,0.12), 0 -2px 20px rgba(0,0,0,0.08)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -120,8 +120,8 @@ export default function ChatBot() {
         maxHeight: `calc(100dvh - ${BOTTOM_OFFSET + 20}px)`,
         borderRadius: 16,
         background: '#fff',
-        border: '1px solid rgba(245, 158, 11,0.2)',
-        boxShadow: '0 8px 40px rgba(245, 158, 11,0.12), 0 2px 20px rgba(0,0,0,0.08)',
+        border: '1px solid rgba(59,130,246,0.2)',
+        boxShadow: '0 8px 40px rgba(59,130,246,0.12), 0 2px 20px rgba(0,0,0,0.08)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -137,10 +137,10 @@ export default function ChatBot() {
         style={{
           position: 'fixed', bottom: 24, right: 24, zIndex: 9999,
           width: 52, height: 52, borderRadius: '50%',
-          background: `linear-gradient(135deg, ${ACCENT}, #fbbf24)`,
+          background: `linear-gradient(135deg, ${ACCENT}, #60a5fa)`,
           border: 'none', cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: `0 4px 20px rgba(245, 158, 11,0.4)`,
+          boxShadow: `0 4px 20px rgba(59,130,246,0.4)`,
           transition: 'transform 0.2s, box-shadow 0.2s',
         }}
         onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.1)')}
@@ -173,7 +173,7 @@ export default function ChatBot() {
             }
             .kwiz-msg::-webkit-scrollbar { width: 4px; }
             .kwiz-msg::-webkit-scrollbar-track { background: transparent; }
-            .kwiz-msg::-webkit-scrollbar-thumb { background: rgba(245, 158, 11,0.3); border-radius: 2px; }
+            .kwiz-msg::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.3); border-radius: 2px; }
             @keyframes kwiz-bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
           `}</style>
 
@@ -181,16 +181,16 @@ export default function ChatBot() {
           <div style={{
             flexShrink: 0,
             padding: '12px 16px',
-            borderBottom: '1px solid rgba(245, 158, 11,0.15)',
+            borderBottom: '1px solid rgba(59,130,246,0.15)',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            background: 'rgba(245, 158, 11,0.04)',
+            background: 'rgba(59,130,246,0.04)',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{
                 width: 34, height: 34, borderRadius: '50%',
-                background: `linear-gradient(135deg, ${ACCENT}, #fbbf24)`,
+                background: `linear-gradient(135deg, ${ACCENT}, #60a5fa)`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 16, boxShadow: `0 0 12px rgba(245, 158, 11,0.3)`,
+                fontSize: 16, boxShadow: `0 0 12px rgba(59,130,246,0.3)`,
               }}>🎮</div>
               <div>
                 <div style={{ color: '#0f172a', fontWeight: 700, fontSize: 14 }}>{BOT_NAME}</div>
@@ -218,9 +218,9 @@ export default function ChatBot() {
                   maxWidth: '82%', padding: '9px 13px',
                   borderRadius: m.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
                   background: m.role === 'user'
-                    ? `linear-gradient(135deg, ${ACCENT}, #fbbf24)`
-                    : 'rgba(245, 158, 11,0.07)',
-                  border: m.role === 'user' ? 'none' : '1px solid rgba(245, 158, 11,0.15)',
+                    ? `linear-gradient(135deg, ${ACCENT}, #60a5fa)`
+                    : 'rgba(59,130,246,0.07)',
+                  border: m.role === 'user' ? 'none' : '1px solid rgba(59,130,246,0.15)',
                   color: m.role === 'user' ? '#fff' : '#1e293b',
                   fontSize: isMobile ? 15 : 13.5, lineHeight: 1.5,
                   wordBreak: 'break-word', whiteSpace: 'pre-wrap',
@@ -234,7 +234,7 @@ export default function ChatBot() {
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
                 <div style={{
                   padding: '10px 14px', borderRadius: '16px 16px 16px 4px',
-                  background: 'rgba(245, 158, 11,0.07)', border: '1px solid rgba(245, 158, 11,0.15)',
+                  background: 'rgba(59,130,246,0.07)', border: '1px solid rgba(59,130,246,0.15)',
                   display: 'flex', gap: 4, alignItems: 'center',
                 }}>
                   {[0, 1, 2].map(d => (
@@ -255,7 +255,7 @@ export default function ChatBot() {
             flexShrink: 0,
             padding: '10px 12px',
             paddingBottom: isMobile ? 'max(10px, env(safe-area-inset-bottom))' : '10px',
-            borderTop: '1px solid rgba(245, 158, 11,0.12)',
+            borderTop: '1px solid rgba(59,130,246,0.12)',
             display: 'flex', gap: 8, alignItems: 'center',
             background: '#fafafa',
           }}>
@@ -273,7 +273,7 @@ export default function ChatBot() {
                 fontSize: isMobile ? 16 : 13.5,
                 outline: 'none', transition: 'border-color 0.15s',
               }}
-              onFocus={e => (e.target.style.borderColor = 'rgba(245, 158, 11,0.5)')}
+              onFocus={e => (e.target.style.borderColor = 'rgba(59,130,246,0.5)')}
               onBlur={e => (e.target.style.borderColor = '#e2e8f0')}
             />
             <button
@@ -282,7 +282,7 @@ export default function ChatBot() {
               style={{
                 width: 38, height: 38, borderRadius: 10, border: 'none',
                 background: input.trim() && !loading
-                  ? `linear-gradient(135deg, ${ACCENT}, #fbbf24)`
+                  ? `linear-gradient(135deg, ${ACCENT}, #60a5fa)`
                   : '#f1f5f9',
                 cursor: input.trim() && !loading ? 'pointer' : 'not-allowed',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',

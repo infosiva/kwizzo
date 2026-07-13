@@ -2,7 +2,7 @@
 import { useRef, useState, useEffect, useCallback } from 'react'
 import { siteConfig } from '@/site.config'
 
-const ACCENT = '#f59e0b'
+const ACCENT = '#3b82f6'
 
 export default function HowItWorksSection() {
   const slides = siteConfig.howItWorks
@@ -90,9 +90,9 @@ export default function HowItWorksSection() {
                 padding: '24px 20px',
                 background: active === i ? '#fff' : '#f8fafc',
                 border: active === i
-                  ? `1.5px solid rgba(245, 158, 11,0.35)`
+                  ? `1.5px solid rgba(59,130,246,0.35)`
                   : '1.5px solid #e2e8f0',
-                boxShadow: active === i ? '0 4px 20px rgba(245, 158, 11,0.10)' : '0 1px 4px rgba(0,0,0,0.04)',
+                boxShadow: active === i ? '0 4px 20px rgba(59,130,246,0.10)' : '0 1px 4px rgba(0,0,0,0.04)',
                 transform: active === i ? 'scale(1)' : 'scale(0.96)',
                 opacity: active === i ? 1 : 0.7,
                 transition: 'transform 220ms cubic-bezier(0.23,1,0.32,1), opacity 220ms ease, border-color 220ms ease, background 220ms ease, box-shadow 220ms ease',
@@ -103,8 +103,8 @@ export default function HowItWorksSection() {
                 <span
                   className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
                   style={{
-                    background: active === i ? 'rgba(245, 158, 11,0.10)' : '#f1f5f9',
-                    border: active === i ? '1px solid rgba(245, 158, 11,0.2)' : '1px solid #e2e8f0',
+                    background: active === i ? 'rgba(59,130,246,0.10)' : '#f1f5f9',
+                    border: active === i ? '1px solid rgba(59,130,246,0.2)' : '1px solid #e2e8f0',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0, lineHeight: 1,
                     transition: 'background 220ms ease, border-color 220ms ease',

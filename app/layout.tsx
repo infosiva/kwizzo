@@ -57,7 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   ])
 
   const themeCSS = buildThemeStyleTag(theme, {
-    background: '#0f0f23',
+    background: '#101026',
     primary: colors.primary,
     secondary: colors.secondary,
   })
@@ -80,7 +80,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className={`${inter.variable} ${nunito.variable} min-h-full flex flex-col`}
         style={{
-          background: '#0f0f23',
+          background: '#101026',
           color: '#f1f5f9',
           fontFamily: 'var(--font-body, system-ui)',
         }}
@@ -105,8 +105,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </Providers>
 
         {flags.chatbot && !isWidgetHidden(theme, 'chatbot') && <ChatBot />}
-        <FeedbackWidget siteName="Kwizzo" accentColor="#f59e0b" accentColor2="#fbbf24" position={flags.chatbot ? 'left' : 'right'} />
-        {!isWidgetHidden(theme, 'backToTop') && <BackToTop accentColor="#f59e0b" />}
+        <FeedbackWidget siteName="Kwizzo" accentColor="#3b82f6" accentColor2="#60a5fa" position={flags.chatbot ? 'left' : 'right'} />
+        {!isWidgetHidden(theme, 'backToTop') && <BackToTop accentColor="#3b82f6" />}
         <Footer siteName={config.name} />
         {!isWidgetHidden(theme, 'cookieConsent') && <CookieConsent />}
         {!isWidgetHidden(theme, 'stickyFooterCTA') && <StickyFooterCTA />}
