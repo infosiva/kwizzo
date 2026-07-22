@@ -5,7 +5,9 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Zap, HelpCircle, Share2 } from 'lucide-react'
+import { Zap, HelpCircle, Share2, Flame } from 'lucide-react'
+import { computeStats } from '@/lib/gameHistory'
+import config from '@/vertical.config'
 
 interface StatPill {
   icon: React.ReactNode
@@ -62,16 +64,16 @@ function AnimatedCount({ value }: { value: number }) {
 }
 
 export default function QuizStats() {
-  const [stats, setStats] = useState({ quizzes: 0, questions: 0, shares: 0 })
+  const [stats, setStats] = useState({ quizzes: 0, questions: 0, shares: 0, streak: 0 })
   const [mounted, setMounted] = useState(false)
+  const streaksOn = 'features' in config && !!(config.features as Record<string, boolean>).streaks
 
   useEffect(() => {
     setMounted(true)
     try {
-      const quizzes   = parseInt(localStorage.getItem('kwizzo_quizzes')   ?? '0', 10)
-      const questions = parseInt(localStorage.getItem('kwizzo_questions') ?? '0', 10)
-      const shares    = parseInt(localStorage.getItem('kwizzo_shares')    ?? '0', 10)
-      setStats({ quizzes, questions, shares })
+      const shares = parseInt(localStorage.getItem('kwizzo_shares') ?? '0', 10)
+      const { totalGames, totalQuestions, currentStreak } = computeStats()
+      setStats({ quizzes: totalGames, questions: totalQuestions, shares, streak: currentStreak })
     } catch {
       // localStorage unavailable — show zeros
     }
@@ -80,9 +82,12 @@ export default function QuizStats() {
   if (!mounted) return null
 
   const pills: StatPill[] = [
-    { icon: <Zap size={14} style={{ color: '#3b82f6' }} />,   label: 'Quizzes created',    value: stats.quizzes,   suffix: '' },
-    { icon: <HelpCircle size={14} style={{ color: '#60a5fa' }} />, label: 'Questions generated', value: stats.questions, suffix: '' },
+    { icon: <Zap size={14} style={{ color: '#3b82f6' }} />,   label: 'Quizzes played',    value: stats.quizzes,   suffix: '' },
+    { icon: <HelpCircle size={14} style={{ color: '#60a5fa' }} />, label: 'Questions answered', value: stats.questions, suffix: '' },
     { icon: <Share2 size={14} style={{ color: '#3b82f6' }} />, label: 'Shares sent',        value: stats.shares,    suffix: '' },
+    ...(streaksOn && stats.streak > 0
+      ? [{ icon: <Flame size={14} style={{ color: '#f59e0b' }} />, label: stats.streak === 1 ? 'Day streak' : 'Day streak', value: stats.streak, suffix: '' }]
+      : []),
   ]
 
   // Only render if user has any activity

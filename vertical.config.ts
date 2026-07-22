@@ -196,7 +196,7 @@ SAFETY (non-negotiable): This platform is actively used by children (age 5+) and
     learningPath:  false,
     multiplayer:   true,
     leaderboard:   true,
-    streaks:       false,
+    streaks:       true,
     ageAdaptive:   true,
     progressTrack: true,
     familyMode:    true,
