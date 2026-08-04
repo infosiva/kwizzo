@@ -4,7 +4,7 @@ import { reportToTaskFlow } from '@/lib/reportToTaskFlow'
 import { aiChat } from '@/lib/ai'
 import { rateLimit } from '@/lib/rateLimit'
 
-const CHAT_LIMITER = rateLimit({ windowMs: 60 * 60 * 1000, max: 30, message: 'Too many chat requests — try again later.' })
+const CHAT_LIMITER = rateLimit({ windowMs: 60 * 60 * 1000, max: 60, message: 'Too many chat requests — try again later.' })
 
 let _groq: Groq | null = null
 function getGroq() {

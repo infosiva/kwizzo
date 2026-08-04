@@ -14,7 +14,6 @@ import { getSiteFlags } from '@/lib/flags'
 import Providers from '@/components/Providers'
 import FeedbackWidget from '@/components/FeedbackWidget'
 import BackToTop from '@/components/BackToTop'
-import FloatingChatWrapper from '@/components/FloatingChatWrapper'
 import CookieConsent from "../components/CookieConsent"
 import Footer from "../components/Footer"
 import StickyFooterCTA from "../components/StickyFooterCTA"
@@ -113,7 +112,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <SchemaOrg />
         <Script defer data-domain="kwizzo.app" src="https://plausible.io/js/script.js" strategy="afterInteractive" />
         <Script defer data-site="kwizzo.app" src="http://31.97.56.148:3098/t.js" strategy="afterInteractive" />
-        <FloatingChatWrapper />
       </body>
     </html>
   )
