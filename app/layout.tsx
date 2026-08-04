@@ -7,7 +7,6 @@ const nunito = Nunito({ subsets: ['latin'], weight: ['700', '800', '900'], varia
 import './globals.css'
 import config from '@/vertical.config'
 import { getScrollbarColor, COLOR_MAP } from '@/lib/themeColors'
-import PageTracker from '@/components/PageTracker'
 import Navbar from '@/components/Navbar'
 import ChatBot from '@/components/ChatBot'
 import { getSiteFlags } from '@/lib/flags'
@@ -94,7 +93,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           "operatingSystem": "Web",
           "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
         }) }} />
-        <PageTracker site='kwizzo' />
         <Navbar />
 
         <Providers>
@@ -111,7 +109,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {!isWidgetHidden(theme, 'stickyFooterCTA') && <StickyFooterCTA />}
         <SchemaOrg />
         <Script defer data-domain="kwizzo.app" src="https://plausible.io/js/script.js" strategy="afterInteractive" />
-        <Script defer data-site="kwizzo.app" src="http://31.97.56.148:3098/t.js" strategy="afterInteractive" />
       </body>
     </html>
   )
