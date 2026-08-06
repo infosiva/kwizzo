@@ -3,6 +3,7 @@ import Link from 'next/link'
 import type { ContentOverrides } from '@/lib/content'
 
 const ACCENT = '#3b82f6'
+const ACCENT_LIGHT = '#60a5fa'
 
 export default function HeroClient({ overrides = {} }: { overrides?: ContentOverrides }) {
   return (
@@ -12,9 +13,9 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
         <span
           className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest"
           style={{
-            background: 'rgba(15, 23, 42,0.55)',
+            background: 'rgba(59,130,246,0.12)',
             border: '1px solid rgba(59,130,246,0.40)',
-            color: '#fde68a',
+            color: '#93c5fd',
           }}
         >
           ⚡ 30-SECOND SETUP · NO ACCOUNT NEEDED
@@ -25,12 +26,12 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
       <div style={{ animationDelay: '60ms' }} className="hero-entry">
         <h1
           className="font-black leading-[0.95] tracking-tight"
-          style={{ fontSize: 'clamp(2rem, 5vw, 3.2rem)', color: '#64748b' }}
+          style={{ fontSize: 'clamp(2rem, 5vw, 3.2rem)', color: '#f1f5f9' }}
         >
           <span className="block">Build a quiz in 30 seconds.</span>
           <span
             className="block"
-            style={{ color: ACCENT }}
+            style={{ color: ACCENT_LIGHT }}
           >
             See where your audience got lost.
           </span>
@@ -39,7 +40,7 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
 
       {/* Subtext */}
       <div style={{ animationDelay: '120ms' }} className="hero-entry">
-        <p className="text-base sm:text-lg leading-relaxed max-w-md" style={{ color: '#64748b' }}>
+        <p className="text-base sm:text-lg leading-relaxed max-w-md" style={{ color: '#94a3b8' }}>
           AI generates questions from any topic — share async or live, get per-question drop-off insights.
         </p>
       </div>
@@ -52,22 +53,22 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
             placeholder="Enter any topic — History, Science, React hooks..."
             className="w-full rounded-xl px-4 py-3.5 text-sm font-medium outline-none transition-all duration-150"
             style={{
-              background: '#fff',
-              border: '1.5px solid #e2e8f0',
-              color: '#0f172a',
+              background: '#181c3a',
+              border: '1.5px solid #2b2f55',
+              color: '#f1f5f9',
             }}
             onFocus={e => {
-              e.currentTarget.style.borderColor = 'rgba(59,130,246,0.5)'
-              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59,130,246,0.10)'
+              e.currentTarget.style.borderColor = 'rgba(59,130,246,0.6)'
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59,130,246,0.15)'
             }}
             onBlur={e => {
-              e.currentTarget.style.borderColor = '#e2e8f0'
+              e.currentTarget.style.borderColor = '#2b2f55'
               e.currentTarget.style.boxShadow = 'none'
             }}
           />
           <span
             className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold px-2 py-0.5 rounded-md"
-            style={{ background: 'rgba(59,130,246,0.22)', color: '#7c2d12' }}
+            style={{ background: 'rgba(59,130,246,0.22)', color: '#dbeafe' }}
           >
             ⚡ AI
           </span>

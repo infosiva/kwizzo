@@ -10,10 +10,9 @@ export default function Icon() {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Simplified game controller — rounded body + two thumb circles */}
-        <rect x="2" y="8" width="20" height="10" rx="5" stroke="white" strokeWidth="2"/>
-        <circle cx="8" cy="13" r="1.6" fill="white"/>
-        <circle cx="16" cy="13" r="1.6" fill="white"/>
+        {/* Quiz-card glyph — rounded card + checkmark (matches navbar KwizzoMark) */}
+        <rect x="2" y="3" width="20" height="18" rx="4" stroke="white" strokeWidth="2" fill="none"/>
+        <path d="M7 12.5l3 3 7-7" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
       </svg>
     </div>
   )
