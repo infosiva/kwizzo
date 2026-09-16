@@ -74,6 +74,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     >
       <head>
         <meta name="google-adsense-account" content="ca-pub-4237294630161176" />
+        <Script
+                  async
+                  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4237294630161176"
+                  crossOrigin="anonymous"
+                  strategy="afterInteractive"
+                />
         <style dangerouslySetInnerHTML={{ __html: themeCSS }} />
       </head>
       <body className={`${inter.variable} ${nunito.variable} min-h-full flex flex-col`}
