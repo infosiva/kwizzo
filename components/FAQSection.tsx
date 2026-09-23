@@ -7,7 +7,7 @@ export default function FAQSection() {
   const items = siteConfig.faq.slice(0, 6)
 
   return (
-    <section id="faq" className="py-8 px-4 sm:px-6 max-w-5xl mx-auto border-t border-white/[0.05]">
+    <section id="faq" className="py-8 px-4 sm:px-6 max-w-5xl mx-auto border-t border-white/[0.05]" style={{ background: '#080712' }}>
       <div className="text-center mb-6">
         <h2 className="text-2xl font-black text-white mb-2">FAQ</h2>
         <p className="text-white/50 text-sm">Common questions answered</p>

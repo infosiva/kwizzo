@@ -51,7 +51,7 @@ SAFETY (non-negotiable): This platform is used by children, teenagers, and famil
     if (groq) {
       try {
         groqStream = await groq.chat.completions.create({
-          model: 'llama-3.1-8b-instant',
+          model: 'qwen/qwen3.8-27b',
           messages: chatMessages,
           max_tokens: 300,
           temperature: 0.7,
