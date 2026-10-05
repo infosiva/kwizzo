@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import type { ContentOverrides } from '@/lib/content'
+import { MagneticButton } from "@infosiva/shared-ui/modern";
 
 const ACCENT = '#3b82f6'
 const ACCENT_LIGHT = '#60a5fa'
@@ -77,17 +78,17 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
 
       {/* CTAs */}
       <div style={{ animationDelay: '240ms' }} className="hero-entry flex flex-col sm:flex-row gap-3">
-        <Link
-          href="/play?mode=solo"
-          className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-black text-base text-white active:scale-[0.97] transition-transform duration-100"
-          style={{
-            background: `linear-gradient(135deg, ${ACCENT}, #60a5fa)`,
-            boxShadow: `0 4px 20px rgba(59,130,246,0.35)`,
-          }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 28px rgba(59,130,246,0.45)` }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 20px rgba(59,130,246,0.35)` }}
-        >
-          Play Free Tonight →
+        <Link href="/play?mode=solo" className="inline-flex">
+          <MagneticButton
+            tabIndex={-1}
+            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-black text-base text-white"
+            style={{
+              background: `linear-gradient(135deg, ${ACCENT}, #60a5fa)`,
+              boxShadow: `0 4px 20px rgba(59,130,246,0.35)`,
+            }}
+          >
+            Play Free Tonight →
+          </MagneticButton>
         </Link>
         <Link
           href="/play?mode=group"

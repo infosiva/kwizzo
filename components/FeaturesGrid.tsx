@@ -1,5 +1,6 @@
 'use client'
 import { siteConfig } from '@/site.config'
+import { SpotlightCard } from "@infosiva/shared-ui/modern";
 
 const ACCENT = '#3b82f6'
 
@@ -13,8 +14,7 @@ export default function FeaturesGrid() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {siteConfig.features.map((f, i) => (
-          <div
-            key={f.title}
+          <SpotlightCard key={f.title}><div
             className="rounded-2xl p-5 flex items-start gap-3 transition-all duration-200 group"
             style={{
               background: '#fff',
@@ -43,7 +43,7 @@ export default function FeaturesGrid() {
               <div className="font-bold text-sm mb-1" style={{ color: '#0f172a' }}>{f.title}</div>
               <div className="text-xs leading-relaxed" style={{ color: '#64748b' }}>{f.desc}</div>
             </div>
-          </div>
+          </div></SpotlightCard>
         ))}
       </div>
     </section>
