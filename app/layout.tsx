@@ -15,7 +15,7 @@ import FeedbackWidget from '@/components/FeedbackWidget'
 import BackToTop from '@/components/BackToTop'
 import CookieConsent from "../components/CookieConsent"
 import Footer from "../components/Footer"
-import { loadSiteTheme, buildThemeStyleTag, isWidgetHidden } from '@/lib/theme-loader'
+import { loadSiteTheme, buildThemeStyleTag, buildGa4Snippet, isWidgetHidden } from '@/lib/theme-loader'
 
 import { MotionProvider } from "@infosiva/shared-ui/modern";
 const inter = Inter({ subsets: ['latin'], variable: '--font-body' })
@@ -81,6 +81,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   strategy="afterInteractive"
                 />
         <style dangerouslySetInnerHTML={{ __html: themeCSS }} />
+      {buildGa4Snippet(theme) && <script dangerouslySetInnerHTML={{ __html: buildGa4Snippet(theme) }} />}
       </head>
       <body className={`${inter.variable} ${nunito.variable} min-h-full flex flex-col`}
         style={{
