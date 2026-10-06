@@ -15,7 +15,6 @@ import FeedbackWidget from '@/components/FeedbackWidget'
 import BackToTop from '@/components/BackToTop'
 import CookieConsent from "../components/CookieConsent"
 import Footer from "../components/Footer"
-import StickyFooterCTA from "../components/StickyFooterCTA"
 import { loadSiteTheme, buildThemeStyleTag, isWidgetHidden } from '@/lib/theme-loader'
 
 import { MotionProvider } from "@infosiva/shared-ui/modern";
@@ -109,11 +108,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </Providers>
 
         {flags.chatbot && !isWidgetHidden(theme, 'chatbot') && <ChatBot />}
-        <FeedbackWidget siteName="Kwizzo" accentColor="#3b82f6" accentColor2="#60a5fa" position={flags.chatbot ? 'left' : 'right'} />
-        {!isWidgetHidden(theme, 'backToTop') && <BackToTop accentColor="#3b82f6" />}
+        <FeedbackWidget siteName="Kwizzo" accentColor="#e8404f" accentColor2="#ff7a85" position={flags.chatbot ? 'left' : 'right'} />
+        {!isWidgetHidden(theme, 'backToTop') && <BackToTop accentColor="#e8404f" />}
         <Footer siteName={config.name} />
         {!isWidgetHidden(theme, 'cookieConsent') && <CookieConsent />}
-        {!isWidgetHidden(theme, 'stickyFooterCTA') && <StickyFooterCTA />}
         <SchemaOrg />
         <Script defer data-domain="kwizzo.app" src="https://plausible.io/js/script.js" strategy="afterInteractive" />
       </body>
