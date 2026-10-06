@@ -54,7 +54,7 @@ export const siteConfig: SiteConfig = {
     gateHeadline:      "You've used your 5 free rounds!",
     gateSubtext:       "That was fun. Unlock unlimited rounds for the whole family.",
     gateCtaText:       'Upgrade to Pro — £3.99/mo',
-    gateCtaHref:       '/pro',
+    gateCtaHref:       '/#pricing',
     gateSecondaryText: 'Play again free tomorrow',
   },
 
@@ -94,7 +94,7 @@ export const siteConfig: SiteConfig = {
       cta: { text: 'Play Free Now', href: '/play?mode=solo' },
     },
     pro: {
-      name: 'Pro Family', price: '$5', period: '/month', badge: 'Popular',
+      name: 'Pro Family', price: '£3.99', period: '/month', badge: 'Popular',
       features: [
         { text: 'Unlimited rounds',            included: true },
         { text: 'All 100+ categories',         included: true },
@@ -103,7 +103,7 @@ export const siteConfig: SiteConfig = {
         { text: 'Priority AI responses',       included: true },
         { text: 'Export results & scorecards', included: true },
       ],
-      cta: { text: 'Upgrade to Pro', href: '/pro' },
+      cta: { text: 'Upgrade to Pro', href: '/#pricing' },
     },
   },
 
@@ -130,7 +130,7 @@ export const siteConfig: SiteConfig = {
   layout: {
     heroVariant:  'split',
     sectionOrder: ['hero', 'quizStats', 'marquee', 'howItWorks', 'features', 'pricing', 'faq', 'finalCta'],
-    hideSections: [],
+    hideSections: ['finalCta'], // compact pass: pricing section already carries the CTA
   },
 
   seo: {

@@ -12,7 +12,7 @@ export default async function HeroSection() {
   const overrides  = await getContentOverrides()
 
   return (
-    <section className="relative px-4 sm:px-6 pt-4 pb-8 max-w-6xl mx-auto">
+    <section className="relative px-4 sm:px-6 pt-3 pb-4 max-w-6xl mx-auto">
       <div className={`grid grid-cols-1 ${
         isSplit    ? 'lg:grid-cols-2 gap-8 lg:gap-12 items-center' :
         isCentered ? 'max-w-3xl mx-auto text-center' :
@@ -25,9 +25,9 @@ export default async function HeroSection() {
 
         {/* RIGHT: game demo — below copy on mobile, alongside on desktop */}
         {!isCentered && (
-          <div className="order-2 lg:pl-4 mt-6 lg:mt-0">
+          <div className="order-2 lg:pl-4 mt-3 lg:mt-0">
             <Suspense fallback={
-              <div className="rounded-2xl h-56 animate-pulse" style={{ border: '1px solid #e2e8f0', background: '#f1f5f9' }} />
+              <div className="rounded-2xl h-56 animate-pulse" style={{ border: '1px solid #2b2f55', background: '#14172f' }} />
             }>
               <HeroDemo />
             </Suspense>

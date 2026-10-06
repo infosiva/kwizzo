@@ -1,7 +1,7 @@
 'use client'
 import Link from "next/link";
 
-const ACCENT = '#3b82f6'
+const ACCENT = '#e8404f'
 
 interface FooterLink {
   label: string;
@@ -37,19 +37,19 @@ export default function Footer({
   return (
     <footer
       className={`w-full mt-auto ${className}`}
-      style={{ borderTop: '1px solid #e2e8f0', background: '#fff' }}
+      style={{ borderTop: '1px solid #2b2f55', background: '#101026' }}
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
             {(icon || siteName) && (
               <div className="flex items-center gap-2 mb-1.5">
                 {icon && <span className="text-xl">{icon}</span>}
-                <span className="font-black text-sm" style={{ color: '#0f172a' }}>{siteName}</span>
+                <span className="font-black text-sm" style={{ color: '#f1f5f9' }}>{siteName}</span>
               </div>
             )}
             {tagline && (
-              <p className="text-xs max-w-xs" style={{ color: '#94a3b8' }}>{tagline}</p>
+              <p className="text-xs max-w-xs" style={{ color: '#a8b3c7' }}>{tagline}</p>
             )}
           </div>
 
@@ -59,9 +59,9 @@ export default function Footer({
                 key={link.href}
                 href={link.href}
                 className="transition-colors duration-150"
-                style={{ color: '#64748b' }}
+                style={{ color: '#a8b3c7' }}
                 onMouseEnter={e => (e.currentTarget.style.color = ACCENT)}
-                onMouseLeave={e => (e.currentTarget.style.color = '#64748b')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#a8b3c7')}
               >
                 {link.label}
               </Link>
@@ -70,8 +70,8 @@ export default function Footer({
         </div>
 
         <div
-          className="mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs"
-          style={{ borderTop: '1px solid #f1f5f9', color: '#94a3b8' }}
+          className="mt-3 pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs"
+          style={{ borderTop: '1px solid #2b2f55', color: '#a8b3c7' }}
         >
           <span>© {year} {siteName}. All rights reserved.</span>
           <span className="flex items-center gap-1.5">

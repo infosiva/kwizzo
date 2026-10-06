@@ -3,19 +3,19 @@ import Link from 'next/link'
 import type { ContentOverrides } from '@/lib/content'
 import { MagneticButton } from "@infosiva/shared-ui/modern";
 
-const ACCENT = '#3b82f6'
-const ACCENT_LIGHT = '#60a5fa'
+const ACCENT = '#e8404f'
+const ACCENT_LIGHT = '#ff7a85'
 
 export default function HeroClient({ overrides = {} }: { overrides?: ContentOverrides }) {
   return (
-    <div className="flex flex-col gap-5 hero-left">
+    <div className="flex flex-col gap-3 hero-left">
       {/* Badge */}
       <div style={{ animationDelay: '0ms' }} className="hero-entry">
         <span
           className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest"
           style={{
-            background: 'rgba(59,130,246,0.12)',
-            border: '1px solid rgba(59,130,246,0.40)',
+            background: 'rgba(232,64,79,0.12)',
+            border: '1px solid rgba(232,64,79,0.40)',
             color: '#93c5fd',
           }}
         >
@@ -41,7 +41,7 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
 
       {/* Subtext */}
       <div style={{ animationDelay: '120ms' }} className="hero-entry">
-        <p className="text-base sm:text-lg leading-relaxed max-w-md" style={{ color: '#94a3b8' }}>
+        <p className="text-base sm:text-lg leading-relaxed max-w-md" style={{ color: '#a8b3c7' }}>
           AI generates questions from any topic — share async or live, get per-question drop-off insights.
         </p>
       </div>
@@ -52,15 +52,15 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
           <input
             type="text"
             placeholder="Enter any topic — History, Science, React hooks..."
-            className="w-full rounded-xl px-4 py-3.5 text-sm font-medium outline-none transition-all duration-150"
+            className="w-full rounded-xl px-4 py-3 text-sm font-medium outline-none transition-all duration-150"
             style={{
               background: '#181c3a',
               border: '1.5px solid #2b2f55',
               color: '#f1f5f9',
             }}
             onFocus={e => {
-              e.currentTarget.style.borderColor = 'rgba(59,130,246,0.6)'
-              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(59,130,246,0.15)'
+              e.currentTarget.style.borderColor = 'rgba(232,64,79,0.6)'
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(232,64,79,0.15)'
             }}
             onBlur={e => {
               e.currentTarget.style.borderColor = '#2b2f55'
@@ -69,7 +69,7 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
           />
           <span
             className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold px-2 py-0.5 rounded-md"
-            style={{ background: 'rgba(59,130,246,0.22)', color: '#dbeafe' }}
+            style={{ background: 'rgba(232,64,79,0.22)', color: '#dbeafe' }}
           >
             ⚡ AI
           </span>
@@ -81,10 +81,10 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
         <Link href="/play?mode=solo" className="inline-flex">
           <MagneticButton
             tabIndex={-1}
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl font-black text-base text-white"
+            className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-xl font-black text-base text-white"
             style={{
-              background: `linear-gradient(135deg, ${ACCENT}, #60a5fa)`,
-              boxShadow: `0 4px 20px rgba(59,130,246,0.35)`,
+              background: `linear-gradient(135deg, ${ACCENT}, #ff7a85)`,
+              boxShadow: `0 4px 20px rgba(232,64,79,0.35)`,
             }}
           >
             Play Free Tonight →
@@ -92,14 +92,14 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
         </Link>
         <Link
           href="/play?mode=group"
-          className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-sm active:scale-[0.97] transition-transform duration-100"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm active:scale-[0.97] transition-transform duration-100"
           style={{
-            background: '#fff',
-            border: '1.5px solid #e2e8f0',
-            color: '#475569',
+            background: '#181c3a',
+            border: '1.5px solid #2b2f55',
+            color: '#cbd5e1',
           }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(59,130,246,0.4)'; (e.currentTarget as HTMLElement).style.color = ACCENT }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#e2e8f0'; (e.currentTarget as HTMLElement).style.color = '#475569' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(232,64,79,0.4)'; (e.currentTarget as HTMLElement).style.color = ACCENT }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#2b2f55'; (e.currentTarget as HTMLElement).style.color = '#cbd5e1' }}
         >
           👨‍👩‍👧 Family Mode
         </Link>
@@ -108,9 +108,9 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
       {/* Live mini-info */}
       <div style={{ animationDelay: '300ms' }} className="hero-entry flex items-center gap-3">
         <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-        <span className="text-xs" style={{ color: '#94a3b8' }}>Free to play · no account needed</span>
+        <span className="text-xs" style={{ color: '#a8b3c7' }}>Free to play · no account needed</span>
         <span style={{ color: '#cbd5e1' }}>·</span>
-        <span className="text-xs" style={{ color: '#94a3b8' }}>🎮 Solo or multiplayer</span>
+        <span className="text-xs" style={{ color: '#a8b3c7' }}>🎮 Solo or multiplayer</span>
       </div>
     </div>
   )
