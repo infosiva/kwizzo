@@ -82,7 +82,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   strategy="afterInteractive"
                 />
         <style dangerouslySetInnerHTML={{ __html: themeCSS }} />
-      {buildGa4Snippet(theme) && <script dangerouslySetInnerHTML={{ __html: buildGa4Snippet(theme) }} />}
+      {buildGa4Snippet(theme) ? <script dangerouslySetInnerHTML={{ __html: buildGa4Snippet(theme) }} /> : null}
       </head>
       <body className={`${inter.variable} ${nunito.variable} min-h-full flex flex-col`}
         style={{
