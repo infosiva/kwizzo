@@ -91,7 +91,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           fontFamily: 'var(--font-body, system-ui)',
         }}
       >
-        <AnimatedBg theme={theme} fallback="none" />
+        <AnimatedBg theme={theme} fallback="aurora" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebApplication",

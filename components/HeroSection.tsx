@@ -25,7 +25,7 @@ export default async function HeroSection() {
 
         {/* RIGHT: game demo — below copy on mobile, alongside on desktop */}
         {!isCentered && (
-          <div className="order-2 lg:pl-4 mt-3 lg:mt-0">
+          <div className="order-2 lg:pl-4 mt-3 lg:mt-0 kw-demo-wrap">
             <Suspense fallback={
               <div className="rounded-2xl h-56 animate-pulse" style={{ border: '1px solid #2b2f55', background: '#14172f' }} />
             }>
