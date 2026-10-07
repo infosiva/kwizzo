@@ -48,8 +48,8 @@ export default function HeroClient({ overrides = {} }: { overrides?: ContentOver
         <div className="relative max-w-md">
           <input
             type="text"
-            placeholder="Enter any topic — History, Science, React hooks..."
-            className="w-full rounded-xl px-4 min-h-[48px] text-base sm:text-sm font-medium outline-none transition-all duration-150"
+            placeholder="Any topic: History, Science..."
+            className="w-full rounded-xl pl-4 pr-14 min-h-[48px] text-base sm:text-sm font-medium outline-none transition-all duration-150"
             style={{
               background: '#181c3a',
               border: '1.5px solid #2b2f55',
