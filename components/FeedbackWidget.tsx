@@ -5,7 +5,7 @@
  *
  * Usage:
  *   import FeedbackWidget from '@/components/FeedbackWidget'
- *   <FeedbackWidget siteName="Kwizzo" accentColor="#7c3aed" />
+ *   <FeedbackWidget siteName="Kwizzo" accentColor="#e8404f" />
  *
  * Requires:
  *   POST /api/feedback  — receives { type, rating, message, email?, page, site }
@@ -19,7 +19,7 @@ const FEEDBACK_TYPES = ['General', 'Bug Report', 'Feature Request', 'Content Iss
 
 interface Props {
   siteName: string
-  /** Main accent gradient start colour, e.g. '#7c3aed'. Defaults to amber. */
+  /** Main accent gradient start colour, e.g. '#e8404f'. Defaults to amber. */
   accentColor?: string
   /** Secondary accent colour. Defaults to rose/red. */
   accentColor2?: string
@@ -33,7 +33,7 @@ interface Props {
 
 export default function FeedbackWidget({
   siteName,
-  accentColor  = '#3b82f6',
+  accentColor  = '#e8404f',
   accentColor2 = '#ef4444',
   apiEndpoint  = '/api/feedback',
   offset       = 24,
@@ -209,14 +209,14 @@ export default function FeedbackWidget({
                     >
                       <Star style={{
                         width: 26, height: 26,
-                        color: n <= (hover || rating) ? '#3b82f6' : 'rgba(255,255,255,0.15)',
-                        fill:  n <= (hover || rating) ? '#3b82f6' : 'transparent',
+                        color: n <= (hover || rating) ? '#e8404f' : 'rgba(255,255,255,0.15)',
+                        fill:  n <= (hover || rating) ? '#e8404f' : 'transparent',
                         transition: 'color 0.1s, fill 0.1s',
                       }} />
                     </button>
                   ))}
                   {rating > 0 && (
-                    <span style={{ marginLeft: 8, color: '#3b82f6', fontSize: 12, fontWeight: 700 }}>
+                    <span style={{ marginLeft: 8, color: '#e8404f', fontSize: 12, fontWeight: 700 }}>
                       {['','Poor','Fair','Good','Great','Excellent'][rating]}
                     </span>
                   )}

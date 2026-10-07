@@ -23,7 +23,7 @@ const TABS: { id: Tab; label: string; icon: string }[] = [
 ]
 
 const THEME_COLORS = [
-  { name: 'violet',  hex: '#7c3aed', label: 'Violet'  },
+  { name: 'violet',  hex: '#e8404f', label: 'Violet'  },
   { name: 'emerald', hex: '#059669', label: 'Emerald' },
   { name: 'blue',    hex: '#2563eb', label: 'Blue'    },
   { name: 'cyan',    hex: '#0891b2', label: 'Cyan'    },
@@ -404,7 +404,7 @@ function AppearanceEditor() {
               className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${
                 saved ? 'bg-green-600 text-white' : 'text-white disabled:opacity-60'
               }`}
-            style={!saved ? { background: 'linear-gradient(135deg, #3b82f6, #60a5fa)' } : {}}
+            style={!saved ? { background: 'linear-gradient(135deg, #e8404f, #ff7a85)' } : {}}
             >
               {saving ? 'Saving…' : saved ? '✓ Saved' : 'Save changes'}
             </button>

@@ -2,8 +2,8 @@
 // components/KwizzoMark.tsx — animated brand mark: quiz-card glyph with a checkmark
 // that draws itself in on mount, subtle scale+rotate on hover. Used in Navbar.
 
-const ACCENT = '#3b82f6'
-const ACCENT_LIGHT = '#60a5fa'
+const ACCENT = '#e8404f'
+const ACCENT_LIGHT = '#ff7a85'
 
 export default function KwizzoMark({ size = 32 }: { size?: number }) {
   return (
@@ -13,22 +13,17 @@ export default function KwizzoMark({ size = 32 }: { size?: number }) {
         width: size,
         height: size,
         background: `linear-gradient(135deg, ${ACCENT} 0%, ${ACCENT_LIGHT} 100%)`,
-        boxShadow: `0 2px 12px rgba(59,130,246,0.35)`,
+        boxShadow: `0 2px 12px rgba(232,64,79,0.35)`,
       }}
     >
-      <svg width={size * 0.62} height={size * 0.62} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Rounded quiz-card outline */}
-        <rect x="2" y="3" width="20" height="18" rx="4" stroke="white" strokeWidth="2" fill="none" />
-        {/* Checkmark that draws itself in */}
-        <path
-          className="kwizzo-mark-check"
-          d="M7 12.5l3 3 7-7"
-          stroke="white"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
+      <svg width={size * 0.7} height={size * 0.7} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* K whose lower arm ends in a question-mark dot */}
+        <g stroke="white" strokeWidth="8" strokeLinecap="round" fill="none">
+          <path d="M20 15v34" />
+          <path d="M22 35L41 16" />
+          <path className="kwizzo-mark-check" d="M29 31l9 10" />
+        </g>
+        <circle cx="46" cy="49" r="5" fill="#101026" />
       </svg>
       <style>{`
         .kwizzo-mark { transition: transform 200ms cubic-bezier(0.23,1,0.32,1); }

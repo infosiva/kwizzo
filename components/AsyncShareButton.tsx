@@ -55,14 +55,14 @@ export default function AsyncShareButton({ quizId, className = '' }: AsyncShareB
       style={{
         background: copied
           ? 'rgba(34,197,94,0.2)'
-          : 'rgba(139,92,246,0.85)',
+          : 'rgba(232,64,79,0.85)',
         border: copied
           ? '1px solid rgba(34,197,94,0.5)'
-          : '1px solid rgba(139,92,246,0.5)',
+          : '1px solid rgba(232,64,79,0.5)',
         color: copied ? '#86efac' : '#ffffff',
         boxShadow: copied
           ? '0 0 20px rgba(34,197,94,0.2)'
-          : '0 0 24px rgba(139,92,246,0.35)',
+          : '0 0 24px rgba(232,64,79,0.35)',
       }}
       aria-label={copied ? 'Link copied!' : 'Copy quiz link'}
     >

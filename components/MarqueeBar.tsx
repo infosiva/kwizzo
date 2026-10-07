@@ -3,7 +3,7 @@ import { siteConfig } from '@/site.config'
 
 const CHIP_COLORS = [
   { bg: '#fce7f3', border: 'rgba(219,39,119,0.3)', text: '#9d174d' },  // pink
-  { bg: '#dbeafe', border: 'rgba(59,130,246,0.3)', text: '#1e40af' },  // blue
+  { bg: '#dbeafe', border: 'rgba(232,64,79,0.3)', text: '#1e40af' },  // blue
   { bg: 'rgba(234,179,8,0.08)',  border: 'rgba(234,179,8,0.2)',  text: '#92400e' },  // amber
   { bg: 'rgba(34,197,94,0.08)',  border: 'rgba(34,197,94,0.2)',  text: '#065f46' },  // green
   { bg: 'rgba(249,115,22,0.08)', border: 'rgba(249,115,22,0.2)', text: '#9a3412' },  // orange

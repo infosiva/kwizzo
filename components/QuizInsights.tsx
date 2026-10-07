@@ -22,7 +22,7 @@ const MOCK_RESULTS: QuestionResult[] = [
 
 function getBarColor(pct: number): string {
   if (pct >= 60) return '#ef4444' // red — most struggled
-  if (pct >= 35) return '#3b82f6' // amber — some struggled
+  if (pct >= 35) return '#e8404f' // amber — some struggled
   return '#22c55e'                // green — mostly got it
 }
 
@@ -43,14 +43,14 @@ export default function QuizInsights({ results }: QuizInsightsProps) {
       transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
       className="mt-6 rounded-2xl overflow-hidden"
       style={{
-        background: 'rgba(139,92,246,0.06)',
-        border: '1px solid rgba(139,92,246,0.18)',
+        background: 'rgba(232,64,79,0.06)',
+        border: '1px solid rgba(232,64,79,0.18)',
       }}
     >
       {/* Header */}
       <div
         className="flex items-center justify-between px-4 py-3"
-        style={{ borderBottom: '1px solid rgba(139,92,246,0.1)' }}
+        style={{ borderBottom: '1px solid rgba(232,64,79,0.1)' }}
       >
         <div className="flex items-center gap-2">
           <span className="text-base">👇</span>
@@ -60,8 +60,8 @@ export default function QuizInsights({ results }: QuizInsightsProps) {
           <span
             className="text-[10px] font-bold px-2 py-0.5 rounded-full"
             style={{
-              background: 'rgba(139,92,246,0.15)',
-              border: '1px solid rgba(139,92,246,0.25)',
+              background: 'rgba(232,64,79,0.15)',
+              border: '1px solid rgba(232,64,79,0.25)',
               color: '#c4b5fd',
             }}
           >

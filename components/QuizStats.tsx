@@ -82,9 +82,9 @@ export default function QuizStats() {
   if (!mounted) return null
 
   const pills: StatPill[] = [
-    { icon: <Zap size={14} style={{ color: '#3b82f6' }} />,   label: 'Quizzes played',    value: stats.quizzes,   suffix: '' },
-    { icon: <HelpCircle size={14} style={{ color: '#60a5fa' }} />, label: 'Questions answered', value: stats.questions, suffix: '' },
-    { icon: <Share2 size={14} style={{ color: '#3b82f6' }} />, label: 'Shares sent',        value: stats.shares,    suffix: '' },
+    { icon: <Zap size={14} style={{ color: '#e8404f' }} />,   label: 'Quizzes played',    value: stats.quizzes,   suffix: '' },
+    { icon: <HelpCircle size={14} style={{ color: '#ff7a85' }} />, label: 'Questions answered', value: stats.questions, suffix: '' },
+    { icon: <Share2 size={14} style={{ color: '#e8404f' }} />, label: 'Shares sent',        value: stats.shares,    suffix: '' },
     ...(streaksOn && stats.streak > 0
       ? [{ icon: <Flame size={14} style={{ color: '#f59e0b' }} />, label: stats.streak === 1 ? 'Day streak' : 'Day streak', value: stats.streak, suffix: '' }]
       : []),
@@ -119,7 +119,7 @@ export default function QuizStats() {
                 {pill.icon}
                 <span
                   className="text-xl font-black tabular-nums"
-                  style={{ color: '#3b82f6' }}
+                  style={{ color: '#e8404f' }}
                 >
                   <AnimatedCount value={pill.value} />
                 </span>

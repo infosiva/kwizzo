@@ -111,6 +111,6 @@ SAFETY (non-negotiable): This platform is used by children, teenagers, and famil
     })
   } catch (err) {
     console.error('[/api/chat]', err)
-    return NextResponse.json({ error: 'Chat failed' }, { status: 500 })
+    return new NextResponse("KwizBot is taking a short break. Please try again in a minute!", { headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
   }
 }

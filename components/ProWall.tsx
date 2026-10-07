@@ -52,7 +52,7 @@ export default function ProWall({ questionsAnswered, playerName, score, onContin
         {/* Upgrade pitch */}
         <div
           className="rounded-2xl p-5 border"
-          style={{ borderColor: 'rgba(139,92,246,0.4)', background: 'rgba(139,92,246,0.08)' }}
+          style={{ borderColor: 'rgba(232,64,79,0.4)', background: 'rgba(232,64,79,0.08)' }}
         >
           <div className="flex items-center gap-2 mb-4">
             <Zap size={18} className={theme.textAccent} />

@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from 'react'
 
-const ACCENT = '#3b82f6'
+const ACCENT = '#e8404f'
 
 type Answer = { letter: string; text: string; pct: number; isCorrect: boolean }
 type Question = { topic: string; prompt: string; points: number; answers: Answer[] }
@@ -98,7 +98,7 @@ export default function HeroDemo() {
           <span
             key={question.topic}
             className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full hero-demo-fade"
-            style={{ background: '#dbeafe', border: '1px solid rgba(59,130,246,0.3)', color: '#1e40af' }}
+            style={{ background: '#dbeafe', border: '1px solid rgba(232,64,79,0.3)', color: '#1e40af' }}
           >
             ⚡ {question.topic}
           </span>

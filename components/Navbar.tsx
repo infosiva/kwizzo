@@ -6,8 +6,8 @@ import { useMagicAuth } from '@/lib/shared/useMagicAuth'
 import MagicAuthModal from '@/lib/shared/MagicAuthModal'
 import KwizzoMark from './KwizzoMark'
 
-const ACCENT = '#3b82f6'
-const ACCENT_LIGHT = '#60a5fa'
+const ACCENT = '#e8404f'
+const ACCENT_LIGHT = '#ff7a85'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
@@ -27,7 +27,7 @@ export default function Navbar() {
         }}
       >
         {/* Top accent line */}
-        <div style={{ height: 3, background: `linear-gradient(90deg, transparent, ${ACCENT} 30%, #60a5fa 60%, ${ACCENT} 80%, transparent)` }} />
+        <div style={{ height: 3, background: `linear-gradient(90deg, transparent, ${ACCENT} 30%, #ff7a85 60%, ${ACCENT} 80%, transparent)` }} />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
           {/* Logo */}
@@ -65,7 +65,7 @@ export default function Navbar() {
                 <Link
                   href="/dashboard"
                   className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-                  style={{ color: '#fff', border: `1px solid rgba(59,130,246,0.4)`, background: 'rgba(59,130,246,0.18)' }}
+                  style={{ color: '#fff', border: `1px solid rgba(232,64,79,0.4)`, background: 'rgba(232,64,79,0.18)' }}
                 >
                   Dashboard
                 </Link>
@@ -91,11 +91,11 @@ export default function Navbar() {
               href="/play?mode=solo"
               className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl text-sm font-black text-white transition-all duration-150 active:scale-[0.97]"
               style={{
-                background: `linear-gradient(135deg, ${ACCENT}, #60a5fa)`,
-                boxShadow: `0 4px 14px rgba(59,130,246,0.35)`,
+                background: `linear-gradient(135deg, ${ACCENT}, #ff7a85)`,
+                boxShadow: `0 4px 14px rgba(232,64,79,0.35)`,
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; (e.currentTarget as HTMLElement).style.boxShadow = `0 6px 20px rgba(59,130,246,0.45)` }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 14px rgba(59,130,246,0.35)` }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; (e.currentTarget as HTMLElement).style.boxShadow = `0 6px 20px rgba(232,64,79,0.45)` }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 14px rgba(232,64,79,0.35)` }}
             >
               <Zap size={14} strokeWidth={3} />
               Play Free
@@ -149,7 +149,7 @@ export default function Navbar() {
               <button
                 onClick={() => { setAuthOpen(true); setOpen(false) }}
                 className="text-center py-2.5 rounded-xl text-sm font-semibold"
-                style={{ border: `1px solid rgba(59,130,246,0.4)`, color: '#fff', background: 'rgba(59,130,246,0.20)' }}
+                style={{ border: `1px solid rgba(232,64,79,0.4)`, color: '#fff', background: 'rgba(232,64,79,0.20)' }}
               >
                 Sign in free
               </button>
@@ -158,7 +158,7 @@ export default function Navbar() {
             <Link
               href="/play?mode=solo"
               className="text-center py-3.5 rounded-xl font-black text-white text-base active:scale-[0.97] transition-transform"
-              style={{ background: `linear-gradient(135deg, ${ACCENT}, #60a5fa)` }}
+              style={{ background: `linear-gradient(135deg, ${ACCENT}, #ff7a85)` }}
               onClick={() => setOpen(false)}
             >
               🎮 Play Free Now

@@ -85,8 +85,8 @@ function ShareQuizLink({ roomCode, topic }: { roomCode: string; topic: string })
     <div
       className="flex items-center gap-3 rounded-2xl px-4 py-3 fade-up"
       style={{
-        background: 'rgba(139,92,246,0.08)',
-        border: '1px solid rgba(139,92,246,0.22)',
+        background: 'rgba(232,64,79,0.08)',
+        border: '1px solid rgba(232,64,79,0.22)',
       }}
     >
       <Link2 size={16} className="text-violet-400 shrink-0" />
@@ -100,8 +100,8 @@ function ShareQuizLink({ roomCode, topic }: { roomCode: string; topic: string })
         onClick={copyLink}
         className="shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
         style={{
-          background: copied ? 'rgba(34,197,94,0.15)' : 'rgba(139,92,246,0.18)',
-          border: copied ? '1px solid rgba(34,197,94,0.35)' : '1px solid rgba(139,92,246,0.35)',
+          background: copied ? 'rgba(34,197,94,0.15)' : 'rgba(232,64,79,0.18)',
+          border: copied ? '1px solid rgba(34,197,94,0.35)' : '1px solid rgba(232,64,79,0.35)',
           color: copied ? '#86efac' : '#c4b5fd',
         }}
       >
@@ -132,8 +132,8 @@ function ShareScoreButton({ correct, total, topic }: { correct: number; total: n
       onClick={shareScore}
       className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all"
       style={{
-        background: copied ? 'rgba(34,197,94,0.15)' : 'rgba(139,92,246,0.12)',
-        border: copied ? '1px solid rgba(34,197,94,0.35)' : '1px solid rgba(139,92,246,0.28)',
+        background: copied ? 'rgba(34,197,94,0.15)' : 'rgba(232,64,79,0.12)',
+        border: copied ? '1px solid rgba(34,197,94,0.35)' : '1px solid rgba(232,64,79,0.28)',
         color: copied ? '#86efac' : '#c4b5fd',
       }}
     >
@@ -494,7 +494,7 @@ function QuizContent() {
             {/* Fun fact to fill wait time */}
             <div
               className="max-w-xs rounded-2xl px-5 py-4 fade-up"
-              style={{ background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.18)' }}
+              style={{ background: 'rgba(232,64,79,0.07)', border: '1px solid rgba(232,64,79,0.18)' }}
             >
               <p className="text-violet-400 text-[10px] font-bold uppercase tracking-widest mb-1.5">Did you know?</p>
               <p className="text-white/60 text-sm leading-relaxed">{loadingTip}</p>
@@ -568,7 +568,7 @@ function QuizContent() {
           <div
             className="text-8xl font-black mb-1 tabular-nums"
             style={{
-              background: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)',
+              background: 'linear-gradient(135deg, #ff7a85 0%, #e8404f 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}
@@ -611,9 +611,9 @@ function QuizContent() {
                     className={`w-full ${heights[rank as 0 | 1 | 2]} rounded-t-xl flex items-start justify-center pt-2`}
                     style={{
                       background: rank === 0
-                        ? 'linear-gradient(180deg, rgba(59,130,246,0.35), rgba(59,130,246,0.12))'
+                        ? 'linear-gradient(180deg, rgba(232,64,79,0.35), rgba(232,64,79,0.12))'
                         : 'rgba(255,255,255,0.06)',
-                      border: rank === 0 ? '1px solid rgba(59,130,246,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                      border: rank === 0 ? '1px solid rgba(232,64,79,0.4)' : '1px solid rgba(255,255,255,0.08)',
                     }}
                   >
                     <span className="text-white/40 text-xs font-bold">{rank + 1}</span>
@@ -747,7 +747,7 @@ function QuizContent() {
             <button
               onClick={() => { setVoiceOn(v => !v); if (voiceOn) cancelVoice() }}
               className="p-1.5 rounded-lg transition-colors"
-              style={{ background: voiceOn ? 'rgba(139,92,246,0.15)' : 'rgba(255,255,255,0.04)', color: voiceOn ? '#a78bfa' : 'rgba(255,255,255,0.2)' }}
+              style={{ background: voiceOn ? 'rgba(232,64,79,0.15)' : 'rgba(255,255,255,0.04)', color: voiceOn ? '#ff7a85' : 'rgba(255,255,255,0.2)' }}
               title={voiceOn ? 'Mute voice' : 'Enable voice'}
             >
               {voiceOn ? <Volume2 size={14} /> : <VolumeX size={14} />}

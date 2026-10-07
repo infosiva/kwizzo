@@ -18,7 +18,7 @@ export default function NotFound() {
         style={{
           fontSize: 64,
           fontWeight: 900,
-          background: 'linear-gradient(135deg, #3b82f6, #60a5fa)',
+          background: 'linear-gradient(135deg, #e8404f, #ff7a85)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text',
@@ -39,12 +39,12 @@ export default function NotFound() {
           marginTop: 8,
           padding: '12px 28px',
           borderRadius: 12,
-          background: 'rgba(59,130,246,0.15)',
+          background: 'rgba(232,64,79,0.15)',
           color: '#b45309',
           fontWeight: 800,
           fontSize: 14,
           textDecoration: 'none',
-          border: '1px solid rgba(59,130,246,0.25)',
+          border: '1px solid rgba(232,64,79,0.25)',
         }}
       >
         Go home →

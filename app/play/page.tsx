@@ -422,7 +422,7 @@ function PlayContent() {
           freeLimit={3}
           freeFeature="game rounds"
           lockedFeature="unlimited games, tournaments & leaderboards"
-          accentColor="#7c3aed"
+          accentColor="#e8404f"
           site="kwizzo"
           onSuccess={onRegistered}
           onDismiss={dismissGate}
