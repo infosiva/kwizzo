@@ -17,6 +17,7 @@ import CookieConsent from "../components/CookieConsent"
 import Footer from "../components/Footer"
 import { loadSiteTheme, buildThemeStyleTag, buildGa4Snippet, isWidgetHidden } from '@/lib/theme-loader'
 
+import { AnimatedBg } from "@/components/AnimatedBg"
 import { MotionProvider } from "@infosiva/shared-ui/modern";
 const inter = Inter({ subsets: ['latin'], variable: '--font-body' })
 
@@ -90,6 +91,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           fontFamily: 'var(--font-body, system-ui)',
         }}
       >
+        <AnimatedBg theme={theme} fallback="none" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebApplication",

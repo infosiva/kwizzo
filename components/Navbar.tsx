@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Menu, X, Zap } from 'lucide-react'
 import { useMagicAuth } from '@/lib/shared/useMagicAuth'
 import MagicAuthModal from '@/lib/shared/MagicAuthModal'
-import KwizzoMark from './KwizzoMark'
+import { Logo } from './Logo'
 
 const ACCENT = '#e8404f'
 const ACCENT_LIGHT = '#ff7a85'
@@ -32,10 +32,7 @@ export default function Navbar() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <KwizzoMark size={32} />
-            <span className="font-black text-lg tracking-tight" style={{ color: '#f1f5f9' }}>
-              Kwi<span style={{ color: ACCENT_LIGHT }}>zzo</span>
-            </span>
+            <Logo />
           </Link>
 
           {/* Desktop nav links */}
