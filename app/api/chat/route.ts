@@ -1,3 +1,4 @@
+import { sanitizeUserInput } from '@/lib/guard'
 import Groq from 'groq-sdk'
 import { NextRequest, NextResponse } from 'next/server'
 import { reportToTaskFlow } from '@/lib/reportToTaskFlow'
@@ -26,6 +27,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json()
+    if (body && Array.isArray(body.messages)) for (const m of body.messages) if (m && typeof m.content === 'string') m.content = sanitizeUserInput(m.content).text
+    if (body && typeof body.message === 'string') body.message = sanitizeUserInput(body.message).text
 
     // Support both widget format {messages, systemPrompt} and legacy {messages}
     const messages: Message[] = body.messages
