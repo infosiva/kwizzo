@@ -8,3 +8,11 @@ Source of truth: `agents/design-system` (MASTER.md). This file is the project po
 
 ## AI platform (ai-core) status
 Not on ai-core yet (honest gap): quiz generation and chat use the local free chain (`lib/ai.ts`). No document upload/RAG/memory in scope; exempt until such a feature exists.
+
+
+## ANIMATED SCOPE (recorded 2026-10-09 sweep)
+- What moves: CSS keyframes already shipped: badge-glow, barFill, bgGradientShift, blink, bounceIn, confettiSpin, cta-pulse, ds-float, ds-shift, fade-in-opacity, fadeSlideIn, fadeUp.
+- Why: ambient background + entry/press feedback on the product's core action; no motion carries information alone.
+- Trigger: page load (ambient/entry), user press/hover (feedback).
+- Reduced-motion: `prefers-reduced-motion` handling present in the project's styles (verified by scan 2026-10-09).
+- Still open: `/review-animations` run (needs a running app, one at a time).
