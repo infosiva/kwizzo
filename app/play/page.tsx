@@ -106,7 +106,8 @@ function PlayContent() {
     if (gameType === 'draw' && valid.length < 2) {
       setError('Draw & Guess needs at least 2 players.'); return
     }
-    const allowed = await gateIncrement()
+    // fail-open after 3s: gate backend (VPS :3110) down must not block play
+    const allowed = await Promise.race([gateIncrement(), new Promise<boolean>(r => setTimeout(() => r(true), 3000))])
     if (!allowed) return
     setCreating(true)
     try {
