@@ -15,7 +15,7 @@ import FeedbackWidget from '@/components/FeedbackWidget'
 import BackToTop from '@/components/BackToTop'
 import CookieConsent from "../components/CookieConsent"
 import Footer from "../components/Footer"
-import { loadSiteTheme, buildThemeStyleTag, buildGa4Snippet, isWidgetHidden } from '@/lib/theme-loader'
+import { loadSiteTheme, buildThemeStyleTag, buildGa4Snippet, resolveGa4Id, isWidgetHidden } from '@/lib/theme-loader'
 
 import { AnimatedBg } from "@/components/AnimatedBg"
 import { MotionProvider } from "@infosiva/shared-ui/modern";
@@ -82,6 +82,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   strategy="afterInteractive"
                 />
         <style dangerouslySetInnerHTML={{ __html: themeCSS }} />
+      {buildGa4Snippet(theme) ? <script async src={`https://www.googletagmanager.com/gtag/js?id=${resolveGa4Id(theme)}`} /> : null}
       {buildGa4Snippet(theme) ? <script dangerouslySetInnerHTML={{ __html: buildGa4Snippet(theme) }} /> : null}
       </head>
       <body className={`${inter.variable} ${nunito.variable} min-h-full flex flex-col`}
